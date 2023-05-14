@@ -1,4 +1,4 @@
-import { getDroppedAssetDetails } from "../getDetails";
+import { getDroppedAssetDetails } from "../getDetails.js";
 
 /*
 {

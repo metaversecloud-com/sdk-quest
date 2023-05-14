@@ -16,9 +16,10 @@ import {
   updateLastVisited,
   updateVisitorDataObject,
   // WORLD CLASS
-  getWorldDetails,
   getWorldDataObject,
+  getWorldDetails,
   updateWorldDataObject,
+  updateWorldDetails,
 } from "./utils/index.js";
 
 import express from "express";
@@ -54,7 +55,8 @@ router.put("/visitor/data", updateVisitorDataObject); // { dataObject: object }
 
 // World
 // urlSlug comes from interactive nonce
-router.get("/world/", getWorldDetails); // { includeDataObject: boolean }
+router.get("/world", getWorldDetails); // { includeDataObject: boolean }
+router.put("/world", updateWorldDetails); // See file for inputs
 router.get("/world/data-object", getWorldDataObject); // Does not include world details
 router.put("/world/data-object", updateWorldDataObject); // { dataObject: object }
 
