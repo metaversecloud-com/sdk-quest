@@ -3,6 +3,8 @@ import error from "../errors.js";
 
 export const removeDroppedAssetsUniqueName = async (req, res) => {
   const droppedAssets = await fetchDroppedAssetsUniqueName(req);
+  if (!droppedAssets) throw "No dropped assets found";
+  if (droppedAssets.error) throw droppedAssets.error;
   if (droppedAssets && droppedAssets.length) {
     droppedAssets.forEach((droppedAsset) => {
       try {

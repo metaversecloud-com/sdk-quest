@@ -1,1 +1,3 @@
-export { getVisitor, updateLastVisited, updateVisitorDataObject } from "./visitor.js";
+export * from "./visitor.js";
+export * from "./visitorUI.js";
+export * from "./dataObject.js";

@@ -3,8 +3,11 @@ import {
   dropAsset,
   fetchDroppedAssetsUniqueName,
   getDroppedAssetDetails,
+  getEmbeddedAssetDetails,
   removeDroppedAssetsUniqueName,
   removeDroppedAsset,
+  updateClickType,
+  updatePosition,
   // USER CLASS
   getUser,
   updateUserDataObject,
@@ -26,12 +29,18 @@ router.get("/", (req, res) => {
 });
 
 // Dropped Asset
-// assetId comes from interactive nonce
-router.get("/dropped-asset", getDroppedAssetDetails); // { includeDataObject: boolean }
-router.get("/dropped-asset/fetchWithUniqueName", fetchDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
+// Get details of droppedAsset that opened iFrame or fired webhook. assetId comes from interactive nonce.
+router.get("/dropped-asset", getEmbeddedAssetDetails); // { includeDataObject: boolean }
+// Gets all dropped assets with unique name
+router.get("/dropped-asset/uniqueNameSearch", fetchDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
 router.post("/dropped-asset", dropAsset); // { id: string, isInteractive: boolean, position: {x: number, y: number }, uniqueName: string }
 router.post("/dropped-asset/removeAllWithUniqueName", removeDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
+
+// Dropped Asset Instance
+router.get("/dropped-asset/:instanceId", getDroppedAssetDetails); // { includeDataObject: boolean }
 router.delete("/dropped-asset/:instanceId", removeDroppedAsset);
+router.put("/dropped-asset/:instanceId/updateClickType", updateClickType); // See file for inputs
+router.put("/dropped-asset/:instanceId/updatePosition", updatePosition); // { position: {x, y} }
 
 // User
 router.get("/user/:profileId", getUser);

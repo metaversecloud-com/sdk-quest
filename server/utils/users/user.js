@@ -27,3 +27,18 @@ export const updateUserDataObject = async (req, res) => {
     error("Updating user object", e, res);
   }
 };
+
+export const incrementUserDataObjectValue = async (req, res) => {
+  const { path, amount } = req.body;
+  const { profileId } = req.params;
+  try {
+    const user = await User.create({ profileId });
+    // Can also pass in a lock object as third argument of type
+    // { lockId: string, releaseLock?: boolean }
+    await user.incrementDataObjectValue(path, amount);
+    if (res) res.json({ user, success: true });
+    return user;
+  } catch (e) {
+    error("Incrementing user data object", e, res);
+  }
+};

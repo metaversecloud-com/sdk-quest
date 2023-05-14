@@ -8,7 +8,7 @@ export const dropAsset = async (req, res) => {
   try {
     const droppedAsset = await createAsset({
       id,
-      isInteractive,
+      isInteractive, // Makes it so interactive credentials are passed into iFrame and/or webhook payloads.
       req,
       position: {
         x: position ? position.x : 0,
