@@ -1,12 +1,14 @@
 import { World } from "../topiaInit.js";
+import error from "../errors.js";
 
-export const getWorldDetails = async (urlSlug) => {
+export const getWorldDetails = async (req, res) => {
   try {
-    const world = World.create(urlSlug);
-    await world.fetchDetails();
-    res.json({ success: true, world });
+    const { urlSlug } = req.query;
+    const { includeDataObject } = req.body;
+    const world = World.create(urlSlug, { credentials: req.query });
+    if (includeDataObject) await world.fetchDataObject();
+    res.json({ world, success: true });
   } catch (error) {
-    console.log("Error getting world details", error);
-    res.status(500).send({ error, success: false });
+    error("Error getting world details", error, res);
   }
 };

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { Topia, DroppedAssetFactory, WorldFactory } from "@rtsdk/topia";
+import { Topia, AssetFactory, DroppedAssetFactory, UserFactory, VisitorFactory, WorldFactory } from "@rtsdk/topia";
 
 const config = {
   apiDomain: process.env.INSTANCE_DOMAIN || "api-stage.topia.io",
@@ -13,7 +13,10 @@ const config = {
 
 const myTopiaInstance = await new Topia(config);
 
+const Asset = new AssetFactory(myTopiaInstance);
 const DroppedAsset = new DroppedAssetFactory(myTopiaInstance);
+const User = new UserFactory(myTopiaInstance);
+const Visitor = new VisitorFactory(myTopiaInstance);
 const World = new WorldFactory(myTopiaInstance);
 
-export { DroppedAsset, myTopiaInstance, World };
+export { Asset, DroppedAsset, myTopiaInstance, User, Visitor, World };

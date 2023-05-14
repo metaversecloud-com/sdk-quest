@@ -1,8 +1,10 @@
 import { DroppedAsset } from "../topiaInit.js";
+import error from "../errors.js";
 
 export const getDroppedAssetDetails = async (req, res) => {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { includeDataObject } = req.body;
     const droppedAsset = await DroppedAsset.get(assetId, urlSlug, {
       credentials: {
         assetId,
@@ -11,9 +13,9 @@ export const getDroppedAssetDetails = async (req, res) => {
         visitorId,
       },
     });
+    if (includeDataObject) await droppedAsset.fetchDataObject();
     res.json({ droppedAsset, success: true });
-  } catch (error) {
-    console.log("Error getting asset and data object", error);
-    res.status(500).send({ error, success: false });
+  } catch (e) {
+    error("Getting asset and data object", e, res);
   }
 };
