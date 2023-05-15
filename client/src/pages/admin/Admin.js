@@ -44,7 +44,6 @@ export function Admin() {
         },
         uniqueName: eggUniqueName,
       });
-      console.log(result);
       if (result.data.success) {
         getDroppedEggs();
         // setDroppedEggs({ ...droppedEggs, ...result.data.droppedAsset });

@@ -1,1 +1,1 @@
-export * from "egg.js";
+export * from "./egg.js";

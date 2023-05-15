@@ -24,6 +24,8 @@ import {
   updateWorldDetails,
 } from "./utils/index.js";
 
+import { createEgg } from "./egg-hunter/index.js";
+
 import express from "express";
 const router = express.Router();
 
