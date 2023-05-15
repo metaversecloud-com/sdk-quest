@@ -6,6 +6,7 @@ export const getWorldDetails = async (req, res) => {
     const { urlSlug } = req.query;
     const { includeDataObject } = req.body;
     const world = World.create(urlSlug, { credentials: req.query });
+    await world.fetchDetails();
     if (includeDataObject) await world.fetchDataObject();
     res.json({ world, success: true });
   } catch (e) {
