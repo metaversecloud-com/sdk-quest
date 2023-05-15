@@ -1,5 +1,6 @@
 import { dropWebImageAsset } from "../utils/droppedAssets/index.js";
 import { getWorldDetails } from "../utils/world/index.js";
+import { getEmbeddedAssetDetails } from "../utils/droppedAssets/index.js";
 import error from "../utils/errors.js";
 
 export const createEgg = async (req, res) => {
@@ -12,7 +13,7 @@ export const createEgg = async (req, res) => {
       return { x, y };
     };
     const position = randomCoord(world.width, world.height);
-    const eggBody = { ...body, isInteractive: true, position };
+    const eggBody = { ...req.body, isInteractive: true, position };
 
     // Check if world already has an egg image set.
     const worldDataObject = world.dataObject;

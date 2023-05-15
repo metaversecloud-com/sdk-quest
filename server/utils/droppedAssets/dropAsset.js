@@ -65,6 +65,6 @@ export const createAsset = async ({ id, isInteractive, req, position, uniqueName
       });
     return droppedAsset;
   } catch (e) {
-    error("Creating asset", e, res);
+    error("Creating asset", e);
   }
 };
