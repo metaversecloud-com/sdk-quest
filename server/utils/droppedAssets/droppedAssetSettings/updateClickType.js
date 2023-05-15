@@ -1,4 +1,5 @@
 import { getDroppedAssetDetails } from "../getDetails.js";
+import error from "../../errors.js";
 
 /*
 {
