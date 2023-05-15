@@ -1,3 +1,4 @@
+import { getVisitor } from "./visitor.js";
 import error from "../errors.js";
 
 export const openIframe = async (req, res) => {
