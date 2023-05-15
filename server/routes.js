@@ -48,8 +48,8 @@ router.put("/dropped-asset/:instanceId/updateClickType", updateClickType); // Se
 router.put("/dropped-asset/:instanceId/updatePosition", updatePosition); // { position: {x, y} }
 
 // User
-router.get("/user/:profileId", getUser);
 router.put("/user/:profileId/data", updateUserDataObject); // { dataObject: object }
+router.get("/user/:profileId", getUser);
 
 // Visitor
 // visitorId comes from interactive nonce
@@ -60,9 +60,9 @@ router.put("/visitor/data", updateVisitorDataObject); // { dataObject: object }
 
 // World
 // urlSlug comes from interactive nonce
-router.get("/world", getWorldDetails); // { includeDataObject: boolean }
-router.put("/world", updateWorldDetails); // See file for inputs
 router.get("/world/data-object", getWorldDataObject); // Does not include world details
 router.put("/world/data-object", updateWorldDataObject); // { dataObject: object }
+router.get("/world", getWorldDetails); // { includeDataObject: boolean }
+router.put("/world", updateWorldDetails); // See file for inputs
 
 export default router;

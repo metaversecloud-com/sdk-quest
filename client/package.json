@@ -28,6 +28,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.5",
     "react-scripts": "4.0.3",
+    "react-virtualized": "^9.22.5",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {

@@ -8,7 +8,7 @@ import { Error, Home } from "@pages";
 import { backendAPI } from "@utils";
 
 // context
-import { setInteractiveParams, setVisitorInfo, useGlobalDispatch } from "@context";
+import { setInteractiveParams, setVisitorInfo, setWorldInfo, useGlobalDispatch } from "@context";
 import { setupBackendAPI } from "../utils/backendAPI";
 
 export function App() {
@@ -55,6 +55,23 @@ export function App() {
       }
     };
     getVisitor();
+  }, [globalDispatch]);
+
+  // Get Visitor info
+  useEffect(() => {
+    const getWorld = async () => {
+      const result = await backendAPI.get("/world");
+      if (result.data.success) {
+        console.log(result.data.world);
+        setWorldInfo({
+          dispatch: globalDispatch,
+          world: result.data.world,
+        });
+      } else {
+        console.log("Error getting world");
+      }
+    };
+    getWorld();
   }, [globalDispatch]);
 
   return (

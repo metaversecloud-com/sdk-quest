@@ -23,6 +23,11 @@ function globalReducer(state, action) {
         ...state,
         visitor: action.payload.visitor,
       };
+    case "SET_WORLD_INFO":
+      return {
+        ...state,
+        visitor: action.payload.world,
+      };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -83,6 +88,15 @@ function setVisitorInfo({ dispatch, visitor }) {
   });
 }
 
+function setWorldInfo({ dispatch, world }) {
+  dispatch({
+    type: "SET_WORLD_INFO",
+    payload: {
+      world,
+    },
+  });
+}
+
 // // eslint-disable-next-line no-unused-vars
 // async function fetchWorld({ apiKey, dispatch, urlSlug }) {
 //   if (!apiKey || !urlSlug) return;
@@ -105,4 +119,4 @@ function setVisitorInfo({ dispatch, visitor }) {
 //   }
 // }
 
-export { GlobalProvider, setInteractiveParams, setVisitorInfo, useGlobalState, useGlobalDispatch };
+export { GlobalProvider, setInteractiveParams, setVisitorInfo, setWorldInfo, useGlobalState, useGlobalDispatch };

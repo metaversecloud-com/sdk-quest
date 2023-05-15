@@ -1,36 +1,91 @@
-import React, {
-  // useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 
 // components
-import { Button, Grid, Typography } from "@mui/material";
+import { Grid, ListItem, ListItemText, Typography } from "@mui/material";
+
+// React virtualized for infinite scroll
+import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from "react-virtualized";
 
 // context
 import { useGlobalState } from "@context";
 
 // utils
-// import { backendAPI } from "@utils";
+import { backendAPI } from "@utils";
+
+const cache = new CellMeasurerCache({
+  fixedWidth: true,
+  defaultHeight: 100,
+});
 
 export function Leaderboard() {
-  const [position, setPosition] = useState(0);
-
   const {
     // hasInteractiveParams,
     visitor,
+    world,
   } = useGlobalState();
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  // const [hasMore, setHasMore] = useState(true);
 
-  // // Get dropped eggs info
-  // useEffect(() => {
-  //   if (hasInteractiveParams) getDroppedEggs();
-  // }, [hasInteractiveParams]);
+  useEffect(() => {
+    fetchMoreData();
+  }, []);
+
+  const fetchMoreData = async () => {
+    try {
+      const result = await backendAPI.get("/world/data-object");
+      if (result.data.success) {
+        setLeaderboardData((prevData) => [...prevData, ...result.data.dataObject.leaderboard]);
+      } else return console.log("ERROR getting data object");
+    } catch (error) {
+      console.log(error);
+    }
+    // const res =
+    // const res = await axios.get("https://api.example.com/leaderboard");
+    // if (res.data.length > 0) {
+    //   setLeaderboardData((prevData) => [...prevData, ...res.data]);
+    // } else {
+    //   // setHasMore(false);
+    // }
+  };
+
+  const rowRenderer = ({ index, key, parent, style }) => {
+    const data = leaderboardData[index];
+    return (
+      <CellMeasurer cache={cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
+        <div style={style}>
+          <ListItem>
+            <ListItemText primary={`${data.name} - ${data.score}`} />
+          </ListItem>
+        </div>
+      </CellMeasurer>
+    );
+  };
+
+  if (!visitor || !world) return;
 
   return (
     <>
       <Grid container direction="column" justifyContent="space-around" p={3}>
-        <Grid item>{visitor && visitor.profileId}</Grid>
-        <Button onClick={() => setPosition(1)}>Hi</Button>
-        <Typography>{position}</Typography>
+        <Typography>{world.name} Leaderboard</Typography>
+        <Typography>Welcome {visitor.username}!</Typography>
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              deferredMeasurementCache={cache}
+              height={height}
+              // onRowsRendered={({ overscanStopIndex }) => {
+              //   if (hasMore && overscanStopIndex === leaderboardData.length - 1) {
+              //     fetchMoreData();
+              //   }
+              // }}
+              overscanRowCount={5}
+              rowCount={leaderboardData.length}
+              rowHeight={cache.rowHeight}
+              rowRenderer={rowRenderer}
+              width={width}
+            />
+          )}
+        </AutoSizer>
       </Grid>
     </>
   );
