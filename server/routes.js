@@ -31,6 +31,9 @@ router.get("/", (req, res) => {
   res.json({ message: "Hello from server!" });
 });
 
+// Egg Hunter Backend
+router.post("/create-egg", createEgg);
+
 // Dropped Asset
 // Get details of droppedAsset that opened iFrame or fired webhook. assetId comes from interactive nonce.
 router.get("/dropped-asset", getEmbeddedAssetDetails); // { includeDataObject: boolean }

@@ -26,7 +26,7 @@ function globalReducer(state, action) {
     case "SET_WORLD_INFO":
       return {
         ...state,
-        visitor: action.payload.world,
+        world: action.payload.world,
       };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);

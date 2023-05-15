@@ -34,18 +34,12 @@ export function Leaderboard() {
     try {
       const result = await backendAPI.get("/world/data-object");
       if (result.data.success) {
-        setLeaderboardData((prevData) => [...prevData, ...result.data.dataObject.leaderboard]);
+        // setLeaderboardData((prevData) => [...prevData, ...result.data.dataObject.leaderboard]);
+        setLeaderboardData((prevData) => [...prevData]);
       } else return console.log("ERROR getting data object");
     } catch (error) {
       console.log(error);
     }
-    // const res =
-    // const res = await axios.get("https://api.example.com/leaderboard");
-    // if (res.data.length > 0) {
-    //   setLeaderboardData((prevData) => [...prevData, ...res.data]);
-    // } else {
-    //   // setHasMore(false);
-    // }
   };
 
   const rowRenderer = ({ index, key, parent, style }) => {

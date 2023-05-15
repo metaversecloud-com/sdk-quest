@@ -37,14 +37,12 @@ export function Admin() {
 
   const dropEgg = async ({ imageUrl }) => {
     try {
-      const result = await backendAPI.post("/dropped-asset/webimage", {
-        isInteractive: true,
+      const result = await backendAPI.post("/create-egg", {
         layers: {
           // TODO: Change to image stored in world data object
           top: imageUrl,
         },
         uniqueName: eggUniqueName,
-        position: { x: 100, y: 100 },
       });
       console.log(result);
       if (result.data.success) {
