@@ -1,6 +1,7 @@
 import {
   // DROPPEDASSET CLASS
   dropAsset,
+  dropWebImageAsset,
   fetchDroppedAssetsUniqueName,
   getDroppedAssetDetails,
   getEmbeddedAssetDetails,
@@ -35,6 +36,7 @@ router.get("/dropped-asset", getEmbeddedAssetDetails); // { includeDataObject: b
 // Gets all dropped assets with unique name
 router.get("/dropped-asset/uniqueNameSearch", fetchDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
 router.post("/dropped-asset", dropAsset); // { id: string, isInteractive: boolean, position: {x: number, y: number }, uniqueName: string }
+router.post("/dropped-asset/webimage", dropWebImageAsset); // { isInteractive: boolean, layers: {bottom: string, top: string}, position: {x: number, y: number }, uniqueName: string }
 router.post("/dropped-asset/removeAllWithUniqueName", removeDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
 
 // Dropped Asset Instance
