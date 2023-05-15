@@ -9,6 +9,7 @@ export const getWorldDetails = async (req, res) => {
     await world.fetchDetails();
     if (includeDataObject) await world.fetchDataObject();
     res.json({ world, success: true });
+    return world;
   } catch (e) {
     error("Error getting world details", e, res);
   }
