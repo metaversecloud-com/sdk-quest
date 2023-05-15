@@ -1,4 +1,5 @@
 import { fetchDroppedAssetsUniqueName } from "./fetchDroppedAssets.js";
+import { DroppedAsset } from "../topiaInit.js";
 import error from "../errors.js";
 
 export const removeDroppedAssetsUniqueName = async (req, res) => {
