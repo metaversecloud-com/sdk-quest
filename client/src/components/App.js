@@ -5,10 +5,10 @@ import { Route, Routes, useSearchParams } from "react-router-dom";
 import { Error, Home } from "@pages";
 
 // utils
-// import { routes } from "@utils";
+import { backendAPI } from "@utils";
 
 // context
-import { setInteractiveParams, useGlobalDispatch } from "@context";
+import { setInteractiveParams, setVisitorInfo, useGlobalDispatch } from "@context";
 import { setupBackendAPI } from "../utils/backendAPI";
 
 export function App() {
@@ -40,6 +40,22 @@ export function App() {
     };
     if (!hasInitBackendAPI) setupAPI();
   }, [globalDispatch, hasInitBackendAPI, searchParams]);
+
+  // Get Visitor info
+  useEffect(() => {
+    const getVisitor = async () => {
+      const result = await backendAPI.get("/visitor");
+      if (result.data.success) {
+        setVisitorInfo({
+          dispatch: globalDispatch,
+          visitor: result.data.visitor,
+        });
+      } else {
+        console.log("Error getting visitor");
+      }
+    };
+    getVisitor();
+  }, [globalDispatch]);
 
   return (
     <Routes>

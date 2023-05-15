@@ -1,5 +1,5 @@
 import React from "react";
-import { Topia, WorldFactory } from "@rtsdk/topia";
+// import { Topia, WorldFactory } from "@rtsdk/topia";
 
 const GlobalStateContext = React.createContext();
 const GlobalDispatchContext = React.createContext();
@@ -18,6 +18,11 @@ function globalReducer(state, action) {
         ...action.payload,
         hasInteractiveParams: true,
       };
+    case "SET_VISITOR_INFO":
+      return {
+        ...state,
+        visitor: action.payload.visitor,
+      };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -27,6 +32,7 @@ function globalReducer(state, action) {
 function GlobalProvider({ children }) {
   const [state, dispatch] = React.useReducer(globalReducer, {
     hasInteractiveParams: false,
+    retrievedVisitor: false,
     selectedWorld: {},
     urlSlug: "",
   });
@@ -68,26 +74,35 @@ function setInteractiveParams({ assetId, dispatch, visitorId, interactiveNonce, 
   });
 }
 
-// eslint-disable-next-line no-unused-vars
-async function fetchWorld({ apiKey, dispatch, urlSlug }) {
-  if (!apiKey || !urlSlug) return;
-  try {
-    const topia = await new Topia({
-      apiDomain: "api-stage.topia.io",
-      apiKey,
-    });
-    const selectedWorld = await new WorldFactory(topia).create(urlSlug);
-    await selectedWorld.fetchDetails();
-    dispatch({
-      type: "SELECT_WORLD",
-      payload: {
-        urlSlug,
-        selectedWorld,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-  }
+function setVisitorInfo({ dispatch, visitor }) {
+  dispatch({
+    type: "SET_VISITOR_INFO",
+    payload: {
+      visitor,
+    },
+  });
 }
 
-export { GlobalProvider, fetchWorld, setInteractiveParams, useGlobalState, useGlobalDispatch };
+// // eslint-disable-next-line no-unused-vars
+// async function fetchWorld({ apiKey, dispatch, urlSlug }) {
+//   if (!apiKey || !urlSlug) return;
+//   try {
+//     const topia = await new Topia({
+//       apiDomain: "api-stage.topia.io",
+//       apiKey,
+//     });
+//     const selectedWorld = await new WorldFactory(topia).create(urlSlug);
+//     await selectedWorld.fetchDetails();
+//     dispatch({
+//       type: "SELECT_WORLD",
+//       payload: {
+//         urlSlug,
+//         selectedWorld,
+//       },
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
+export { GlobalProvider, setInteractiveParams, setVisitorInfo, useGlobalState, useGlobalDispatch };

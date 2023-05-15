@@ -1,33 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // components
-import { Button, Grid, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Grid,
+  // TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 
 // context
-import { fetchWorld, useGlobalDispatch, useGlobalState } from "@context";
+import {
+  // fetchWorld, useGlobalDispatch,
+  useGlobalState,
+} from "@context";
 
 // utils
 import { backendAPI } from "@utils";
 
 export function Home() {
-  const [apiKey, setApiKey] = useState();
-  const [urlSlug, setUrlSlug] = useState();
   const [droppedAsset, setDroppedAsset] = useState();
+  const [toggle, setToggle] = useState("leaderboard");
+  const [droppedEggs, setDroppedEggs] = useState();
+
+  // Get Visitor info
+  useEffect(() => {
+    const getDroppedEggs = async () => {
+      const result = await backendAPI.post("/dropped-asset/uniqueNameSearch", {
+        isPartial: true,
+        uniqueName: "sdk-egg-hunter_egg",
+      });
+      if (result.data.success) {
+        setDroppedEggs(result.data.droppedAssets);
+      } else {
+        console.log("Error getting visitor");
+      }
+    };
+    getDroppedEggs();
+  }, []);
 
   // context
-  const globalDispatch = useGlobalDispatch();
-  const { hasInteractiveParams, selectedWorld } = useGlobalState();
-  const { name } = selectedWorld;
+  // const globalDispatch = useGlobalDispatch();
+  const {
+    hasInteractiveParams,
+    visitor,
+    // selectedWorld
+  } = useGlobalState();
+  // const { name } = selectedWorld;
 
-  const handleSelectWorld = async () => {
-    await fetchWorld({ apiKey, dispatch: globalDispatch, urlSlug })
-      .then(() => {
-        console.log("Success!");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  // const handleSelectWorld = async () => {
+  //   await fetchWorld({ apiKey, dispatch: globalDispatch, urlSlug })
+  //     .then(() => {
+  //       console.log("Success!");
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
 
   const handleGetDroppedAsset = async () => {
     try {
@@ -40,76 +70,36 @@ export function Home() {
     }
   };
 
+  console.log(visitor);
+  console.log(droppedEggs);
+
+  if (!hasInteractiveParams)
+    return <Typography>You can only access this application from within a Topia world embed.</Typography>;
+
   return (
     <>
-      <Grid container direction="column" justifyContent="space-around" p={10}>
-        <Grid item pb={10}>
-          <Grid alignItems="center" container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h4">Client side example using API Key</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography>
-                Enter your API Key and URL Slug to retrieve the detail of your world. Once retrieved the world will be
-                saved to Global Context for easy use throughout your application!
-              </Typography>
-            </Grid>
-            <Grid item>
-              <TextField
-                id="apiKeyInput"
-                label="API Key"
-                onChange={(event) => {
-                  event.preventDefault();
-                  setApiKey(event.target.value);
-                }}
-                sx={{ width: 320 }}
-                value={apiKey}
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                disabled={!apiKey}
-                id="urlSlugInput"
-                label="URL Slug"
-                onChange={(event) => {
-                  event.preventDefault();
-                  setUrlSlug(event.target.value);
-                }}
-                value={urlSlug}
-              />
-            </Grid>
-            <Grid item>
-              <Button onClick={handleSelectWorld} variant="contained">
-                Get World Details
-              </Button>
-            </Grid>
-            {name && (
-              <Grid item xs={12}>
-                <Typography>You have successfully retrieved the world details for {name}!</Typography>
-              </Grid>
-            )}
-          </Grid>
-        </Grid>
+      <Grid container direction="column" justifyContent="space-around" p={3}>
         <Grid item>
           <Grid alignItems="center" container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant="h4">Server side example using interactive parameters</Typography>
+              <Typography variant="h4">Egg Hunter</Typography>
             </Grid>
-            <Grid item xs={12}>
-              {!hasInteractiveParams ? (
-                <Typography>
-                  Edit an asset in your world and open the Links page in the Modify Asset drawer and add a link to your
-                  website or use &quot;http://localhost:3000&quot; for testing locally. You can also add assetId,
-                  interactiveNonce, interactivePublicKey, urlSlug, and visitorId directly to the URL as search
-                  parameters to use this feature.
-                </Typography>
-              ) : (
-                <Typography>Interactive parameters found, nice work!</Typography>
-              )}
-            </Grid>
+            {visitor && visitor.isAdmin && (
+              <ToggleButtonGroup
+                aria-label="Admin vs Leaderboard"
+                color="primary"
+                exclusive
+                onChange={(e) => setToggle(e.target.value)}
+                value={toggle}
+              >
+                <ToggleButton value="leaderboard">Leaderboard</ToggleButton>
+                <ToggleButton value="admin">Admin</ToggleButton>
+              </ToggleButtonGroup>
+            )}
+
             <Grid item>
               <Button onClick={handleGetDroppedAsset} variant="contained">
-                Get Dropped Asset Details
+                Remove all dropped eggs
               </Button>
             </Grid>
             {droppedAsset && (

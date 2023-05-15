@@ -33,7 +33,7 @@ router.get("/", (req, res) => {
 // Get details of droppedAsset that opened iFrame or fired webhook. assetId comes from interactive nonce.
 router.get("/dropped-asset", getEmbeddedAssetDetails); // { includeDataObject: boolean }
 // Gets all dropped assets with unique name
-router.get("/dropped-asset/uniqueNameSearch", fetchDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
+router.post("/dropped-asset/uniqueNameSearch", fetchDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
 router.post("/dropped-asset", dropAsset); // { id: string, isInteractive: boolean, position: {x: number, y: number }, uniqueName: string }
 router.post("/dropped-asset/removeAllWithUniqueName", removeDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
 
