@@ -35,9 +35,10 @@ router.get("/", (req, res) => {
 router.get("/dropped-asset", getEmbeddedAssetDetails); // { includeDataObject: boolean }
 // Gets all dropped assets with unique name
 router.post("/dropped-asset/uniqueNameSearch", fetchDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
-router.post("/dropped-asset", dropAsset); // { id: string, isInteractive: boolean, position: {x: number, y: number }, uniqueName: string }
 router.post("/dropped-asset/webimage", dropWebImageAsset); // { isInteractive: boolean, layers: {bottom: string, top: string}, position: {x: number, y: number }, uniqueName: string }
 router.post("/dropped-asset/removeAllWithUniqueName", removeDroppedAssetsUniqueName); // { isPartial: boolean, uniqueName: string }
+// This has to go last
+router.post("/dropped-asset", dropAsset); // { id: string, isInteractive: boolean, position: {x: number, y: number }, uniqueName: string }
 
 // Dropped Asset Instance
 router.get("/dropped-asset/:instanceId", getDroppedAssetDetails); // { includeDataObject: boolean }

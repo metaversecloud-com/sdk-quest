@@ -19,26 +19,12 @@ import {
 // utils
 import { backendAPI } from "@utils";
 
-export function Home() {
-  const [droppedAsset, setDroppedAsset] = useState();
-  const [toggle, setToggle] = useState("leaderboard");
-  const [droppedEggs, setDroppedEggs] = useState();
+const eggUniqueName = "sdk-egg-hunter_egg";
 
-  // Get Visitor info
-  useEffect(() => {
-    const getDroppedEggs = async () => {
-      const result = await backendAPI.post("/dropped-asset/uniqueNameSearch", {
-        isPartial: true,
-        uniqueName: "sdk-egg-hunter_egg",
-      });
-      if (result.data.success) {
-        setDroppedEggs(result.data.droppedAssets);
-      } else {
-        console.log("Error getting visitor");
-      }
-    };
-    getDroppedEggs();
-  }, []);
+export function Home() {
+  // const [droppedAsset, setDroppedAsset] = useState();
+  const [toggle, setToggle] = useState("leaderboard");
+  const [droppedEggs, setDroppedEggs] = useState([]);
 
   // context
   // const globalDispatch = useGlobalDispatch();
@@ -47,6 +33,12 @@ export function Home() {
     visitor,
     // selectedWorld
   } = useGlobalState();
+
+  // Get dropped eggs info
+  useEffect(() => {
+    if (hasInteractiveParams) getDroppedEggs();
+  }, [hasInteractiveParams]);
+
   // const { name } = selectedWorld;
 
   // const handleSelectWorld = async () => {
@@ -59,11 +51,24 @@ export function Home() {
   //     });
   // };
 
-  const handleGetDroppedAsset = async () => {
+  // const handleGetDroppedAsset = async () => {
+  //   try {
+  //     const result = await backendAPI.get("/dropped-asset");
+  //     if (result.data.success) {
+  //       setDroppedAsset(result.data.droppedAsset);
+  //     } else return console.log("ERROR getting data object");
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const getDroppedEggs = async () => {
     try {
-      const result = await backendAPI.get("/dropped-asset");
+      const result = await backendAPI.post("/dropped-asset/uniqueNameSearch", {
+        uniqueName: eggUniqueName,
+      });
       if (result.data.success) {
-        setDroppedAsset(result.data.droppedAsset);
+        setDroppedEggs(result.data.droppedAssets);
       } else return console.log("ERROR getting data object");
     } catch (error) {
       console.log(error);
@@ -78,12 +83,40 @@ export function Home() {
           // TODO: Change to image stored in world data object
           top: imageUrl,
         },
-        uniqueName: "sdk-egg-hunter_egg",
+        uniqueName: eggUniqueName,
         position: { x: 100, y: 100 },
       });
+      console.log(result);
       if (result.data.success) {
-        setDroppedEggs({ ...droppedEggs, ...result.data.droppedAsset });
+        getDroppedEggs();
+        // setDroppedEggs({ ...droppedEggs, ...result.data.droppedAsset });
       } else return console.log("ERROR getting data object");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const removeAllEggs = async () => {
+    try {
+      const result = await backendAPI.post("/dropped-asset/removeAllWithUniqueName", {
+        uniqueName: eggUniqueName,
+      });
+      console.log(result);
+      if (result.data.success) {
+        setDroppedEggs([]);
+      } else return console.log("ERROR getting data object");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const removeEgg = async ({ id }) => {
+    try {
+      const result = await backendAPI.delete(`/dropped-asset/${id}`);
+
+      if (result.data.success) {
+        getDroppedEggs();
+      } else return console.log("ERROR deleting egg");
     } catch (error) {
       console.log(error);
     }
@@ -104,52 +137,59 @@ export function Home() {
               <Typography variant="h4">Egg Hunter</Typography>
             </Grid>
             {visitor && visitor.isAdmin && (
-              <ToggleButtonGroup
-                aria-label="Admin vs Leaderboard"
-                color="primary"
-                exclusive
-                onChange={(e) => setToggle(e.target.value)}
-                value={toggle}
-              >
-                <ToggleButton value="leaderboard">Leaderboard</ToggleButton>
-                <ToggleButton value="admin">Admin</ToggleButton>
-              </ToggleButtonGroup>
+              <Grid item xs={12}>
+                <ToggleButtonGroup
+                  aria-label="Admin vs Leaderboard"
+                  color="primary"
+                  exclusive
+                  onChange={(e) => setToggle(e.target.value)}
+                  value={toggle}
+                >
+                  <ToggleButton value="leaderboard">Leaderboard</ToggleButton>
+                  <ToggleButton value="admin">Admin</ToggleButton>
+                </ToggleButtonGroup>
+              </Grid>
             )}
 
             <Grid item>
-              <Button onClick={handleGetDroppedAsset} variant="contained">
-                Remove all dropped eggs
-              </Button>
+              Click to Hide an Egg in the world
               <Button
                 onClick={() =>
                   dropEgg({
-                    imageUrl:
-                      "https://www.shutterstock.com/image-vector/colorful-illustration-test-word-260nw-1438324490.jpg",
+                    imageUrl: "https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png",
                   })
                 }
-                variant="contained"
               >
-                <img
-                  alt="Drop egg in world"
-                  src="https://www.shutterstock.com/image-vector/colorful-illustration-test-word-260nw-1438324490.jpg"
-                />
+                <img alt="Drop egg in world" src="https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png" />
               </Button>
             </Grid>
 
             <Grid item>
-              <Button onClick={handleGetDroppedAsset} variant="contained">
+              <Button onClick={removeAllEggs} variant="contained">
                 Remove all dropped eggs
               </Button>
             </Grid>
             {droppedEggs && (
               <>
                 <Grid item pt={4} xs={12}>
-                  <Typography>
-                    You have successfully retrieved the dropped asset details for {droppedAsset.assetName}!
-                  </Typography>
+                  <Typography>There are currently {droppedEggs.length} eggs hidden in this world</Typography>
                 </Grid>
-                <Grid item m={4} xs={12}>
-                  <img alt="preview" src={droppedAsset.topLayerURL || droppedAsset.bottomLayerURL} />
+                <Grid item pt={4} xs={12}>
+                  {droppedEggs.map((egg, index) => {
+                    return (
+                      <Grid alignItems="center" container direction="row" key={egg.id} spacing={0}>
+                        <Grid item m={1} xs={2}>
+                          <Typography>Egg {index + 1}</Typography>
+                        </Grid>
+                        <Grid item m={1} xs={4}>
+                          <Button>Walk to</Button>
+                        </Grid>
+                        <Grid item m={1} xs={2}>
+                          <Button onClick={() => removeEgg(egg.id)}>Remove</Button>
+                        </Grid>
+                      </Grid>
+                    );
+                  })}
                 </Grid>
               </>
             )}
