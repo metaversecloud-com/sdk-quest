@@ -14,6 +14,7 @@ import {
   updateUserDataObject,
   // VISITOR CLASS
   getVisitor,
+  moveVisitor,
   updateLastVisited,
   updateVisitorDataObject,
   // WORLD CLASS
@@ -54,6 +55,7 @@ router.put("/user/:profileId/data", updateUserDataObject); // { dataObject: obje
 // visitorId comes from interactive nonce
 router.get("/visitor", getVisitor); // { includeDataObject: boolean }
 router.put("/visitor/last-visited", updateLastVisited);
+router.put("/visitor/move", moveVisitor);
 router.put("/visitor/data", updateVisitorDataObject); // { dataObject: object }
 
 // World

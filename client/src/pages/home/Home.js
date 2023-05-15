@@ -110,7 +110,7 @@ export function Home() {
     }
   };
 
-  const removeEgg = async ({ id }) => {
+  const removeEgg = async (id) => {
     try {
       const result = await backendAPI.delete(`/dropped-asset/${id}`);
 
@@ -122,8 +122,17 @@ export function Home() {
     }
   };
 
-  console.log(visitor);
-  console.log(droppedEggs);
+  const moveVisitor = async (position) => {
+    try {
+      const result = await backendAPI.put(`/visitor/move`, { moveTo: position });
+
+      if (result.data.success) {
+        console.log("Moved successfully");
+      } else return console.log("ERROR deleting egg");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   if (!hasInteractiveParams)
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
@@ -182,7 +191,7 @@ export function Home() {
                           <Typography>Egg {index + 1}</Typography>
                         </Grid>
                         <Grid item m={1} xs={4}>
-                          <Button>Walk to</Button>
+                          <Button onClick={() => moveVisitor(egg.position)}>Walk to</Button>
                         </Grid>
                         <Grid item m={1} xs={2}>
                           <Button onClick={() => removeEgg(egg.id)}>Remove</Button>
