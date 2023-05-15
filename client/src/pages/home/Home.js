@@ -70,6 +70,25 @@ export function Home() {
     }
   };
 
+  const dropEgg = async ({ imageUrl }) => {
+    try {
+      const result = await backendAPI.post("/dropped-asset/webimage", {
+        isInteractive: true,
+        layers: {
+          // TODO: Change to image stored in world data object
+          top: imageUrl,
+        },
+        uniqueName: "sdk-egg-hunter_egg",
+        position: { x: 100, y: 100 },
+      });
+      if (result.data.success) {
+        setDroppedEggs({ ...droppedEggs, ...result.data.droppedAsset });
+      } else return console.log("ERROR getting data object");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   console.log(visitor);
   console.log(droppedEggs);
 
@@ -101,8 +120,28 @@ export function Home() {
               <Button onClick={handleGetDroppedAsset} variant="contained">
                 Remove all dropped eggs
               </Button>
+              <Button
+                onClick={() =>
+                  dropEgg({
+                    imageUrl:
+                      "https://www.shutterstock.com/image-vector/colorful-illustration-test-word-260nw-1438324490.jpg",
+                  })
+                }
+                variant="contained"
+              >
+                <img
+                  alt="Drop egg in world"
+                  src="https://www.shutterstock.com/image-vector/colorful-illustration-test-word-260nw-1438324490.jpg"
+                />
+              </Button>
             </Grid>
-            {droppedAsset && (
+
+            <Grid item>
+              <Button onClick={handleGetDroppedAsset} variant="contained">
+                Remove all dropped eggs
+              </Button>
+            </Grid>
+            {droppedEggs && (
               <>
                 <Grid item pt={4} xs={12}>
                   <Typography>
