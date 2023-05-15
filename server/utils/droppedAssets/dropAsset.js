@@ -7,7 +7,7 @@ export const dropWebImageAsset = async (req, res) => {
     const modReq = { ...req, body: { ...req.body, id: process.env.WEBIMAGE_ASSET_ID } };
     const droppedAsset = await dropAsset(modReq);
     if (droppedAsset) await droppedAsset.updateWebImageLayers(layers.bottom || "", layers.top || "");
-    else throw "Erorr dropping the asset";
+    else throw "Error dropping the asset";
     if (res) res.json({ droppedAsset, success: true });
   } catch (e) {
     error("Dropping web image asset", e, res);
@@ -24,8 +24,8 @@ export const dropAsset = async (req, res) => {
       isInteractive, // Makes it so interactive credentials are passed into iFrame and/or webhook payloads.
       req,
       position: {
-        x: position ? position.x : 0,
-        y: position ? position.y + 42 : 42,
+        x: position.x || 0,
+        y: position.y || 0,
       },
       uniqueName,
       urlSlug,
