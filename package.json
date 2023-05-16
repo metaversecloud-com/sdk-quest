@@ -29,7 +29,7 @@
     "server": "node server/index.js",
     "client": "npm start --prefix client",
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "postinstall": "cd client && npm install"
+    "postinstall": "if [ \"$HEROKU\" = \"true\" ]; then echo Skipping postinstall; else npm install && cd client && npm install; fi"
   },
   "type": "module",
   "version": "1.0.0"
