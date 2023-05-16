@@ -27,6 +27,7 @@ export function Leaderboard() {
   }, [leaderboardData]);
 
   const loadMoreRows = () => {
+    console.log(data.length, leaderboardData.length);
     if (data.length < leaderboardData.length) {
       setData(leaderboardData.slice(0, data.length + 20));
     } else {
@@ -88,7 +89,10 @@ export function Leaderboard() {
           content = "";
       }
       return (
-        <Box key={key} style={cellStyle}>
+        <Box
+          key={key}
+          style={item.profileId === visitor.profileId ? { ...cellStyle, background: "lightgray" } : cellStyle}
+        >
           <Box sx={{ padding: "5px 0px" }}>
             <Typography>{content}</Typography>
           </Box>
@@ -108,18 +112,18 @@ export function Leaderboard() {
       p={3}
       sx={{ height: "50vh", background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)", borderRadius: 15 }}
     >
-      <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 8, width: "100%" }}>
+      <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 5, width: "100%" }}>
         <AutoSizer>
           {({ height, width }) => (
             <MultiGrid
               cellRenderer={cellRenderer}
               columnCount={3}
-              columnWidth={width / 3}
+              columnWidth={({ index }) => (index === 0 ? width / 5 : index === 1 ? width / 2.5 : width / 3)} // 50px for the first column, 100px for the others
               fixedRowCount={1}
               height={height}
               onSectionRendered={({ rowStopIndex }) => {
                 // Load more rows when we've rendered the last row
-                if (rowStopIndex === data.length && hasMore) {
+                if (rowStopIndex === data.length - 1 && hasMore) {
                   loadMoreRows();
                 }
               }}

@@ -42,20 +42,18 @@ export function EggClicked() {
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
 
   return (
-    <>
-      <Grid container direction="column" justifyContent="space-around" p={3}>
-        <Grid item>
-          <Grid alignItems="center" container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h4">Egg Hunter</Typography>
-            </Grid>
-            <Grid container direction="column" p={2}>
-              {message && <Typography>{message} Come back tomorrow to find another!</Typography>}
-              {message && <Leaderboard />}
-            </Grid>
-          </Grid>
-        </Grid>
+    <Grid alignItems="center" container direction="column" p={0}>
+      <Grid item p={3} xs={12}>
+        <Typography variant="h4">Egg Hunter</Typography>
       </Grid>
-    </>
+      <Grid container direction="column">
+        {message && (
+          <Grid item p={1}>
+            <Typography>{message} Come back tomorrow to find another!</Typography>
+          </Grid>
+        )}
+        {message && <Leaderboard />}
+      </Grid>
+    </Grid>
   );
 }

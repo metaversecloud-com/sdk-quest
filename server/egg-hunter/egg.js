@@ -103,20 +103,31 @@ export const getEggLeaderboard = async (req, res) => {
           profileId,
         });
       }
+      leaderboard.push({ profileId: "blah", name: "Flood", collected: 20 });
+      leaderboard.push({ profileId: "blah", name: "Michael", collected: 50 });
+      leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
+      leaderboard.push({ profileId: "blah", name: "Rose", collected: 80 });
+      leaderboard.push({ profileId: "blah", name: "Billy Bue", collected: 5 });
+      leaderboard.push({ profileId: "blah", name: "Lowell", collected: 2 });
+      leaderboard.push({ profileId: "blah", name: "Lina", collected: 3 });
+      leaderboard.push({ profileId: "blah", name: "Chris", collected: 6 });
+      leaderboard.push({ profileId: "blah", name: "Danielle", collected: 9 });
+      leaderboard.push({ profileId: "blah", name: "Sam", collected: 10 });
+      leaderboard.push({ profileId: "blah", name: "Bryan", collected: 7 });
+      leaderboard.push({ profileId: "blah", name: "Ewing", collected: 8 });
+      leaderboard.push({ profileId: "blah", name: "Fabio", collected: 12 });
+      leaderboard.push({ profileId: "blah", name: "Jesus", collected: 13 });
+      leaderboard.push({ profileId: "blah", name: "Saqib", collected: 14 });
+      leaderboard.push({ profileId: "blah", name: "Taveras", collected: 15 });
+      leaderboard.push({ profileId: "blah", name: "Rex", collected: 16 });
+      leaderboard.push({ profileId: "blah", name: "Juan Pablo", collected: 17 });
+      leaderboard.push({ profileId: "blah", name: "Anna", collected: 18 });
+      leaderboard.push({ profileId: "blah", name: "James", collected: 19 });
+      leaderboard.push({ profileId: "blah", name: "Alex", collected: 20 });
+      leaderboard.push({ profileId: "blah", name: "Dalton", collected: 21 });
     }
-    leaderboard.push({ name: "Flood", collected: 20 });
-    leaderboard.push({ name: "Michael", collected: 50 });
-    leaderboard.push({ name: "Eoin", collected: 10 });
-    leaderboard.push({ name: "Rose", collected: 80 });
-    leaderboard.push({ name: "Billy Bue", collected: 5 });
-    leaderboard.push({ name: "Lowell", collected: 2 });
-    leaderboard.push({ name: "Lina", collected: 3 });
-    leaderboard.push({ name: "Chris", collected: 6 });
-    leaderboard.push({ name: "Danielle", collected: 9 });
-    leaderboard.push({ name: "Sam", collected: 10 });
-    leaderboard.push({ name: "Bryan", collected: 7 });
-    leaderboard.push({ name: "Ewing", collected: 8 });
     leaderboard.sort((a, b) => b.collected - a.collected);
+
     if (res) res.json({ leaderboard, success: true });
   } catch (e) {
     error("Getting egg leaderboard", e, res);
