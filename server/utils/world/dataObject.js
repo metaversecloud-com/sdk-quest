@@ -6,7 +6,7 @@ export const getWorldDataObject = async (req, res) => {
     const { urlSlug } = req.query;
     const world = World.create(urlSlug, { credentials: req.query });
     await world.fetchDataObject();
-    res.json({ dataObject: world.dataObject, success: true });
+    if (res) res.json({ dataObject: world.dataObject, success: true });
     return world.dataObject;
   } catch (e) {
     error("Error getting world details", e, res);
