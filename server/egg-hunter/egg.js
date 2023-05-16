@@ -100,9 +100,22 @@ export const getEggLeaderboard = async (req, res) => {
         leaderboard.push({
           name: profileMapper[profileId],
           collected: Object.keys(eggsCollectedByUser[profileId]).length,
+          profileId,
         });
       }
     }
+    leaderboard.push({ name: "Flood", collected: 20 });
+    leaderboard.push({ name: "Michael", collected: 50 });
+    leaderboard.push({ name: "Eoin", collected: 10 });
+    leaderboard.push({ name: "Rose", collected: 80 });
+    leaderboard.push({ name: "Billy Bue", collected: 5 });
+    leaderboard.push({ name: "Lowell", collected: 2 });
+    leaderboard.push({ name: "Lina", collected: 3 });
+    leaderboard.push({ name: "Chris", collected: 6 });
+    leaderboard.push({ name: "Danielle", collected: 9 });
+    leaderboard.push({ name: "Sam", collected: 10 });
+    leaderboard.push({ name: "Bryan", collected: 7 });
+    leaderboard.push({ name: "Ewing", collected: 8 });
     leaderboard.sort((a, b) => b.collected - a.collected);
     if (res) res.json({ leaderboard, success: true });
   } catch (e) {

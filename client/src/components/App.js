@@ -78,10 +78,12 @@ export function App() {
   useEffect(() => {
     const getLeaderboardData = async () => {
       const result = await backendAPI.get("/egg-leaderboard");
-      if (result.data.success) {
+      let { leaderboard, success } = result.data;
+      if (success) {
         setLeaderboardData({
           dispatch: globalDispatch,
-          leaderboardData: result.data.leaderboard,
+          // leaderboardData: result.data.leaderboard,
+          leaderboardData: leaderboard,
         });
         // setLeaderboardData((prevData) => [...prevData, ...result.data.leaderboard]);
         // setLeaderboardData((prevData) => [...prevData]);

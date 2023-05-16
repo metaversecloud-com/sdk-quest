@@ -37,10 +37,10 @@ export function Leaderboard() {
   const cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
     const cellStyle = {
       ...style,
-      padding: "0 10px",
-      margin: "15px 0",
-      lineHeight: `${rowIndex === 0 ? 40 : 40}px`, // Match row height
-      borderBottom: rowIndex !== 0 ? "1px solid #ddd" : null,
+      padding: `${rowIndex === 0 ? 0 : 0}px 10px`, // Match row height
+      margin: `${rowIndex === 0 ? 10 : 0}px 0`, // Match row height
+      lineHeight: `${rowIndex === 0 ? 40 : 30}px`, // Match row height
+      boxShadow: "0px 1px 0px #E8E8E8",
     };
 
     if (rowIndex === 0) {
@@ -89,7 +89,9 @@ export function Leaderboard() {
       }
       return (
         <Box key={key} style={cellStyle}>
-          <Typography>{content}</Typography>
+          <Box sx={{ padding: "5px 0px" }}>
+            <Typography>{content}</Typography>
+          </Box>
         </Box>
       );
     }
