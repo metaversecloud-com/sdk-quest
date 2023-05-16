@@ -9,6 +9,7 @@ export const dropWebImageAsset = async (req, res) => {
     if (droppedAsset) await droppedAsset.updateWebImageLayers(layers.bottom || "", layers.top || "");
     else throw "Error dropping the asset";
     if (res) res.json({ droppedAsset, success: true });
+    return droppedAsset;
   } catch (e) {
     error("Dropping web image asset", e, res);
   }
