@@ -27,7 +27,7 @@ export function Leaderboard() {
     // hasInteractiveParams,
     leaderboardData,
     visitor,
-    world,
+    // world,
   } = useGlobalState();
   // const [leaderboardData, setLeaderboardData] = useState([]);
   // const [hasMore, setHasMore] = useState(true);
@@ -62,7 +62,7 @@ export function Leaderboard() {
     );
   };
 
-  if (!visitor || !world) return;
+  if (!visitor || !leaderboardData) return;
 
   return (
     <>

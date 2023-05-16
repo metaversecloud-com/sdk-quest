@@ -15,6 +15,7 @@ export function Admin() {
   // const [droppedAsset, setDroppedAsset] = useState();
 
   const [droppedEggs, setDroppedEggs] = useState([]);
+  const [dropping, setDropping] = useState(false);
   const { hasInteractiveParams } = useGlobalState();
 
   // Get dropped eggs info
@@ -37,6 +38,7 @@ export function Admin() {
 
   const dropEgg = async ({ imageUrl }) => {
     try {
+      setDropping(true);
       const result = await backendAPI.post("/create-egg", {
         layers: {
           // TODO: Change to image stored in world data object
@@ -48,7 +50,9 @@ export function Admin() {
         getDroppedEggs();
         // setDroppedEggs({ ...droppedEggs, ...result.data.droppedAsset });
       } else return console.log("ERROR getting data object");
+      setDropping(false);
     } catch (error) {
+      setDropping(false);
       console.log(error);
     }
   };
@@ -100,6 +104,7 @@ export function Admin() {
           <Grid item>Click to Hide an Egg in the world</Grid>
           <Grid item>
             <Button
+              disabled={dropping}
               onClick={() =>
                 dropEgg({
                   imageUrl: "https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png",
@@ -127,7 +132,14 @@ export function Admin() {
               {droppedEggs.map((egg, index) => {
                 console.log(egg);
                 return (
-                  <Grid alignItems="center" container direction="row" key={egg.id} spacing={2}>
+                  <Grid
+                    alignItems="center"
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    key={egg.id}
+                    spacing={3}
+                  >
                     <Grid item>
                       <Typography>Egg {index + 1}</Typography>
                     </Grid>
