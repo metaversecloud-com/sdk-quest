@@ -3,11 +3,17 @@ import { getWorldDataObject, getWorldDetails } from "../utils/world/index.js";
 import { getEmbeddedAssetDetails } from "../utils/droppedAssets/index.js";
 import { getVisitor } from "../utils/index.js";
 import error from "../utils/errors.js";
+import { getStreak, getLongestStreak } from "./streaks.js";
 
 const randomCoord = (width, height) => {
   const x = Math.floor(Math.random() * (width / 2 - -width / 2 + 1) + -width / 2);
   const y = Math.floor(Math.random() * (height / 2 - -height / 2 + 1) + -height / 2);
   return { x, y };
+};
+
+export const getEggImage = async (req, res) => {
+  // TODO: Make this pull from data objects so matches what will be dropped
+  if (res) res.json({ eggImage: process.env.DEFAULT_EGG_IMAGE_URL, success: true });
 };
 
 export const createEgg = async (req, res) => {
@@ -99,13 +105,13 @@ export const getEggLeaderboard = async (req, res) => {
       console.log("Object", worldDataObject);
       const { eggsCollectedByUser, profileMapper } = worldDataObject;
       for (const profileId in eggsCollectedByUser) {
-        const streak = getStreak(eggsCollectedByUser[profileId]);
-        console.log(streak);
+        // const streak = getStreak(eggsCollectedByUser[profileId]);
+        const longestStreak = getLongestStreak(eggsCollectedByUser[profileId]);
         leaderboard.push({
           name: profileMapper[profileId],
           collected: Object.keys(eggsCollectedByUser[profileId]).length,
           profileId,
-          streak,
+          streak: longestStreak,
         });
       }
       leaderboard.push({ profileId: "blah", name: "Flood", collected: 20 });
@@ -137,36 +143,4 @@ export const getEggLeaderboard = async (req, res) => {
   } catch (e) {
     error("Getting egg leaderboard", e, res);
   }
-};
-
-function getStreak(data) {
-  let currentDate = new Date();
-  let streak = 0;
-
-  while (true) {
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so we add 1
-    const day = String(currentDate.getDate()).padStart(2, "0");
-    const dayOfWeek = currentDate.getDay();
-
-    const key = `${year}_${month}_${day}`;
-
-    // TODO: Check when the world was closed, which requires that we save the history of open and closed days.
-    if (data[key]) {
-      streak++;
-      currentDate.setDate(currentDate.getDate() - 1); // Go to the previous day
-    } else if (dayOfWeek === 0 || dayOfWeek === 6) {
-      // Skips weekends, but gives you streak credit above if you somehow came on a weekend
-      currentDate.setDate(currentDate.getDate() - 1); // Go to the previous day
-    } else {
-      break; // End the loop when we find a day that doesn't exist in the data
-    }
-  }
-
-  return streak;
-}
-
-export const getEggImage = async (req, res) => {
-  // TODO: Make this pull from data objects so matches what will be dropped
-  if (res) res.json({ eggImage: process.env.DEFAULT_EGG_IMAGE_URL, success: true });
 };
