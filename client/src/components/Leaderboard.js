@@ -20,6 +20,7 @@ const cache = new CellMeasurerCache({
 export function Leaderboard() {
   const {
     // hasInteractiveParams,
+    // leaderboard,
     visitor,
     world,
   } = useGlobalState();
@@ -28,15 +29,15 @@ export function Leaderboard() {
 
   useEffect(() => {
     fetchMoreData();
-  }, []);
+  }, [visitor]);
 
   const fetchMoreData = async () => {
     try {
       const result = await backendAPI.get("/egg-leaderboard");
       if (result.data.success) {
-        console.log(visitor.profileId, result.data.dataObject);
-        // setLeaderboardData((prevData) => [...prevData, ...result.data.dataObject.leaderboard]);
-        setLeaderboardData((prevData) => [...prevData]);
+        console.log(visitor.profileId, result.data.leaderboard);
+        setLeaderboardData((prevData) => [...prevData, ...result.data.leaderboard]);
+        // setLeaderboardData((prevData) => [...prevData]);
       } else return console.log("ERROR getting data object");
     } catch (error) {
       console.log(error);
@@ -49,7 +50,7 @@ export function Leaderboard() {
       <CellMeasurer cache={cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
         <div style={style}>
           <ListItem>
-            <ListItemText primary={`${data.name} - ${data.score}`} />
+            <ListItemText primary={`${data.name} - ${data.collected}`} />
           </ListItem>
         </div>
       </CellMeasurer>
@@ -62,8 +63,9 @@ export function Leaderboard() {
     <>
       <Grid container direction="column" justifyContent="space-around" p={3}>
         <Typography>{world.name} Leaderboard</Typography>
-        <Typography>Welcome {visitor.username}!</Typography>
-        <AutoSizer>
+        {/* <Typography>Welcome {visitor.username}!</Typography> */}
+
+        <AutoSizer defaultHeight={600}>
           {({ height, width }) => (
             <List
               deferredMeasurementCache={cache}

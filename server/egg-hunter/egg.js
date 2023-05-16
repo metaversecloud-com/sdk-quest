@@ -59,7 +59,7 @@ export const eggClicked = async (req, res) => {
       //YYYY_MM_DD
       const date = new Date();
       const dateKey = `${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;
-
+      // world.setDataObject({});
       if (
         eggsCollectedByUser &&
         eggsCollectedByUser[visitor.profileId] &&
@@ -78,6 +78,7 @@ export const eggClicked = async (req, res) => {
         const position = randomCoord(world.width, world.height);
         await updatePosition({ ...req, body: { position } });
         if (res) res.json({ addedClick: true, success: true });
+        return;
       }
     }
     if (res) res.json({ addedClick: true, success: true });
@@ -91,8 +92,16 @@ export const getEggLeaderboard = async (req, res) => {
     const worldDataObject = await getWorldDataObject(req);
     let leaderboard = [];
     if (worldDataObject) {
+      console.log("Object", worldDataObject);
       const { eggsCollectedByUser, profileMapper } = worldDataObject;
+      for (const profileId in eggsCollectedByUser) {
+        leaderboard.push({
+          name: profileMapper[profileId],
+          collected: Object.keys(eggsCollectedByUser[profileId]).length,
+        });
+      }
     }
+    leaderboard.sort((a, b) => b.collected - a.collected);
     if (res) res.json({ leaderboard, success: true });
   } catch (e) {
     error("Getting egg leaderboard", e, res);

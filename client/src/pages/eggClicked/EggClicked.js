@@ -49,8 +49,10 @@ export function EggClicked() {
             <Grid item xs={12}>
               <Typography variant="h4">Egg Hunter</Typography>
             </Grid>
-            <Typography>{message} Come back tomorrow to find another!</Typography>
-            <Leaderboard />
+            <Grid container direction="column" p={2}>
+              {message && <Typography>{message} Come back tomorrow to find another!</Typography>}
+              {message && <Leaderboard />}
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
