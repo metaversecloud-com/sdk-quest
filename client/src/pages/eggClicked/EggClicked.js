@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Leaderboard } from "../../components";
 
 // components
@@ -26,12 +26,7 @@ export function EggClicked() {
   // context
   const globalDispatch = useGlobalDispatch();
 
-  // Get dropped eggs info
-  useEffect(() => {
-    if (hasInteractiveParams) handleEggClicked();
-  }, [hasInteractiveParams]);
-
-  const handleEggClicked = async () => {
+  const handleEggClicked = useCallback(async () => {
     try {
       const result = await backendAPI.post("/egg-clicked");
       const { addedClick, success } = result.data;
@@ -45,7 +40,12 @@ export function EggClicked() {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [globalDispatch]);
+
+  // Get dropped eggs info
+  useEffect(() => {
+    if (hasInteractiveParams) handleEggClicked();
+  }, [hasInteractiveParams, handleEggClicked]);
 
   if (!hasInteractiveParams)
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
