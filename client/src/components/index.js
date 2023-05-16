@@ -1,1 +1,2 @@
-export * from "./WorldsTable";
+export * from "./Admin";
+export * from "./Leaderboard";

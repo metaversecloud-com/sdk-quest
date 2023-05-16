@@ -28,6 +28,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.5",
     "react-scripts": "4.0.3",
+    "react-virtualized": "^9.22.5",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
@@ -41,8 +42,8 @@
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
-    "start": "react-app-rewired --openssl-legacy-provider start",
-    "build": "react-app-rewired --openssl-legacy-provider build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "lint": "eslint -c .eslintrc.js --ext .js,.jsx .",

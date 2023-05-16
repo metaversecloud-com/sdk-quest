@@ -5,11 +5,13 @@ import { Route, Routes, useSearchParams } from "react-router-dom";
 import { Error, Home } from "@pages";
 
 // utils
-// import { routes } from "@utils";
+import { backendAPI } from "@utils";
 
 // context
-import { setInteractiveParams, useGlobalDispatch } from "@context";
+import { setInteractiveParams, setLeaderboardData, setVisitorInfo, setWorldInfo, useGlobalDispatch } from "@context";
 import { setupBackendAPI } from "../utils/backendAPI";
+import { getLeaderboardData } from "../utils/leaderboard";
+import { EggClicked } from "../pages";
 
 export function App() {
   const [searchParams] = useSearchParams();
@@ -41,12 +43,50 @@ export function App() {
     if (!hasInitBackendAPI) setupAPI();
   }, [globalDispatch, hasInitBackendAPI, searchParams]);
 
+  // Get Visitor info
+  useEffect(() => {
+    const getVisitor = async () => {
+      const result = await backendAPI.get("/visitor");
+      if (result.data.success) {
+        setVisitorInfo({
+          dispatch: globalDispatch,
+          visitor: result.data.visitor,
+        });
+      } else {
+        console.log("Error getting visitor");
+      }
+    };
+    getVisitor();
+  }, [globalDispatch]);
+
+  // Get Visitor info
+  useEffect(() => {
+    const getWorld = async () => {
+      const result = await backendAPI.get("/world");
+      if (result.data.success) {
+        console.log(result.data.world);
+        setWorldInfo({
+          dispatch: globalDispatch,
+          world: result.data.world,
+        });
+      } else {
+        console.log("Error getting world");
+      }
+    };
+    getWorld();
+  }, [globalDispatch]);
+
+  useEffect(() => {
+    getLeaderboardData({ setLeaderboardData, globalDispatch });
+  }, [globalDispatch]);
+
   return (
     <Routes>
       {/* {routes.map((route, index) => {
         return <Route element={<route.component />} key={index} path={route.path} />
       })} */}
       <Route element={<Home />} exact path="/" />
+      <Route element={<EggClicked />} exact path="/egg-clicked" />
       <Route element={<Error />} exact path="*" />
     </Routes>
   );
