@@ -41,8 +41,7 @@ export const createEgg = async (req, res) => {
 
     const egg = await dropWebImageAsset({ ...req, body: eggBody });
     if (res) res.json({ egg, success: true });
-    const baseURL =
-      process.env.NODE_ENV === "development" ? "http://localhost:3000" : req.protocol + "://" + req.get("host");
+    const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://" + req.get("host");
     egg.updateClickType({
       clickType: "link",
       clickableLinkTitle: "Egg Hunter",
