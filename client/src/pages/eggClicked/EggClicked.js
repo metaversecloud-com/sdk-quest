@@ -6,9 +6,13 @@ import { Grid, Typography } from "@mui/material";
 
 // context
 import {
-  // fetchWorld, useGlobalDispatch,
+  // fetchWorld,
+  setLeaderboardData,
+  useGlobalDispatch,
   useGlobalState,
 } from "@context";
+
+import { getLeaderboardData } from "@utils/leaderboard";
 
 import { backendAPI } from "@utils";
 
@@ -18,6 +22,9 @@ export function EggClicked() {
     hasInteractiveParams,
     // selectedWorld
   } = useGlobalState();
+
+  // context
+  const globalDispatch = useGlobalDispatch();
 
   // Get dropped eggs info
   useEffect(() => {
@@ -30,6 +37,8 @@ export function EggClicked() {
       const { addedClick, success } = result.data;
       if (addedClick) {
         setMessage("Congrats! You found an egg.");
+        // Refresh the leaderboard
+        getLeaderboardData({ setLeaderboardData, globalDispatch });
       } else if (success) {
         setMessage("You already found an egg today.");
       } else return console.log("ERROR getting data object");

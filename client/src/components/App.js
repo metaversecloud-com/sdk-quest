@@ -10,6 +10,7 @@ import { backendAPI } from "@utils";
 // context
 import { setInteractiveParams, setLeaderboardData, setVisitorInfo, setWorldInfo, useGlobalDispatch } from "@context";
 import { setupBackendAPI } from "../utils/backendAPI";
+import { getLeaderboardData } from "../utils/leaderboard";
 import { EggClicked } from "../pages";
 
 export function App() {
@@ -76,20 +77,7 @@ export function App() {
   }, [globalDispatch]);
 
   useEffect(() => {
-    const getLeaderboardData = async () => {
-      const result = await backendAPI.get("/egg-leaderboard");
-      let { leaderboard, success } = result.data;
-      if (success) {
-        setLeaderboardData({
-          dispatch: globalDispatch,
-          // leaderboardData: result.data.leaderboard,
-          leaderboardData: leaderboard,
-        });
-        // setLeaderboardData((prevData) => [...prevData, ...result.data.leaderboard]);
-        // setLeaderboardData((prevData) => [...prevData]);
-      } else return console.log("ERROR getting data object");
-    };
-    getLeaderboardData();
+    getLeaderboardData({ setLeaderboardData, globalDispatch });
   }, [globalDispatch]);
 
   return (
