@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 // components
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import { DirectionsWalk, RemoveCircleOutline } from "@mui/icons-material";
 
 // context
 import { useGlobalState } from "@context";
@@ -141,15 +142,30 @@ export function Admin() {
             <Grid item pt={4}>
               {droppedEggs.map((egg, index) => {
                 return (
-                  <Grid alignItems="center" container direction="row" justifyContent="space-between" key={egg.id}>
-                    <Grid item xs={3}>
-                      <Typography>Egg {index + 1}</Typography>
-                    </Grid>
+                  <Grid
+                    alignItems="center"
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    key={egg.id}
+                    sx={{ width: "50vw" }}
+                  >
                     <Grid item xs={5}>
-                      <Button onClick={() => moveVisitor(egg.position)}>Walk to</Button>
+                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>Egg {index + 1}</Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Tooltip placement="left" title="Walk to">
+                        <IconButton aria-label="Walk to" onClick={() => moveVisitor(egg.position)}>
+                          <DirectionsWalk />
+                        </IconButton>
+                      </Tooltip>
                     </Grid>
                     <Grid item xs={3}>
-                      <Button onClick={() => removeEgg(egg.id)}>Remove</Button>
+                      <Tooltip placement="right" title="Remove">
+                        <IconButton aria-label="Remove from world" onClick={() => removeEgg(egg.id)}>
+                          <RemoveCircleOutline />
+                        </IconButton>
+                      </Tooltip>
                     </Grid>
                   </Grid>
                 );

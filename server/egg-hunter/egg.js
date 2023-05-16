@@ -25,7 +25,6 @@ export const createEgg = async (req, res) => {
 
     // Check if world already has an egg image set.
     const worldDataObject = world.dataObject;
-    console.log(worldDataObject);
     if (worldDataObject && worldDataObject.eggDetails && worldDataObject.eggDetails.topLayer)
       eggBody.layers.top = worldDataObject.eggDetails.topLayer;
     else {
@@ -102,7 +101,6 @@ export const getEggLeaderboard = async (req, res) => {
     const worldDataObject = await getWorldDataObject(req);
     let leaderboard = [];
     if (worldDataObject) {
-      console.log("Object", worldDataObject);
       const { eggsCollectedByUser, profileMapper } = worldDataObject;
       for (const profileId in eggsCollectedByUser) {
         // const streak = getStreak(eggsCollectedByUser[profileId]);
