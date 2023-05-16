@@ -64,7 +64,6 @@ export function App() {
     const getWorld = async () => {
       const result = await backendAPI.get("/world");
       if (result.data.success) {
-        console.log(result.data.world);
         setWorldInfo({
           dispatch: globalDispatch,
           world: result.data.world,

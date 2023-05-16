@@ -23,13 +23,12 @@ export function Leaderboard() {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    if (leaderboardData && leaderboardData.length) setData(leaderboardData.slice(0, 20));
+    if (leaderboardData && leaderboardData.length) setData(leaderboardData.slice(0, 25));
   }, [leaderboardData]);
 
   const loadMoreRows = () => {
-    console.log(data.length, leaderboardData.length);
     if (data.length < leaderboardData.length) {
-      setData(leaderboardData.slice(0, data.length + 20));
+      setData(leaderboardData.slice(0, data.length + 25));
     } else {
       setHasMore(false);
     }
@@ -118,7 +117,7 @@ export function Leaderboard() {
       justifyContent="space-around"
       mt={3}
       p={3}
-      sx={{ height: "50vh", background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)", borderRadius: 15 }}
+      sx={{ height: "60vh", background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)", borderRadius: 15 }}
     >
       <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 5, width: "100%" }}>
         <AutoSizer>
