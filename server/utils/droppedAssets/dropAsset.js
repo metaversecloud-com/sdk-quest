@@ -4,7 +4,7 @@ import error from "../errors.js";
 export const dropWebImageAsset = async (req, res) => {
   const { layers } = req.body;
   try {
-    const modReq = { ...req, body: { ...req.body, id: process.env.WEBIMAGE_ASSET_ID } };
+    const modReq = { ...req, body: { ...req.body, id: "webImageAsset" } };
     const droppedAsset = await dropAsset(modReq);
     if (droppedAsset) await droppedAsset.updateWebImageLayers(layers.bottom || "", layers.top || "");
     else throw "Error dropping the asset";
