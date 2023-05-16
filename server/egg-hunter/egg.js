@@ -28,11 +28,15 @@ export const createEgg = async (req, res) => {
         // If the embedded asset has egg details, add those egg details to the world data object.
         world.updateDataObject({ eggDetails: assetDataObject.eggDetails });
       } else {
-        eggBody.top = "https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png";
+        eggBody.top = process.env.DEFAULT_EGG_IMAGE_URL;
       }
     }
 
     const egg = await dropWebImageAsset({ ...req, body: eggBody });
+    egg.updateClickType({
+      clickType: "link",
+      clickableLink: "localhost:3000/egg-clicked",
+    });
 
     if (res) res.json({ egg, success: true });
   } catch (e) {
