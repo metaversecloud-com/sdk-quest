@@ -17,17 +17,22 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(function (req, res, next) {
   const ogSend = res.send;
   res.send = function (data) {
-    if (data) {
-      const cleanData = JSON.parse(data);
-      const path = findObjectKeyPath(cleanData, "topia");
-      if (path) {
-        delete cleanData[path]["topia"];
-        delete cleanData[path]["credentials"];
-        delete cleanData[path]["jwt"];
-        delete cleanData[path]["requestOptions"];
+    if (data && res.statusCode < 300) {
+      try {
+        const cleanData = JSON.parse(data);
+        const path = findObjectKeyPath(cleanData, "topia");
+        if (path) {
+          delete cleanData[path]["topia"];
+          delete cleanData[path]["credentials"];
+          delete cleanData[path]["jwt"];
+          delete cleanData[path]["requestOptions"];
+        }
+        res.send = ogSend;
+        return res.send(cleanData);
+      } catch (error) {
+        console.log(error);
+        next();
       }
-      res.send = ogSend;
-      return res.send(cleanData);
     }
   };
   next();
