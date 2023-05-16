@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Admin } from "../admin";
-import { Leaderboard } from "../leaderboard";
+import { Admin, Leaderboard } from "../../components";
 
 // components
 import {

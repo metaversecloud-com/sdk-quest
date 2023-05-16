@@ -24,7 +24,7 @@ import {
   updateWorldDetails,
 } from "./utils/index.js";
 
-import { createEgg } from "./egg-hunter/index.js";
+import { createEgg, eggClicked } from "./egg-hunter/index.js";
 
 import express from "express";
 const router = express.Router();
@@ -35,6 +35,7 @@ router.get("/", (req, res) => {
 
 // Egg Hunter Backend
 router.post("/create-egg", createEgg);
+router.post("/egg-clicked", eggClicked);
 
 // Dropped Asset
 // Get details of droppedAsset that opened iFrame or fired webhook. assetId comes from interactive nonce.

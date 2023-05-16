@@ -1,4 +1,4 @@
-import { Error, Home } from "@pages";
+import { EggClicked, Error, Home } from "@pages";
 
 export const routes = [
   {
@@ -6,6 +6,12 @@ export const routes = [
     path: "/",
     component: Home,
     text: "Home",
+  },
+  {
+    id: "Egg-Clicked",
+    path: "/egg-clicked",
+    component: EggClicked,
+    text: "Egg Clicked",
   },
   {
     path: "/error",

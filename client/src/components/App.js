@@ -10,6 +10,7 @@ import { backendAPI } from "@utils";
 // context
 import { setInteractiveParams, setVisitorInfo, setWorldInfo, useGlobalDispatch } from "@context";
 import { setupBackendAPI } from "../utils/backendAPI";
+import { EggClicked } from "../pages";
 
 export function App() {
   const [searchParams] = useSearchParams();
@@ -80,6 +81,7 @@ export function App() {
         return <Route element={<route.component />} key={index} path={route.path} />
       })} */}
       <Route element={<Home />} exact path="/" />
+      <Route element={<EggClicked />} exact path="/egg-clicked" />
       <Route element={<Error />} exact path="*" />
     </Routes>
   );

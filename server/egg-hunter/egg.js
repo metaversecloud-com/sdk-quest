@@ -35,11 +35,19 @@ export const createEgg = async (req, res) => {
     const egg = await dropWebImageAsset({ ...req, body: eggBody });
     egg.updateClickType({
       clickType: "link",
-      clickableLink: "localhost:3000/egg-clicked",
+      clickableLinkTitle: "Egg Hunter",
+      isOpenLinkInDrawer: true,
+      // clickableLink: "http://localhost:3000/egg-clicked/",
+      clickableLink: "https://nytimes.com/",
     });
 
     if (res) res.json({ egg, success: true });
   } catch (e) {
     error("Error dropping asset", e, res);
   }
+};
+
+export const eggClicked = async (req, res) => {
+  const worldDataObject = await getWorldDataObject(req);
+  if (res) res.json({ addedClick: true, success: true });
 };
