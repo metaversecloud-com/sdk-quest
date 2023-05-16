@@ -96,47 +96,52 @@ export function Admin() {
   return (
     <>
       <Grid container direction="column" justifyContent="space-around" p={3}>
-        <Grid item>
-          Click to Hide an Egg in the world
-          <Button
-            onClick={() =>
-              dropEgg({
-                imageUrl: "https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png",
-              })
-            }
-          >
-            <img alt="Drop egg in world" src="https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png" />
-          </Button>
+        <Grid alignItems="center" container direction="column" p={1}>
+          <Grid item>Click to Hide an Egg in the world</Grid>
+          <Grid item>
+            <Button
+              onClick={() =>
+                dropEgg({
+                  imageUrl: "https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png",
+                })
+              }
+            >
+              <img alt="Drop egg in world" src="https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png" />
+            </Button>
+          </Grid>
         </Grid>
 
-        <Grid item>
-          <Button onClick={removeAllEggs} variant="contained">
-            Remove all dropped eggs
-          </Button>
-        </Grid>
         {droppedEggs && (
-          <>
-            <Grid item pt={4} xs={12}>
-              <Typography>There are currently {droppedEggs.length} eggs hidden in this world</Typography>
+          <Grid alignItems="center" container direction="column" p={0}>
+            <Grid item p={2}>
+              <Typography>
+                {droppedEggs.length} {droppedEggs.length === 1 ? "egg" : "eggs"} hidden in this world
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Button onClick={removeAllEggs} variant="contained">
+                Remove all eggs
+              </Button>
             </Grid>
             <Grid item pt={4} xs={12}>
               {droppedEggs.map((egg, index) => {
+                console.log(egg);
                 return (
-                  <Grid alignItems="center" container direction="row" key={egg.id} spacing={0}>
-                    <Grid item m={1} xs={2}>
+                  <Grid alignItems="center" container direction="row" key={egg.id} spacing={2}>
+                    <Grid item>
                       <Typography>Egg {index + 1}</Typography>
                     </Grid>
-                    <Grid item m={1} xs={4}>
+                    <Grid item>
                       <Button onClick={() => moveVisitor(egg.position)}>Walk to</Button>
                     </Grid>
-                    <Grid item m={1} xs={2}>
+                    <Grid item>
                       <Button onClick={() => removeEgg(egg.id)}>Remove</Button>
                     </Grid>
                   </Grid>
                 );
               })}
             </Grid>
-          </>
+          </Grid>
         )}
       </Grid>
     </>

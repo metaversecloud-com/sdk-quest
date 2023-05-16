@@ -35,6 +35,7 @@ export const createEgg = async (req, res) => {
     }
 
     const egg = await dropWebImageAsset({ ...req, body: eggBody });
+    if (res) res.json({ egg, success: true });
     egg.updateClickType({
       clickType: "link",
       clickableLinkTitle: "Egg Hunter",
@@ -42,8 +43,6 @@ export const createEgg = async (req, res) => {
       clickableLink: "http://localhost:3000/egg-clicked/",
       // clickableLink: "https://nytimes.com/",
     });
-
-    if (res) res.json({ egg, success: true });
   } catch (e) {
     error("Error dropping asset", e, res);
   }

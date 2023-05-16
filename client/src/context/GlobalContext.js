@@ -28,6 +28,11 @@ function globalReducer(state, action) {
         ...state,
         world: action.payload.world,
       };
+    case "SET_LEADERBOARD_DATA":
+      return {
+        ...state,
+        leaderboardData: action.payload.leaderboardData,
+      };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
@@ -97,6 +102,15 @@ function setWorldInfo({ dispatch, world }) {
   });
 }
 
+function setLeaderboardData({ dispatch, leaderboardData }) {
+  dispatch({
+    type: "SET_LEADERBOARD_DATA",
+    payload: {
+      leaderboardData,
+    },
+  });
+}
+
 // // eslint-disable-next-line no-unused-vars
 // async function fetchWorld({ apiKey, dispatch, urlSlug }) {
 //   if (!apiKey || !urlSlug) return;
@@ -119,4 +133,12 @@ function setWorldInfo({ dispatch, world }) {
 //   }
 // }
 
-export { GlobalProvider, setInteractiveParams, setVisitorInfo, setWorldInfo, useGlobalState, useGlobalDispatch };
+export {
+  GlobalProvider,
+  setInteractiveParams,
+  setLeaderboardData,
+  setVisitorInfo,
+  setWorldInfo,
+  useGlobalState,
+  useGlobalDispatch,
+};

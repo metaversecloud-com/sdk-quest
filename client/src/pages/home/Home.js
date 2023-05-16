@@ -32,31 +32,25 @@ export function Home() {
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
 
   return (
-    <>
-      <Grid container direction="column" justifyContent="space-around" p={3}>
-        <Grid item>
-          <Grid alignItems="center" container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h4">Egg Hunter</Typography>
-            </Grid>
-            {visitor && visitor.isAdmin && (
-              <Grid item xs={12}>
-                <ToggleButtonGroup
-                  aria-label="Admin vs Leaderboard"
-                  color="primary"
-                  exclusive
-                  onChange={(e) => setToggle(e.target.value)}
-                  value={toggle}
-                >
-                  <ToggleButton value="leaderboard">Leaderboard</ToggleButton>
-                  <ToggleButton value="admin">Admin</ToggleButton>
-                </ToggleButtonGroup>
-              </Grid>
-            )}
-            {toggle === "admin" ? <Admin /> : <Leaderboard />}
-          </Grid>
-        </Grid>
+    <Grid alignItems="center" container direction="column" p={0}>
+      <Grid item p={3} xs={12}>
+        <Typography variant="h4">Egg Hunter</Typography>
       </Grid>
-    </>
+      {visitor && visitor.isAdmin && (
+        <Grid item xs={12}>
+          <ToggleButtonGroup
+            aria-label="Admin vs Leaderboard"
+            color="primary"
+            exclusive
+            onChange={(e) => setToggle(e.target.value)}
+            value={toggle}
+          >
+            <ToggleButton value="leaderboard">Leaderboard</ToggleButton>
+            <ToggleButton value="admin">Admin</ToggleButton>
+          </ToggleButtonGroup>
+        </Grid>
+      )}
+      {toggle === "admin" ? <Admin /> : <Leaderboard />}
+    </Grid>
   );
 }
