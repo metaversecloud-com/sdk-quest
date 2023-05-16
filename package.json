@@ -19,7 +19,7 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "build": "npm install && npm run build -w server && npm run build -w client",
+    "build": "cd client && npm install && npm run build",
     "link-sdk": "yalc link @rtsdk/topia",
     "unlink-sdk": "yalc remove @rtsdk/topia",
     "server": "node server/index.js",
