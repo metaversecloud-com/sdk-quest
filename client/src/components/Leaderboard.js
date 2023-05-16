@@ -38,9 +38,11 @@ export function Leaderboard() {
   const cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
     const cellStyle = {
       ...style,
-      padding: `${rowIndex === 0 ? 0 : 0}px 10px`, // Match row height
-      margin: `${rowIndex === 0 ? 10 : 0}px 0`, // Match row height
-      lineHeight: `${rowIndex === 0 ? 40 : 30}px`, // Match row height
+      padding: `${rowIndex === 0 ? 0 : 0}px 10px`,
+      margin: `${rowIndex === 0 ? 10 : 0}px 0`,
+      lineHeight: `${rowIndex === 0 ? 40 : 30}px`,
+      // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
+
       boxShadow: "0px 1px 0px #E8E8E8",
     };
 
@@ -58,7 +60,10 @@ export function Leaderboard() {
           content = "Name";
           break;
         case 2:
-          content = "Collected";
+          content = "Streak";
+          break;
+        case 3:
+          content = "Total";
           break;
         default:
           content = "";
@@ -83,6 +88,9 @@ export function Leaderboard() {
           content = item.name;
           break;
         case 2:
+          content = `${item.streak ? item.streak : 0} ⚡`;
+          break;
+        case 3:
           content = item.collected;
           break;
         default:
@@ -117,8 +125,10 @@ export function Leaderboard() {
           {({ height, width }) => (
             <MultiGrid
               cellRenderer={cellRenderer}
-              columnCount={3}
-              columnWidth={({ index }) => (index === 0 ? width / 5 : index === 1 ? width / 2.5 : width / 3)} // 50px for the first column, 100px for the others
+              columnCount={4}
+              columnWidth={({ index }) =>
+                index === 0 ? width / 6 : index === 1 ? width / 2.5 : index == 2 ? width / 5 : width / 6
+              } // 50px for the first column, 100px for the others
               fixedRowCount={1}
               height={height}
               onSectionRendered={({ rowStopIndex }) => {

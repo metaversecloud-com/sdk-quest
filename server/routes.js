@@ -24,7 +24,7 @@ import {
   updateWorldDetails,
 } from "./utils/index.js";
 
-import { createEgg, eggClicked, getEggLeaderboard } from "./egg-hunter/index.js";
+import { createEgg, eggClicked, getEggImage, getEggLeaderboard } from "./egg-hunter/index.js";
 
 import express from "express";
 const router = express.Router();
@@ -37,6 +37,7 @@ router.get("/", (req, res) => {
 router.post("/create-egg", createEgg);
 router.post("/egg-clicked", eggClicked);
 router.get("/egg-leaderboard", getEggLeaderboard);
+router.get("/egg-image", getEggImage);
 
 // Dropped Asset
 // Get details of droppedAsset that opened iFrame or fired webhook. assetId comes from interactive nonce.

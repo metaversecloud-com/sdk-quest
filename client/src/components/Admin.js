@@ -15,13 +15,28 @@ export function Admin() {
   // const [droppedAsset, setDroppedAsset] = useState();
 
   const [droppedEggs, setDroppedEggs] = useState([]);
+  const [eggImage, setEggImage] = useState("");
   const [dropping, setDropping] = useState(false);
   const { hasInteractiveParams } = useGlobalState();
 
   // Get dropped eggs info
   useEffect(() => {
-    if (hasInteractiveParams) getDroppedEggs();
+    if (hasInteractiveParams) {
+      getDroppedEggs();
+      getEggImage();
+    }
   }, [hasInteractiveParams]);
+
+  const getEggImage = async () => {
+    try {
+      const result = await backendAPI.get("/egg-image");
+      if (result.data.success) {
+        setEggImage(result.data.eggImage);
+      } else return console.log("ERROR getting egg image");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getDroppedEggs = async () => {
     try {
@@ -36,14 +51,10 @@ export function Admin() {
     }
   };
 
-  const dropEgg = async ({ imageUrl }) => {
+  const dropEgg = async () => {
     try {
       setDropping(true);
       const result = await backendAPI.post("/create-egg", {
-        layers: {
-          // TODO: Change to image stored in world data object
-          top: imageUrl,
-        },
         uniqueName: eggUniqueName,
       });
       if (result.data.success) {
@@ -101,24 +112,19 @@ export function Admin() {
     <>
       <Grid container direction="column" justifyContent="space-around" p={3}>
         <Grid alignItems="center" container direction="column" p={1}>
-          <Grid item>Click to Hide an Egg in the world</Grid>
           <Grid item>
-            <Button
-              disabled={dropping}
-              onClick={() =>
-                dropEgg({
-                  imageUrl: "https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png",
-                })
-              }
-            >
-              <img alt="Drop egg in world" src="https://topiaimages.s3.us-west-1.amazonaws.com/easter-egg.png" />
+            <Typography>{!dropping ? "Click to Hide an Egg in the world" : "Dropping egg..."}</Typography>
+          </Grid>
+          <Grid item>
+            <Button disabled={dropping} onClick={dropEgg}>
+              <img alt="Drop egg in world" className={dropping ? "dropping" : ""} src={eggImage} />
             </Button>
           </Grid>
         </Grid>
 
-        {droppedEggs && (
-          <Grid alignItems="center" container direction="column" p={0}>
-            <Grid item p={2}>
+        {droppedEggs.length ? (
+          <Grid alignItems="center" container direction="column">
+            <Grid item p={1}>
               <Typography>
                 {droppedEggs.length} {droppedEggs.length === 1 ? "egg" : "eggs"} hidden in this world
               </Typography>
@@ -128,25 +134,17 @@ export function Admin() {
                 Remove all eggs
               </Button>
             </Grid>
-            <Grid item pt={4} xs={12}>
+            <Grid item pt={4}>
               {droppedEggs.map((egg, index) => {
-                console.log(egg);
                 return (
-                  <Grid
-                    alignItems="center"
-                    container
-                    direction="row"
-                    justifyContent="space-between"
-                    key={egg.id}
-                    spacing={3}
-                  >
-                    <Grid item>
+                  <Grid alignItems="center" container direction="row" justifyContent="space-between" key={egg.id}>
+                    <Grid item xs={3}>
                       <Typography>Egg {index + 1}</Typography>
                     </Grid>
-                    <Grid item>
+                    <Grid item xs={5}>
                       <Button onClick={() => moveVisitor(egg.position)}>Walk to</Button>
                     </Grid>
-                    <Grid item>
+                    <Grid item xs={3}>
                       <Button onClick={() => removeEgg(egg.id)}>Remove</Button>
                     </Grid>
                   </Grid>
@@ -154,6 +152,8 @@ export function Admin() {
               })}
             </Grid>
           </Grid>
+        ) : (
+          <></>
         )}
       </Grid>
     </>

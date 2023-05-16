@@ -15,22 +15,21 @@ export const createEgg = async (req, res) => {
     const world = await getWorldDetails({ ...req, body: { ...req.body, includeDataObject: true } });
     // Randomly place the egg
     const position = randomCoord(world.width, world.height);
-    const eggBody = { ...req.body, isInteractive: true, position };
+    const eggBody = { ...req.body, isInteractive: true, position, layers: { top: process.env.DEFAULT_EGG_IMAGE_URL } };
 
     // Check if world already has an egg image set.
     const worldDataObject = world.dataObject;
+    console.log(worldDataObject);
     if (worldDataObject && worldDataObject.eggDetails && worldDataObject.eggDetails.topLayer)
-      eggBody.top = worldDataObject.eggDetails.topLayer;
+      eggBody.layers.top = worldDataObject.eggDetails.topLayer;
     else {
       // If egg image not set in world data object, check the embedded asset
       const embeddedAsset = await getEmbeddedAssetDetails({ ...req, body: { ...req.body, includeDataObject: true } });
       const assetDataObject = embeddedAsset.dataObject;
       if (assetDataObject && assetDataObject.eggDetails && assetDataObject.eggDetails.topLayer) {
-        eggBody.top = assetDataObject.eggDetails.topLayer;
+        eggBody.layers.top = assetDataObject.eggDetails.topLayer;
         // If the embedded asset has egg details, add those egg details to the world data object.
         world.updateDataObject({ eggDetails: assetDataObject.eggDetails });
-      } else {
-        eggBody.top = process.env.DEFAULT_EGG_IMAGE_URL;
       }
     }
 
@@ -101,6 +100,7 @@ export const getEggLeaderboard = async (req, res) => {
           name: profileMapper[profileId],
           collected: Object.keys(eggsCollectedByUser[profileId]).length,
           profileId,
+          streak: getStreak(eggsCollectedByUser[profileId]),
         });
       }
       leaderboard.push({ profileId: "blah", name: "Flood", collected: 20 });
@@ -132,4 +132,31 @@ export const getEggLeaderboard = async (req, res) => {
   } catch (e) {
     error("Getting egg leaderboard", e, res);
   }
+};
+
+function getStreak(data) {
+  let currentDate = new Date();
+  let streak = 0;
+
+  while (true) {
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so we add 1
+    const day = String(currentDate.getDate()).padStart(2, "0");
+
+    const key = `${year}_${month}_${day}`;
+
+    if (data[key]) {
+      streak++;
+      currentDate.setDate(currentDate.getDate() - 1); // Go to the previous day
+    } else {
+      break; // End the loop when we find a day that doesn't exist in the data
+    }
+  }
+
+  return streak;
+}
+
+export const getEggImage = async (req, res) => {
+  // TODO: Make this pull from data objects so matches what will be dropped
+  if (res) res.json({ eggImage: process.env.DEFAULT_EGG_IMAGE_URL, success: true });
 };
