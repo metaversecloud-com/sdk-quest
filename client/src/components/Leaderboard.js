@@ -34,16 +34,15 @@ export function Leaderboard() {
     }
   };
 
-  // const handleScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
-  //   const bottomReached = scrollTop + clientHeight >= scrollHeight;
-  //   if (bottomReached && hasMore) {
-  //     loadMoreRows();
-  //   }
-  // };
-
-  // const rowGetter = ({ index }) => data[index];
-
   const cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
+    const cellStyle = {
+      ...style,
+      padding: "0 10px",
+      margin: "15px 0",
+      lineHeight: `${rowIndex === 0 ? 40 : 40}px`, // Match row height
+      borderBottom: rowIndex !== 0 ? "1px solid #ddd" : null,
+    };
+
     if (rowIndex === 0) {
       // Render headers
       let content;
@@ -64,7 +63,7 @@ export function Leaderboard() {
           content = "";
       }
       return (
-        <Box key={key} style={style}>
+        <Box key={key} style={cellStyle}>
           <Typography>{content}</Typography>
         </Box>
       );
@@ -89,45 +88,12 @@ export function Leaderboard() {
           content = "";
       }
       return (
-        <Box key={key} style={style}>
+        <Box key={key} style={cellStyle}>
           <Typography>{content}</Typography>
         </Box>
       );
     }
   };
-
-  // const [leaderboardData, setLeaderboardData] = useState([]);
-  // const [hasMore, setHasMore] = useState(true);
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, [visitor]);
-
-  // const fetchData = async () => {
-  //   try {
-  //     const result = await backendAPI.get("/egg-leaderboard");
-  //     if (result.data.success) {
-  //       console.log(visitor.profileId, result.data.leaderboard);
-  //       setLeaderboardData((prevData) => [...prevData, ...result.data.leaderboard]);
-  //       // setLeaderboardData((prevData) => [...prevData]);
-  //     } else return console.log("ERROR getting data object");
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // const rowRenderer = ({ index, key, parent, style }) => {
-  //   const data = leaderboardData[index];
-  //   return (
-  //     <CellMeasurer cache={cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-  //       <div style={style}>
-  //         <ListItem>
-  //           <ListItemText primary={`${data.name} - ${data.collected}`} />
-  //         </ListItem>
-  //       </div>
-  //     </CellMeasurer>
-  //   );
-  // };
 
   if (!visitor || !leaderboardData) return;
 
@@ -146,7 +112,7 @@ export function Leaderboard() {
             <MultiGrid
               cellRenderer={cellRenderer}
               columnCount={3}
-              columnWidth={width * 0.3}
+              columnWidth={width / 3}
               fixedRowCount={1}
               height={height}
               onSectionRendered={({ rowStopIndex }) => {
@@ -156,7 +122,7 @@ export function Leaderboard() {
                 }
               }}
               rowCount={data.length + 1} // Plus 1 for header row
-              rowHeight={30}
+              rowHeight={({ index }) => (index === 0 ? 40 : 30)} // 50px for body rows, 30px for the header
               width={width}
             />
           )}
@@ -164,92 +130,4 @@ export function Leaderboard() {
       </Box>
     </Grid>
   );
-
-  // return (
-  //   <Grid
-  //     container
-  //     direction="column"
-  //     justifyContent="space-around"
-  //     mt={3}
-  //     p={3}
-  //     sx={{ height: "50vh", background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)", borderRadius: 15 }}
-  //   >
-  //     <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 8, width: "100%" }}>
-  //       <AutoSizer>
-  //         {({ height, width }) => (
-  //           <Table
-  //             headerHeight={60}
-  //             height={height}
-  //             onScroll={handleScroll}
-  //             rowCount={data.length}
-  //             rowGetter={rowGetter}
-  //             rowHeight={30}
-  //             width={width}
-  //           >
-  //             {/* <Column
-  //             label='Rank'
-  //             dataKey='rank'
-  //             width={50}
-  //             cellRenderer={({ cellData }) => <Typography>{cellData}</Typography>}
-  //           /> */}
-  //             {/* <Column
-  //             label='Avatar'
-  //             dataKey='avatar'
-  //             width={50}
-  //             cellRenderer={({ cellData }) => <img src={cellData} alt="avatar" style={{ height: 20, width: 20 }} />}
-  //           /> */}
-  //             <Column
-  //               cellRenderer={({ cellData }) => <Typography>{cellData}</Typography>}
-  //               dataKey="name"
-  //               label="Name"
-  //               width={width * 0.2}
-  //             />
-  //             <Column
-  //               cellRenderer={({ cellData }) => <Typography>{cellData}</Typography>}
-  //               dataKey="collected"
-  //               label="Collected"
-  //               width={width * 0.2}
-  //             />
-  //           </Table>
-  //         )}
-  //       </AutoSizer>
-  //     </Box>
-  //   </Grid>
-  // );
-
-  // return (
-  //   <>
-  //     <Grid
-  //       container
-  //       direction="column"
-  //       justifyContent="space-around"
-  //       mt={3}
-  //       p={3}
-  //       sx={{ height: "100%", background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)", borderRadius: 15 }}
-  //     >
-  //       <Grid item>{/* <Typography>{world.name} Leaderboard</Typography> */}</Grid>
-  //       {/* <Typography>Welcome {visitor.username}!</Typography> */}
-  //       <Grid item p={2} sx={{ height: "50vh", backgroundColor: "white", borderRadius: 8 }}>
-  //         <AutoSizer>
-  //           {({ height, width }) => (
-  //             <List
-  //               deferredMeasurementCache={cache}
-  //               height={height}
-  //               // onRowsRendered={({ overscanStopIndex }) => {
-  //               //   if (hasMore && overscanStopIndex === leaderboardData.length - 1) {
-  //               //     fetchData();
-  //               //   }
-  //               // }}
-  //               overscanRowCount={1}
-  //               rowCount={leaderboardData.length}
-  //               rowHeight={cache.rowHeight}
-  //               rowRenderer={rowRenderer}
-  //               width={width}
-  //             />
-  //           )}
-  //         </AutoSizer>
-  //       </Grid>
-  //     </Grid>
-  //   </>
-  // );
 }
