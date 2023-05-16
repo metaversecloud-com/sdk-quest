@@ -1,17 +1,19 @@
-import { dropWebImageAsset } from "../utils/droppedAssets/index.js";
+import { dropWebImageAsset, updatePosition } from "../utils/droppedAssets/index.js";
 import { getWorldDetails } from "../utils/world/index.js";
 import { getEmbeddedAssetDetails } from "../utils/droppedAssets/index.js";
+import { getVisitor } from "../utils/index.js";
 import error from "../utils/errors.js";
+
+const randomCoord = (width, height) => {
+  const x = Math.floor(Math.random() * (width / 2 - -width / 2 + 1) + -width / 2);
+  const y = Math.floor(Math.random() * (height / 2 - -height / 2 + 1) + -height / 2);
+  return { x, y };
+};
 
 export const createEgg = async (req, res) => {
   try {
     const world = await getWorldDetails({ ...req, body: { ...req.body, includeDataObject: true } });
     // Randomly place the egg
-    const randomCoord = (width, height) => {
-      const x = Math.floor(Math.random() * (width / 2 - -width / 2 + 1) + -width / 2);
-      const y = Math.floor(Math.random() * (height / 2 - -height / 2 + 1) + -height / 2);
-      return { x, y };
-    };
     const position = randomCoord(world.width, world.height);
     const eggBody = { ...req.body, isInteractive: true, position };
 
@@ -37,8 +39,8 @@ export const createEgg = async (req, res) => {
       clickType: "link",
       clickableLinkTitle: "Egg Hunter",
       isOpenLinkInDrawer: true,
-      // clickableLink: "http://localhost:3000/egg-clicked/",
-      clickableLink: "https://nytimes.com/",
+      clickableLink: "http://localhost:3000/egg-clicked/",
+      // clickableLink: "https://nytimes.com/",
     });
 
     if (res) res.json({ egg, success: true });
@@ -48,6 +50,34 @@ export const createEgg = async (req, res) => {
 };
 
 export const eggClicked = async (req, res) => {
-  const worldDataObject = await getWorldDataObject(req);
-  if (res) res.json({ addedClick: true, success: true });
+  try {
+    const visitor = await getVisitor(req);
+    const world = await getWorldDetails({ ...req, body: { ...req.body, includeDataObject: true } });
+    const worldDataObject = world.dataObject;
+    if (worldDataObject) {
+      const { eggsCollectedByUser } = worldDataObject;
+      //YYYY_MM_DD
+      const date = new Date();
+      const dateKey = `${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;
+      if (
+        eggsCollectedByUser &&
+        eggsCollectedByUser[visitor.profileId] &&
+        eggsCollectedByUser[visitor.profileId][dateKey]
+      ) {
+        // FAIL: Visitor has already collected an egg today.
+        if (res) res.json({ addedClick: false, success: true });
+        return;
+      } else {
+        // SUCCESS: This is the first egg visitor collected today.
+        await world.updateDataObject({ eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: true } } });
+        // Move the egg to a new random location
+        const position = randomCoord(world.width, world.height);
+        await updatePosition({ ...req, body: { position } });
+        if (res) res.json({ addedClick: true, success: true });
+      }
+    }
+    if (res) res.json({ addedClick: true, success: true });
+  } catch (e) {
+    error("Handling egg click", e, res);
+  }
 };
