@@ -11,10 +11,6 @@
     "express": "^4.18.2",
     "yalc": "^1.0.0-pre.53"
   },
-  "workspaces": [
-    "client",
-    "server"
-  ],
   "description": "",
   "engines": {
     "node": "18.14"
@@ -28,8 +24,7 @@
     "unlink-sdk": "yalc remove @rtsdk/topia",
     "server": "node server/index.js",
     "client": "npm start --prefix client",
-    "start": "concurrently \"npm run server\" \"npm run client\"",
-    "postinstall": "if [ \"$HEROKU\" = \"true\" ]; then echo Skipping postinstall; else npm install && cd client && npm install; fi"
+    "start": "concurrently \"npm run server\" \"npm run client\""
   },
   "type": "module",
   "version": "1.0.0"
