@@ -32,8 +32,9 @@ export function Leaderboard() {
 
   const fetchMoreData = async () => {
     try {
-      const result = await backendAPI.get("/world/data-object");
+      const result = await backendAPI.get("/egg-leaderboard");
       if (result.data.success) {
+        console.log(visitor.profileId, result.data.dataObject);
         // setLeaderboardData((prevData) => [...prevData, ...result.data.dataObject.leaderboard]);
         setLeaderboardData((prevData) => [...prevData]);
       } else return console.log("ERROR getting data object");

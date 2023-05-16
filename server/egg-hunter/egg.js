@@ -1,5 +1,5 @@
 import { dropWebImageAsset, updatePosition } from "../utils/droppedAssets/index.js";
-import { getWorldDetails } from "../utils/world/index.js";
+import { getWorldDataObject, getWorldDetails } from "../utils/world/index.js";
 import { getEmbeddedAssetDetails } from "../utils/droppedAssets/index.js";
 import { getVisitor } from "../utils/index.js";
 import error from "../utils/errors.js";
@@ -59,6 +59,7 @@ export const eggClicked = async (req, res) => {
       //YYYY_MM_DD
       const date = new Date();
       const dateKey = `${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;
+
       if (
         eggsCollectedByUser &&
         eggsCollectedByUser[visitor.profileId] &&
@@ -69,7 +70,10 @@ export const eggClicked = async (req, res) => {
         return;
       } else {
         // SUCCESS: This is the first egg visitor collected today.
-        await world.updateDataObject({ eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: true } } });
+        await world.updateDataObject({
+          eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: true } }, // Add egg collection dateKey.
+          profileMapper: { [visitor.profileId]: visitor.username }, // Update the username of the visitor to be shown in the leaderboard.
+        });
         // Move the egg to a new random location
         const position = randomCoord(world.width, world.height);
         await updatePosition({ ...req, body: { position } });
@@ -79,5 +83,18 @@ export const eggClicked = async (req, res) => {
     if (res) res.json({ addedClick: true, success: true });
   } catch (e) {
     error("Handling egg click", e, res);
+  }
+};
+
+export const getEggLeaderboard = async (req, res) => {
+  try {
+    const worldDataObject = await getWorldDataObject(req);
+    let leaderboard = [];
+    if (worldDataObject) {
+      const { eggsCollectedByUser, profileMapper } = worldDataObject;
+    }
+    if (res) res.json({ leaderboard, success: true });
+  } catch (e) {
+    error("Getting egg leaderboard", e, res);
   }
 };
