@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 
 // components
 import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
-import { DirectionsWalk, RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutline } from "@mui/icons-material";
+
+import { WalkIcon } from "./SVGs.js";
 
 // context
 import { useGlobalState } from "@context";
@@ -156,7 +158,7 @@ export function Admin() {
                     <Grid item xs={4}>
                       <Tooltip placement="left" title="Walk to">
                         <IconButton aria-label="Walk to" onClick={() => moveVisitor(egg.position)}>
-                          <DirectionsWalk />
+                          <WalkIcon />
                         </IconButton>
                       </Tooltip>
                     </Grid>
