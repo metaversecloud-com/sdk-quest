@@ -1,5 +1,5 @@
 {
-  "name": "sdk-boilerplate",
+  "name": "egg-hunter",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -11,6 +11,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": "18.14"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -42,8 +45,8 @@
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "start": "react-app-rewired --openssl-legacy-provider start",
+    "build": "react-app-rewired --openssl-legacy-provider build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "lint": "eslint -c .eslintrc.js --ext .js,.jsx .",
