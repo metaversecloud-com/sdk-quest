@@ -55,8 +55,11 @@ export const eggClicked = async (req, res) => {
     if (worldDataObject) {
       const { eggsCollectedByUser } = worldDataObject;
       //YYYY_MM_DD
-      const date = new Date();
-      const dateKey = `${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so we add 1
+      const day = String(currentDate.getDate()).padStart(2, "0");
+      const dateKey = `${year}_${month}_${day}`;
       // world.setDataObject({});
       if (
         eggsCollectedByUser &&
@@ -96,11 +99,13 @@ export const getEggLeaderboard = async (req, res) => {
       console.log("Object", worldDataObject);
       const { eggsCollectedByUser, profileMapper } = worldDataObject;
       for (const profileId in eggsCollectedByUser) {
+        const streak = getStreak(eggsCollectedByUser[profileId]);
+        console.log(streak);
         leaderboard.push({
           name: profileMapper[profileId],
           collected: Object.keys(eggsCollectedByUser[profileId]).length,
           profileId,
-          streak: getStreak(eggsCollectedByUser[profileId]),
+          streak,
         });
       }
       leaderboard.push({ profileId: "blah", name: "Flood", collected: 20 });
@@ -142,11 +147,16 @@ function getStreak(data) {
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so we add 1
     const day = String(currentDate.getDate()).padStart(2, "0");
+    const dayOfWeek = currentDate.getDay();
 
     const key = `${year}_${month}_${day}`;
 
+    // TODO: Check when the world was closed, which requires that we save the history of open and closed days.
     if (data[key]) {
       streak++;
+      currentDate.setDate(currentDate.getDate() - 1); // Go to the previous day
+    } else if (dayOfWeek === 0 || dayOfWeek === 6) {
+      // Skips weekends, but gives you streak credit above if you somehow came on a weekend
       currentDate.setDate(currentDate.getDate() - 1); // Go to the previous day
     } else {
       break; // End the loop when we find a day that doesn't exist in the data
