@@ -17,7 +17,7 @@ export const getEmbeddedAssetDetails = async (req, res) => {
     if (res) res.json({ droppedAsset, success: true });
     return droppedAsset;
   } catch (e) {
-    return error("Getting asset and data object", e, res);
+    error("Getting asset and data object", e, res);
   }
 };
 
@@ -38,6 +38,6 @@ export const getDroppedAssetDetails = async (req, res) => {
     if (res) res.json({ droppedAsset, success: true });
     return droppedAsset;
   } catch (e) {
-    return error("Getting asset and data object", e, res);
+    error("Getting dropped asset instance and data object", e, res);
   }
 };

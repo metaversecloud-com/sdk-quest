@@ -1,3 +1,4 @@
+import { getVisitor } from "./visitor.js";
 import error from "../errors.js";
 
 export const openIframe = async (req, res) => {
@@ -37,7 +38,8 @@ export const moveVisitor = async (req, res) => {
     const visitor = await getVisitor(req);
     if (!visitor) throw "No visitor found";
     if (visitor.error) throw visitor.error;
-    await visitor.moveVisitor({ moveTo, shouldTeleportVisitor });
+    if (!moveTo || !moveTo.x || !moveTo.y) throw "Invalid movement coordinates";
+    await visitor.moveVisitor({ x: moveTo.x, y: moveTo.y, shouldTeleportVisitor });
     if (res) res.json({ visitor, success: true });
     return visitor;
   } catch (e) {
