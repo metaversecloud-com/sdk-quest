@@ -116,9 +116,13 @@ export function Admin() {
             <Typography>{!dropping ? "Click to Hide an Egg in the world" : "Dropping egg..."}</Typography>
           </Grid>
           <Grid item>
-            <Button disabled={dropping} onClick={dropEgg}>
-              <img alt="Drop egg in world" className={dropping ? "dropping" : ""} src={eggImage} />
-            </Button>
+            {eggImage ? (
+              <Button disabled={dropping} onClick={dropEgg}>
+                <img alt="Drop egg in world" className={dropping ? "dropping" : ""} src={eggImage} />
+              </Button>
+            ) : (
+              <div />
+            )}
           </Grid>
         </Grid>
 
