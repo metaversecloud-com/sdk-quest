@@ -77,6 +77,9 @@ export const eggClicked = async (req, res) => {
         // Move the egg to a new random location
         const position = randomCoord(world.width, world.height);
         await updatePosition({ ...req, body: { position } });
+        visitor.updateDataObject({
+          eggsCollectedByWorld: { [world.urlSlug]: { [dateKey]: true } }, // Add egg collection dateKey.
+        });
         if (res) res.json({ addedClick: true, success: true });
         return;
       }
