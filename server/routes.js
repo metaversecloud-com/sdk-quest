@@ -29,10 +29,6 @@ import { createEgg, eggClicked, getEggImage, getEggLeaderboard } from "./egg-hun
 import express from "express";
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json({ message: "Hello from server!" });
-});
-
 // Egg Hunter Backend
 router.post("/create-egg", createEgg);
 router.post("/egg-clicked", eggClicked);
