@@ -21,7 +21,7 @@ app.use(function (req, res, next) {
       try {
         const cleanData = JSON.parse(data);
         const path = findObjectKeyPath(cleanData, "topia");
-        if (path) {
+        if (cleanData && path && cleanData[path]) {
           delete cleanData[path]["topia"];
           delete cleanData[path]["credentials"];
           delete cleanData[path]["jwt"];

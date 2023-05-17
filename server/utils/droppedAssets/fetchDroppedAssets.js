@@ -18,7 +18,14 @@ export const fetchDroppedAssetsUniqueName = async (req, res) => {
       isPartial,
       uniqueName,
     });
-    if (res) res.json({ droppedAssets, success: true });
+    const normalized = droppedAssets.map((asset) => {
+      delete asset["topia"];
+      delete asset["credentials"];
+      delete asset["jwt"];
+      delete asset["requestOptions"];
+      return asset;
+    });
+    if (res) res.json({ droppedAssets: normalized, success: true });
     return droppedAssets;
   } catch (e) {
     error("Fetching dropped assets with unique name", e, res);
