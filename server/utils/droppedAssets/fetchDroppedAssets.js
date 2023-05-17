@@ -19,11 +19,12 @@ export const fetchDroppedAssetsUniqueName = async (req, res) => {
       uniqueName,
     });
     const normalized = droppedAssets.map((asset) => {
-      delete asset["topia"];
-      delete asset["credentials"];
-      delete asset["jwt"];
-      delete asset["requestOptions"];
-      return asset;
+      let normalizedAsset = { ...asset };
+      delete normalizedAsset["topia"];
+      delete normalizedAsset["credentials"];
+      delete normalizedAsset["jwt"];
+      delete normalizedAsset["requestOptions"];
+      return normalizedAsset;
     });
     if (res) res.json({ droppedAssets: normalized, success: true });
     return droppedAssets;
