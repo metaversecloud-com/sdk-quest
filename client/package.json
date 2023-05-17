@@ -55,6 +55,5 @@
     "link-sdk": "yalc link @rtsdk/topia",
     "unlink-sdk": "yalc remove @rtsdk/topia"
   },
-  "private": true,
   "version": "0.1.0"
 }

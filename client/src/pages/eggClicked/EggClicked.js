@@ -42,6 +42,15 @@ export function EggClicked() {
           case 3:
             numString = "third";
             break;
+          case 4:
+            numString = "fourth";
+            break;
+          case 5:
+            numString = "fifth";
+            break;
+          case 6:
+            numString = "sixth";
+            break;
           default:
             numString = "";
         }
