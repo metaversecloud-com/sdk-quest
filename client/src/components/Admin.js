@@ -162,7 +162,6 @@ export function Admin() {
             </Grid>
             <Grid item pt={4}>
               {droppedEggs.map((egg, index) => {
-                console.log(droppedEggs);
                 if (!egg) return <div />;
                 let lastMovedFormatted = "-";
                 if (egg.clickableLink) {
