@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import router from "./routes.js";
 import cors from "cors";
+import { findObjectKeyPath } from "./utils/findObjectKeyPath.js";
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
@@ -12,6 +13,30 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(function (req, res, next) {
+  const ogSend = res.send;
+  res.send = function (data) {
+    if (data && res.statusCode < 300) {
+      try {
+        const cleanData = JSON.parse(data);
+        const path = findObjectKeyPath(cleanData, "topia");
+        if (path) {
+          delete cleanData[path]["topia"];
+          delete cleanData[path]["credentials"];
+          delete cleanData[path]["jwt"];
+          delete cleanData[path]["requestOptions"];
+        }
+        res.send = ogSend;
+        return res.send(cleanData);
+      } catch (error) {
+        console.log(error);
+        next();
+      }
+    }
+  };
+  next();
+});
 
 app.use("/backend", router);
 
