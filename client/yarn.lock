@@ -1401,7 +1401,14 @@
 "@mui/core-downloads-tracker@^5.13.0":
   version "5.13.0"
 
-"@mui/material@^5.10.17":
+"@mui/icons-material@^5.11.16":
+  version "5.11.16"
+  resolved "https://registry.npmjs.org/@mui/icons-material/-/icons-material-5.11.16.tgz"
+  integrity sha512-oKkx9z9Kwg40NtcIajF9uOXhxiyTZrrm9nmIJ4UjkU2IdHpd4QVLbCc/5hZN/y0C6qzi2Zlxyr9TGddQx2vx2A==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
+
+"@mui/material@^5.0.0", "@mui/material@^5.10.17":
   version "5.13.0"
   dependencies:
     "@babel/runtime" "^7.21.0"
@@ -4059,6 +4066,11 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+dayjs@^1.11.7:
+  version "1.11.7"
+  resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.7.tgz"
+  integrity sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==
 
 debug@^2.2.0:
   version "2.6.9"

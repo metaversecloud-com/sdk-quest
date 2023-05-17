@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
 
 // components
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import { RemoveCircleOutline } from "@mui/icons-material";
+
+import { WalkIcon } from "./SVGs.js";
 
 // context
 import { useGlobalState } from "@context";
 
 // utils
 import { backendAPI } from "@utils";
+
+// Formatting
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 const eggUniqueName = "sdk-egg-hunter_egg";
 
@@ -45,7 +52,22 @@ export function Admin() {
       });
       if (result.data.success) {
         setDroppedEggs(result.data.droppedAssets);
-      } else return console.log("ERROR getting data object");
+        // TODO Get dropped asset details and include data object so can display 'lastMoved'
+        // const requests = result.data.droppedAssets.map(async (egg) => {
+        //   const response = await backendAPI.post(`/dropped-asset/get/${egg.id}`, {
+        //     includeDataObject: true,
+        //   });
+        //   return response.data.droppedAsset;
+        // });
+
+        // const droppedAssets = await Promise.all(requests);
+        // setDroppedEggs(droppedAssets);
+        // console.log(droppedAssets);
+        // .then(droppedEggs => setDroppedEggs(droppedEggs);)
+        // .catch(error => console.error(error));
+
+        // setDroppedEggs(result.data.droppedAssets);
+      } else return console.log("ERROR getting dropped eggs");
     } catch (error) {
       console.log(error);
     }
@@ -116,9 +138,13 @@ export function Admin() {
             <Typography>{!dropping ? "Click to Hide an Egg in the world" : "Dropping egg..."}</Typography>
           </Grid>
           <Grid item>
-            <Button disabled={dropping} onClick={dropEgg}>
-              <img alt="Drop egg in world" className={dropping ? "dropping" : ""} src={eggImage} />
-            </Button>
+            {eggImage ? (
+              <Button disabled={dropping} onClick={dropEgg}>
+                <img alt="Drop egg in world" className={dropping ? "dropping" : ""} src={eggImage} />
+              </Button>
+            ) : (
+              <div />
+            )}
           </Grid>
         </Grid>
 
@@ -136,16 +162,43 @@ export function Admin() {
             </Grid>
             <Grid item pt={4}>
               {droppedEggs.map((egg, index) => {
+                console.log(droppedEggs);
+                let lastMovedFormatted = "-";
+                if (egg.clickableLink) {
+                  const clickableLink = new URL(egg.clickableLink);
+                  let params = new URLSearchParams(clickableLink.search);
+                  const lastMoved = new Date(parseInt(params.get("lastMoved")));
+                  dayjs.extend(relativeTime);
+                  lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
+                }
                 return (
-                  <Grid alignItems="center" container direction="row" justifyContent="space-between" key={egg.id}>
+                  <Grid
+                    alignItems="center"
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    key={egg.id}
+                    sx={{ width: "80vw" }}
+                  >
                     <Grid item xs={3}>
-                      <Typography>Egg {index + 1}</Typography>
+                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>Egg {index + 1}</Typography>
                     </Grid>
-                    <Grid item xs={5}>
-                      <Button onClick={() => moveVisitor(egg.position)}>Walk to</Button>
+                    <Grid item xs={6}>
+                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{lastMovedFormatted}</Typography>
                     </Grid>
-                    <Grid item xs={3}>
-                      <Button onClick={() => removeEgg(egg.id)}>Remove</Button>
+                    <Grid item xs={1}>
+                      <Tooltip placement="left" title="Walk to">
+                        <IconButton aria-label="Walk to" onClick={() => moveVisitor(egg.position)}>
+                          <WalkIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
+                    <Grid item xs={1}>
+                      <Tooltip placement="right" title="Remove">
+                        <IconButton aria-label="Remove from world" onClick={() => removeEgg(egg.id)}>
+                          <RemoveCircleOutline />
+                        </IconButton>
+                      </Tooltip>
                     </Grid>
                   </Grid>
                 );

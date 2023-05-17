@@ -46,7 +46,7 @@ router.post("/dropped-asset/removeAllWithUniqueName", removeDroppedAssetsUniqueN
 router.post("/dropped-asset", dropAsset); // { id: string, isInteractive: boolean, position: {x: number, y: number }, uniqueName: string }
 
 // Dropped Asset Instance
-router.get("/dropped-asset/:instanceId", getDroppedAssetDetails); // { includeDataObject: boolean }
+router.post("/dropped-asset/get/:instanceId", getDroppedAssetDetails); // { includeDataObject: boolean }
 router.delete("/dropped-asset/:instanceId", removeDroppedAsset);
 router.put("/dropped-asset/:instanceId/updateClickType", updateClickType); // See file for inputs
 router.put("/dropped-asset/:instanceId/updatePosition", updatePosition); // { position: {x, y} }

@@ -1,14 +1,19 @@
-import { dropWebImageAsset, updatePosition } from "../utils/droppedAssets/index.js";
+import { dropWebImageAsset } from "../utils/droppedAssets/index.js";
 import { getWorldDataObject, getWorldDetails } from "../utils/world/index.js";
 import { getEmbeddedAssetDetails } from "../utils/droppedAssets/index.js";
 import { getVisitor } from "../utils/index.js";
 import error from "../utils/errors.js";
 import { getStreak, getLongestStreak } from "./streaks.js";
+import { DroppedAsset } from "../utils/topiaInit.js";
 
 const randomCoord = (width, height) => {
   const x = Math.floor(Math.random() * (width / 2 - -width / 2 + 1) + -width / 2);
   const y = Math.floor(Math.random() * (height / 2 - -height / 2 + 1) + -height / 2);
   return { x, y };
+};
+
+const getBaseURL = (req) => {
+  return process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://" + req.get("host");
 };
 
 export const getEggImage = async (req, res) => {
@@ -25,7 +30,6 @@ export const createEgg = async (req, res) => {
 
     // Check if world already has an egg image set.
     const worldDataObject = world.dataObject;
-    console.log(worldDataObject);
     if (worldDataObject && worldDataObject.eggDetails && worldDataObject.eggDetails.topLayer)
       eggBody.layers.top = worldDataObject.eggDetails.topLayer;
     else {
@@ -40,14 +44,14 @@ export const createEgg = async (req, res) => {
     }
 
     const egg = await dropWebImageAsset({ ...req, body: eggBody });
-    if (res) res.json({ egg, success: true });
+
     egg.updateClickType({
       clickType: "link",
       clickableLinkTitle: "Egg Hunter",
       isOpenLinkInDrawer: true,
-      clickableLink: "http://localhost:3000/egg-clicked/",
-      // clickableLink: "https://nytimes.com/",
+      clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
     });
+    if (res) res.json({ egg, success: true });
   } catch (e) {
     error("Error dropping asset", e, res);
   }
@@ -58,6 +62,7 @@ export const eggClicked = async (req, res) => {
     const visitor = await getVisitor(req);
     const world = await getWorldDetails({ ...req, body: { ...req.body, includeDataObject: true } });
     const worldDataObject = world.dataObject;
+    const numberAllowedToCollect = 3;
     if (worldDataObject) {
       const { eggsCollectedByUser } = worldDataObject;
       //YYYY_MM_DD
@@ -67,31 +72,68 @@ export const eggClicked = async (req, res) => {
       const day = String(currentDate.getDate()).padStart(2, "0");
       const dateKey = `${year}_${month}_${day}`;
       // world.setDataObject({});
+      //TODO: Add lock to updateDataObject to prevent duplicates?
+      // dateKey_req.params.assetId_req.params.visitorId_req.params.interactiveNonce?
       if (
         eggsCollectedByUser &&
         eggsCollectedByUser[visitor.profileId] &&
-        eggsCollectedByUser[visitor.profileId][dateKey]
+        eggsCollectedByUser[visitor.profileId][dateKey] &&
+        eggsCollectedByUser[visitor.profileId][dateKey].length >= numberAllowedToCollect
       ) {
-        // FAIL: Visitor has already collected an egg today.
-        if (res) res.json({ addedClick: false, success: true });
+        console.log("Fail");
+        // FAIL: Visitor has already collected 3 eggs today.
+        if (res) res.json({ addedClick: false, numberAllowedToCollect, success: true });
         return;
       } else {
-        // SUCCESS: This is the first egg visitor collected today.
-        await world.updateDataObject({
-          eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: true } }, // Add egg collection dateKey.
-          profileMapper: { [visitor.profileId]: visitor.username }, // Update the username of the visitor to be shown in the leaderboard.
-        });
         // Move the egg to a new random location
         const position = randomCoord(world.width, world.height);
-        await updatePosition({ ...req, body: { position } });
-        visitor.updateDataObject({
-          eggsCollectedByWorld: { [world.urlSlug]: { [dateKey]: true } }, // Add egg collection dateKey.
+
+        const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+
+        // Doesn't need an await as it's just instantiating an instance from class.
+        const droppedAsset = DroppedAsset.create(assetId, urlSlug, {
+          credentials: {
+            assetId,
+            interactiveNonce,
+            interactivePublicKey,
+            visitorId,
+          },
         });
-        if (res) res.json({ addedClick: true, success: true });
+
+        await droppedAsset.updatePosition(position.x, position.y);
+        droppedAsset.updateClickType({
+          clickType: "link",
+          clickableLinkTitle: "Egg Hunter",
+          isOpenLinkInDrawer: true,
+          clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+        });
+
+        // Add egg collected to leaderboard
+        let collectedArray = [];
+        if (
+          eggsCollectedByUser &&
+          eggsCollectedByUser[visitor.profileId] &&
+          eggsCollectedByUser[visitor.profileId][dateKey]
+        ) {
+          collectedArray = eggsCollectedByUser[visitor.profileId][dateKey];
+        }
+
+        collectedArray.push({ type: "egg", value: 1 });
+        // SUCCESS: This is the first egg visitor collected today.
+        console.log(`${visitor.username} ${visitor.profileId} successfully got egg`, collectedArray);
+        await world.updateDataObject({
+          eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
+          profileMapper: { [visitor.profileId]: visitor.username }, // Update the username of the visitor to be shown in the leaderboard.
+        });
+
+        visitor.updateDataObject({
+          eggsCollectedByWorld: { [world.urlSlug]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
+        });
+        if (res)
+          res.json({ addedClick: true, numberAllowedToCollect, numberCollected: collectedArray.length, success: true });
         return;
       }
     }
-    if (res) res.json({ addedClick: true, success: true });
   } catch (e) {
     error("Handling egg click", e, res);
   }
@@ -102,43 +144,62 @@ export const getEggLeaderboard = async (req, res) => {
     const worldDataObject = await getWorldDataObject(req);
     let leaderboard = [];
     if (worldDataObject) {
-      console.log("Object", worldDataObject);
       const { eggsCollectedByUser, profileMapper } = worldDataObject;
-      for (const profileId in eggsCollectedByUser) {
-        // const streak = getStreak(eggsCollectedByUser[profileId]);
-        const longestStreak = getLongestStreak(eggsCollectedByUser[profileId]);
-        leaderboard.push({
-          name: profileMapper[profileId],
-          collected: Object.keys(eggsCollectedByUser[profileId]).length,
-          profileId,
-          streak: longestStreak,
-        });
-      }
-      leaderboard.push({ profileId: "blah", name: "Flood", collected: 20 });
-      leaderboard.push({ profileId: "blah", name: "Michael", collected: 50 });
-      leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
-      leaderboard.push({ profileId: "blah", name: "Rose", collected: 80 });
-      leaderboard.push({ profileId: "blah", name: "Billy Bue", collected: 5 });
-      leaderboard.push({ profileId: "blah", name: "Lowell", collected: 2 });
-      leaderboard.push({ profileId: "blah", name: "Lina", collected: 3 });
-      leaderboard.push({ profileId: "blah", name: "Chris", collected: 6 });
-      leaderboard.push({ profileId: "blah", name: "Danielle", collected: 9 });
-      leaderboard.push({ profileId: "blah", name: "Sam", collected: 10 });
-      leaderboard.push({ profileId: "blah", name: "Bryan", collected: 7 });
-      leaderboard.push({ profileId: "blah", name: "Ewing", collected: 8 });
-      leaderboard.push({ profileId: "blah", name: "Fabio", collected: 12 });
-      leaderboard.push({ profileId: "blah", name: "Jesus", collected: 13 });
-      leaderboard.push({ profileId: "blah", name: "Saqib", collected: 14 });
-      leaderboard.push({ profileId: "blah", name: "Taveras", collected: 15 });
-      leaderboard.push({ profileId: "blah", name: "Rex", collected: 16 });
-      leaderboard.push({ profileId: "blah", name: "Juan Pablo", collected: 17 });
-      leaderboard.push({ profileId: "blah", name: "Anna", collected: 18 });
-      leaderboard.push({ profileId: "blah", name: "James", collected: 19 });
-      leaderboard.push({ profileId: "blah", name: "Alex", collected: 20 });
-      leaderboard.push({ profileId: "blah", name: "Dalton", collected: 21 });
-    }
-    leaderboard.sort((a, b) => b.collected - a.collected);
+      if (eggsCollectedByUser) {
+        console.log("Eggs by user", eggsCollectedByUser);
+        for (const profileId in eggsCollectedByUser) {
+          // const streak = getStreak(eggsCollectedByUser[profileId]);
+          const longestStreak = getLongestStreak(eggsCollectedByUser[profileId]);
+          let collected = 0;
+          // const objValues = Object.values(eggsCollectedByUser[profileId]);
+          Object.values(eggsCollectedByUser[profileId]).forEach((day) => {
+            if (day === true) collected++;
+            if (day.length) collected += day.length;
+          });
 
+          leaderboard.push({
+            name: profileMapper[profileId],
+            collected,
+            profileId,
+            streak: longestStreak,
+          });
+        }
+        // leaderboard.push({ profileId: "blah", name: "Flood", collected: 20 });
+        // leaderboard.push({ profileId: "blah", name: "Michael", collected: 50 });
+        // leaderboard.push({ profileId: "blah", streak: 2, name: "Ewing", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Eoin", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Barry", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Billy", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Bonnie", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Bowen", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Sammy", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Rose", collected: 80 });
+        // leaderboard.push({ profileId: "blah", name: "Billy Bue", collected: 5 });
+        // leaderboard.push({ profileId: "blah", name: "Lowell", collected: 2 });
+        // leaderboard.push({ profileId: "blah", name: "Lina", collected: 3 });
+        // leaderboard.push({ profileId: "blah", name: "Chris", collected: 6 });
+        // leaderboard.push({ profileId: "blah", streak: 2, name: "Danielle", collected: 9 });
+        // leaderboard.push({ profileId: "blah", streak: 4, name: "Sam", collected: 10 });
+        // leaderboard.push({ profileId: "blah", name: "Bryan", collected: 7 });
+        // leaderboard.push({ profileId: "blah", name: "Ewing", collected: 8 });
+        // leaderboard.push({ profileId: "blah", name: "Fabio", collected: 12 });
+        // leaderboard.push({ profileId: "blah", name: "Jesus", collected: 13 });
+        // leaderboard.push({ profileId: "blah", name: "Saqib", collected: 14 });
+        // leaderboard.push({ profileId: "blah", name: "Taveras", collected: 15 });
+        // leaderboard.push({ profileId: "blah", name: "Rex", collected: 16 });
+        // leaderboard.push({ profileId: "blah", name: "Juan Pablo", collected: 17 });
+        // leaderboard.push({ profileId: "blah", name: "Anna", collected: 18 });
+        // leaderboard.push({ profileId: "blah", name: "James", collected: 19 });
+        // leaderboard.push({ profileId: "blah", name: "Alex", collected: 20 });
+        // leaderboard.push({ profileId: "blah", name: "Dalton", collected: 21 });
+      }
+      leaderboard.sort((a, b) => b.collected - a.collected);
+    }
     if (res) res.json({ leaderboard, success: true });
   } catch (e) {
     error("Getting egg leaderboard", e, res);
