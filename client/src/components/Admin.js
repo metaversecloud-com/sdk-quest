@@ -12,6 +12,10 @@ import { useGlobalState } from "@context";
 // utils
 import { backendAPI } from "@utils";
 
+// Formatting
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
 const eggUniqueName = "sdk-egg-hunter_egg";
 
 export function Admin() {
@@ -48,7 +52,22 @@ export function Admin() {
       });
       if (result.data.success) {
         setDroppedEggs(result.data.droppedAssets);
-      } else return console.log("ERROR getting data object");
+        // TODO Get dropped asset details and include data object so can display 'lastMoved'
+        // const requests = result.data.droppedAssets.map(async (egg) => {
+        //   const response = await backendAPI.post(`/dropped-asset/get/${egg.id}`, {
+        //     includeDataObject: true,
+        //   });
+        //   return response.data.droppedAsset;
+        // });
+
+        // const droppedAssets = await Promise.all(requests);
+        // setDroppedEggs(droppedAssets);
+        // console.log(droppedAssets);
+        // .then(droppedEggs => setDroppedEggs(droppedEggs);)
+        // .catch(error => console.error(error));
+
+        // setDroppedEggs(result.data.droppedAssets);
+      } else return console.log("ERROR getting dropped eggs");
     } catch (error) {
       console.log(error);
     }
@@ -143,6 +162,15 @@ export function Admin() {
             </Grid>
             <Grid item pt={4}>
               {droppedEggs.map((egg, index) => {
+                console.log(droppedEggs);
+                let lastMovedFormatted = "-";
+                if (egg.clickableLink) {
+                  const clickableLink = new URL(egg.clickableLink);
+                  let params = new URLSearchParams(clickableLink.search);
+                  const lastMoved = new Date(parseInt(params.get("lastMoved")));
+                  dayjs.extend(relativeTime);
+                  lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
+                }
                 return (
                   <Grid
                     alignItems="center"
@@ -150,19 +178,22 @@ export function Admin() {
                     direction="row"
                     justifyContent="space-between"
                     key={egg.id}
-                    sx={{ width: "50vw" }}
+                    sx={{ width: "80vw" }}
                   >
-                    <Grid item xs={5}>
+                    <Grid item xs={3}>
                       <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>Egg {index + 1}</Typography>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={6}>
+                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{lastMovedFormatted}</Typography>
+                    </Grid>
+                    <Grid item xs={1}>
                       <Tooltip placement="left" title="Walk to">
                         <IconButton aria-label="Walk to" onClick={() => moveVisitor(egg.position)}>
                           <WalkIcon />
                         </IconButton>
                       </Tooltip>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={1}>
                       <Tooltip placement="right" title="Remove">
                         <IconButton aria-label="Remove from world" onClick={() => removeEgg(egg.id)}>
                           <RemoveCircleOutline />
