@@ -12,7 +12,7 @@ const randomCoord = (width, height) => {
   return { x, y };
 };
 
-const getBaseURL = () => {
+const getBaseURL = (req) => {
   return process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://" + req.get("host");
 };
 
@@ -44,14 +44,14 @@ export const createEgg = async (req, res) => {
     }
 
     const egg = await dropWebImageAsset({ ...req, body: eggBody });
-    if (res) res.json({ egg, success: true });
 
     egg.updateClickType({
       clickType: "link",
       clickableLinkTitle: "Egg Hunter",
       isOpenLinkInDrawer: true,
-      clickableLink: getBaseURL() + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+      clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
     });
+    if (res) res.json({ egg, success: true });
   } catch (e) {
     error("Error dropping asset", e, res);
   }
@@ -105,7 +105,7 @@ export const eggClicked = async (req, res) => {
           clickType: "link",
           clickableLinkTitle: "Egg Hunter",
           isOpenLinkInDrawer: true,
-          clickableLink: getBaseURL() + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+          clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
         });
 
         // Add egg collected to leaderboard
