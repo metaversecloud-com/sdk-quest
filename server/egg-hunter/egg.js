@@ -62,7 +62,7 @@ export const eggClicked = async (req, res) => {
     const visitor = await getVisitor(req);
     const world = await getWorldDetails({ ...req, body: { ...req.body, includeDataObject: true } });
     const worldDataObject = world.dataObject;
-    const numberAllowedToCollect = 3;
+    const numberAllowedToCollect = 5;
     if (worldDataObject) {
       const { eggsCollectedByUser } = worldDataObject;
       //YYYY_MM_DD
