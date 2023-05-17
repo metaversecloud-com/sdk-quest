@@ -82,7 +82,7 @@ export const eggClicked = async (req, res) => {
       } else {
         // Move the egg to a new random location
         const position = randomCoord(world.width, world.height);
-        const dataObjectUpdate = { lastFound: new Date().valueOf() };
+        const dataObjectUpdate = { lastMoved: new Date().valueOf() };
         await updatePosition({ ...req, body: { position, dataObjectUpdate } });
 
         // Add egg collected to leaderboard
