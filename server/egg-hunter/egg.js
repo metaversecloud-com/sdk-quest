@@ -1,14 +1,19 @@
-import { dropWebImageAsset, updatePosition } from "../utils/droppedAssets/index.js";
+import { dropWebImageAsset } from "../utils/droppedAssets/index.js";
 import { getWorldDataObject, getWorldDetails } from "../utils/world/index.js";
 import { getEmbeddedAssetDetails } from "../utils/droppedAssets/index.js";
 import { getVisitor } from "../utils/index.js";
 import error from "../utils/errors.js";
 import { getStreak, getLongestStreak } from "./streaks.js";
+import { DroppedAsset } from "../utils/topiaInit.js";
 
 const randomCoord = (width, height) => {
   const x = Math.floor(Math.random() * (width / 2 - -width / 2 + 1) + -width / 2);
   const y = Math.floor(Math.random() * (height / 2 - -height / 2 + 1) + -height / 2);
   return { x, y };
+};
+
+const getBaseURL = (req) => {
+  return process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://" + req.get("host");
 };
 
 export const getEggImage = async (req, res) => {
@@ -39,14 +44,14 @@ export const createEgg = async (req, res) => {
     }
 
     const egg = await dropWebImageAsset({ ...req, body: eggBody });
-    if (res) res.json({ egg, success: true });
-    const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://" + req.get("host");
+
     egg.updateClickType({
       clickType: "link",
       clickableLinkTitle: "Egg Hunter",
       isOpenLinkInDrawer: true,
-      clickableLink: baseURL + "/egg-clicked/",
+      clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
     });
+    if (res) res.json({ egg, success: true });
   } catch (e) {
     error("Error dropping asset", e, res);
   }
@@ -82,8 +87,28 @@ export const eggClicked = async (req, res) => {
       } else {
         // Move the egg to a new random location
         const position = randomCoord(world.width, world.height);
-        await updatePosition({ ...req, body: { position } });
 
+        const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+
+        // Doesn't need an await as it's just instantiating an instance from class.
+        const droppedAsset = DroppedAsset.create(assetId, urlSlug, {
+          credentials: {
+            assetId,
+            interactiveNonce,
+            interactivePublicKey,
+            visitorId,
+          },
+        });
+
+        await droppedAsset.updatePosition(position.x, position.y);
+        droppedAsset.updateClickType({
+          clickType: "link",
+          clickableLinkTitle: "Egg Hunter",
+          isOpenLinkInDrawer: true,
+          clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+        });
+
+        // Add egg collected to leaderboard
         let collectedArray = [];
         if (
           eggsCollectedByUser &&

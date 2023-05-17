@@ -46,9 +46,9 @@ export function EggClicked() {
             numString = "";
         }
         setMessage(
-          `You just found your ${numString} egg today. ${
+          `You just found a ${numString} egg. ${
             numberCollected === numberAllowedToCollect
-              ? "You can find more tomorrow. Help your friends find theirs!"
+              ? "Help your friends find theirs and come find more tomorrow!"
               : `Go find ${numberAllowedToCollect - numberCollected} more!`
           }`,
         );
@@ -58,7 +58,7 @@ export function EggClicked() {
         setMessage(
           `You already found ${numberAllowedToCollect} ${
             numberAllowedToCollect === 1 ? "egg" : "eggs"
-          } today. Find more tomorrow or help your friends find theirs!`,
+          } today. Help your friends find theirs and come find more tomorrow!`,
         );
       } else return console.log("ERROR getting data object");
     } catch (error) {
