@@ -29,13 +29,37 @@ export function EggClicked() {
   const handleEggClicked = useCallback(async () => {
     try {
       const result = await backendAPI.post("/egg-clicked");
-      const { addedClick, success } = result.data;
+      const { addedClick, numberAllowedToCollect, numberCollected, success } = result.data;
       if (addedClick) {
-        setMessage("Congrats! You found an egg.");
+        let numString = "";
+        switch (numberCollected) {
+          case 1:
+            numString = "first";
+            break;
+          case 2:
+            numString = "second";
+            break;
+          case 3:
+            numString = "third";
+            break;
+          default:
+            numString = "";
+        }
+        setMessage(
+          `You just found your ${numString} egg today. ${
+            numberCollected === numberAllowedToCollect
+              ? "You can find more tomorrow. Help your friends find theirs!"
+              : `Go find ${numberAllowedToCollect - numberCollected} more!`
+          }`,
+        );
         // Refresh the leaderboard
         getLeaderboardData({ setLeaderboardData, globalDispatch });
       } else if (success) {
-        setMessage("You already found an egg today.");
+        setMessage(
+          `You already found ${numberAllowedToCollect} ${
+            numberAllowedToCollect === 1 ? "egg" : "eggs"
+          } today. Find more tomorrow or help your friends find theirs!`,
+        );
       } else return console.log("ERROR getting data object");
     } catch (error) {
       console.log(error);
@@ -58,7 +82,7 @@ export function EggClicked() {
       <Grid container direction="column">
         {message && (
           <Grid item p={1}>
-            <Typography>{message} Come back tomorrow to find another!</Typography>
+            <Typography>{message}</Typography>
           </Grid>
         )}
         {message && <Leaderboard />}
