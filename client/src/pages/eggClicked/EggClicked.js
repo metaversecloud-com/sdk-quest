@@ -86,7 +86,7 @@ export function EggClicked() {
   return (
     <Grid alignItems="center" container direction="column" p={0}>
       <Grid item p={3} xs={12}>
-        <Typography variant="h4">Egg Hunter</Typography>
+        <Typography variant="h4">Egg Hunt</Typography>
       </Grid>
       <Grid container direction="column">
         {message && (

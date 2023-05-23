@@ -29,7 +29,7 @@ import { createEgg, eggClicked, getEggImage, getEggLeaderboard } from "./egg-hun
 import express from "express";
 const router = express.Router();
 
-// Egg Hunter Backend
+// Egg Hunt Backend
 router.post("/create-egg", createEgg);
 router.post("/egg-clicked", eggClicked);
 router.get("/egg-leaderboard", getEggLeaderboard);
