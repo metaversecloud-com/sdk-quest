@@ -16,9 +16,14 @@ const getBaseURL = (req) => {
   return process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://" + req.get("host");
 };
 
-export const getEggImage = async (req, res) => {
+export const getEggImage = (req, res) => {
+  const { urlSlug } = req.query;
+  const eggImage = urlSlug.includes("ingda")
+    ? "https://topiaimages.s3.us-west-1.amazonaws.com/ingda_egg.png"
+    : "https://topiaimages.s3.us-west-1.amazonaws.com/arva_egg.png";
   // TODO: Make this pull from data objects so matches what will be dropped
-  if (res) res.json({ eggImage: process.env.DEFAULT_EGG_IMAGE_URL, success: true });
+  if (res) res.json({ eggImage, success: true });
+  return eggImage;
 };
 
 export const createEgg = async (req, res) => {
@@ -26,7 +31,7 @@ export const createEgg = async (req, res) => {
     const world = await getWorldDetails({ ...req, body: { ...req.body, includeDataObject: true } });
     // Randomly place the egg
     const position = randomCoord(world.width, world.height);
-    const eggBody = { ...req.body, isInteractive: true, position, layers: { top: process.env.DEFAULT_EGG_IMAGE_URL } };
+    const eggBody = { ...req.body, isInteractive: true, position, layers: { top: getEggImage(req) } };
 
     // Check if world already has an egg image set.
     const worldDataObject = world.dataObject;
@@ -47,7 +52,7 @@ export const createEgg = async (req, res) => {
 
     egg.updateClickType({
       clickType: "link",
-      clickableLinkTitle: "Egg Hunter",
+      clickableLinkTitle: "Egg Hunt",
       isOpenLinkInDrawer: true,
       clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
     });
@@ -103,7 +108,7 @@ export const eggClicked = async (req, res) => {
         await droppedAsset.updatePosition(position.x, position.y);
         droppedAsset.updateClickType({
           clickType: "link",
-          clickableLinkTitle: "Egg Hunter",
+          clickableLinkTitle: "Egg Hunt",
           isOpenLinkInDrawer: true,
           clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
         });
