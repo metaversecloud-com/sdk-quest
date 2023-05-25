@@ -1,5 +1,5 @@
 {
-  "name": "egg-hunter",
+  "name": "@egg-hunter/client",
   "browserslist": {
     "production": [
       ">0.2%",
