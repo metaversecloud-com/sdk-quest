@@ -18,12 +18,12 @@ const getBaseURL = (req) => {
 
 export const getEggImage = (req, res) => {
   const { urlSlug } = req.query;
-  const eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/default_egg.png";
+  let eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/default_egg.png";
 
   if (urlSlug.includes("ingda")) {
-    "https://topiaimages.s3.us-west-1.amazonaws.com/ingda_egg.png"
+    eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/ingda_egg.png"
   } else if (urlSlug.includes("arva")) {
-    "https://topiaimages.s3.us-west-1.amazonaws.com/arva_egg.png"
+    eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/arva_egg.png"
   }
 
   // TODO: Make this pull from data objects so matches what will be dropped
