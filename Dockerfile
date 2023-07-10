@@ -11,7 +11,7 @@ ENV API_URL=http://localhost:3001
 
 EXPOSE 3000
 RUN npm install
-RUN npm audit fix --force
+RUN npm audit fix
 RUN npm run build
 
 CMD ["npm", "start"]
