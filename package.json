@@ -20,7 +20,7 @@
   ],
   "description": "",
   "engines": {
-    "node": "18.14"
+    "node": "18.16"
   },
   "keywords": [],
   "license": "ISC",

@@ -14,7 +14,7 @@ module.exports = {
     "plugin:jest/recommended",
     "plugin:testing-library/react",
   ],
-  parser: "babel-eslint", // Uses babel-eslint transforms.
+  parser: "@babel/eslint-parser", // Uses babel-eslint transforms.
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
