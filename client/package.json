@@ -30,12 +30,11 @@
     "babel-plugin-import": "^1.13.5",
     "customize-cra": "^1.0.0",
     "dayjs": "^1.11.7",
-    "eslint": "^7.32.0",
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.5",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "react-virtualized": "^9.22.5",
     "web-vitals": "^2.1.4"
   },
@@ -50,8 +49,8 @@
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
-    "start": "react-app-rewired --openssl-legacy-provider start",
-    "build": "react-app-rewired --openssl-legacy-provider build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "lint": "eslint -c .eslintrc.js --ext .js,.jsx .",
