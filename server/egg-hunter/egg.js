@@ -21,9 +21,9 @@ export const getEggImage = (req, res) => {
   let eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/default_egg.png";
 
   if (urlSlug.includes("ingda")) {
-    eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/ingda_egg.png"
+    eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/ingda_egg.png";
   } else if (urlSlug.includes("arva")) {
-    eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/arva_egg.png"
+    eggImage = "https://topiaimages.s3.us-west-1.amazonaws.com/arva_egg.png";
   }
 
   // TODO: Make this pull from data objects so matches what will be dropped
@@ -57,7 +57,7 @@ export const createEgg = async (req, res) => {
 
     egg.updateClickType({
       clickType: "link",
-      clickableLinkTitle: "Egg Hunt",
+      clickableLinkTitle: "Quest",
       isOpenLinkInDrawer: true,
       clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
     });
@@ -113,7 +113,7 @@ export const eggClicked = async (req, res) => {
         await droppedAsset.updatePosition(position.x, position.y);
         droppedAsset.updateClickType({
           clickType: "link",
-          clickableLinkTitle: "Egg Hunt",
+          clickableLinkTitle: "Quest",
           isOpenLinkInDrawer: true,
           clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
         });
