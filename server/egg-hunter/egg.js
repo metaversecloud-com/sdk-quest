@@ -130,7 +130,7 @@ export const eggClicked = async (req, res) => {
 
         collectedArray.push({ type: "egg", value: 1 });
         // SUCCESS: This is the first egg visitor collected today.
-        console.log(`${visitor.username} ${visitor.profileId} successfully got treasure`, collectedArray);
+        console.log(`${visitor.username} ${visitor.profileId} successfully got`, collectedArray);
         await world.updateDataObject({
           eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
           profileMapper: { [visitor.profileId]: visitor.username }, // Update the username of the visitor to be shown in the leaderboard.
@@ -145,7 +145,7 @@ export const eggClicked = async (req, res) => {
       }
     }
   } catch (e) {
-    error("Handling treasure click", e, res);
+    error("Handling click", e, res);
   }
 };
 
@@ -211,6 +211,6 @@ export const getEggLeaderboard = async (req, res) => {
     }
     if (res) res.json({ leaderboard, success: true });
   } catch (e) {
-    error("Getting treasure leaderboard", e, res);
+    error("Getting leaderboard", e, res);
   }
 };
