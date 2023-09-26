@@ -117,7 +117,12 @@ export function Leaderboard() {
       justifyContent="space-around"
       mt={3}
       p={3}
-      sx={{ height: "60vh", background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)", borderRadius: 15 }}
+      sx={{
+        height: "60vh",
+        // background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)",
+        border: "8px solid black",
+        borderRadius: 15,
+      }}
     >
       <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 5, width: "100%" }}>
         <AutoSizer>
