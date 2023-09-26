@@ -31,44 +31,49 @@ export function EggClicked() {
       const result = await backendAPI.post("/egg-clicked");
       const { addedClick, numberAllowedToCollect, numberCollected, success } = result.data;
       if (addedClick) {
-        let numString = "";
-        switch (numberCollected) {
-          case 1:
-            numString = "first";
-            break;
-          case 2:
-            numString = "second";
-            break;
-          case 3:
-            numString = "third";
-            break;
-          case 4:
-            numString = "fourth";
-            break;
-          case 5:
-            numString = "fifth";
-            break;
-          case 6:
-            numString = "sixth";
-            break;
-          default:
-            numString = "";
-        }
+        //   let numString = "";
+        //   switch (numberCollected) {
+        //     case 1:
+        //       numString = "first";
+        //       break;
+        //     case 2:
+        //       numString = "second";
+        //       break;
+        //     case 3:
+        //       numString = "third";
+        //       break;
+        //     case 4:
+        //       numString = "fourth";
+        //       break;
+        //     case 5:
+        //       numString = "fifth";
+        //       break;
+        //     case 6:
+        //       numString = "sixth";
+        //       break;
+        //     default:
+        //       numString = "";
+        // }
         setMessage(
-          `You just found a ${numString} egg. ${
-            numberCollected === numberAllowedToCollect
-              ? "Help your friends find theirs and come find more tomorrow!"
-              : `Go find ${numberAllowedToCollect - numberCollected} more!`
-          }`,
+          `🎉 Congratulations! You’re one step closer to completing your daily quest! [${numberCollected}/${numberAllowedToCollect}] collected`,
+
+          // `You just found a ${numString} egg. ${
+          //   numberCollected === numberAllowedToCollect
+          //     ? "Help your friends find theirs and come find more tomorrow!"
+          //     : `Go find ${numberAllowedToCollect - numberCollected} more!`
+          // }`,
         );
         // Refresh the leaderboard
         getLeaderboardData({ setLeaderboardData, globalDispatch });
       } else if (success) {
         setMessage(
-          `You already found ${numberAllowedToCollect} ${
-            numberAllowedToCollect === 1 ? "egg" : "eggs"
-          } today. Help your friends find theirs and come find more tomorrow!`,
+          `🎉 Congratulations! You’ve already completed your daily quest! Continue tomorrow. [${numberCollected}/${numberAllowedToCollect}] collected`,
         );
+        // setMessage(
+        //   `You already found ${numberAllowedToCollect} ${
+        //     numberAllowedToCollect === 1 ? "egg" : "eggs"
+        //   } today. Help your friends find theirs and come find more tomorrow!`,
+        // );
       } else return console.log("ERROR getting data object");
     } catch (error) {
       console.log(error);

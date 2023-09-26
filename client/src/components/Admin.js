@@ -135,12 +135,12 @@ export function Admin() {
       <Grid container direction="column" justifyContent="space-around" p={3}>
         <Grid alignItems="center" container direction="column" p={1}>
           <Grid item>
-            <Typography>{!dropping ? "Click to Hide an Egg in the world" : "Dropping egg..."}</Typography>
+            <Typography>{!dropping ? "Click to Hide treasure in the world" : "Dropping treasure..."}</Typography>
           </Grid>
           <Grid item>
             {eggImage ? (
               <Button disabled={dropping} onClick={dropEgg}>
-                <img alt="Drop egg in world" className={dropping ? "dropping" : ""} src={eggImage} />
+                <img alt="Drop treasure in world" className={dropping ? "dropping" : ""} src={eggImage} />
               </Button>
             ) : (
               <div />
@@ -152,12 +152,12 @@ export function Admin() {
           <Grid alignItems="center" container direction="column">
             <Grid item p={1}>
               <Typography>
-                {droppedEggs.length} {droppedEggs.length === 1 ? "egg" : "eggs"} hidden in this world
+                {droppedEggs.length} {droppedEggs.length === 1 ? "treasure" : "treasure"} hidden in this world
               </Typography>
             </Grid>
             <Grid item>
               <Button onClick={removeAllEggs} variant="contained">
-                Remove all eggs
+                Remove all treasure
               </Button>
             </Grid>
             <Grid item pt={4}>
@@ -181,7 +181,7 @@ export function Admin() {
                     sx={{ width: "80vw" }}
                   >
                     <Grid item xs={3}>
-                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>Egg {index + 1}</Typography>
+                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>Treasure {index + 1}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{lastMovedFormatted}</Typography>
