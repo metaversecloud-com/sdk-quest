@@ -101,6 +101,7 @@ export function Leaderboard() {
       );
     } else {
       // Render body rows
+      if (!data || !data[rowIndex - 1]) return <div style={{ height: 30 }} />;
       const item = data[rowIndex - 1]; // Subtract 1 for header row
       let content;
       switch (columnIndex) {
@@ -147,7 +148,7 @@ export function Leaderboard() {
     }
   };
 
-  if (!visitor || !data || !data.length) return;
+  // if (!visitor || !data || !data.length) return;
 
   // const cache = new CellMeasurerCache({
   //   defaultWidth: 100,
