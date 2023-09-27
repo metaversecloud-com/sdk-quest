@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 // components
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
 
 // React virtualized for infinite scroll
 import { AutoSizer, MultiGrid } from "react-virtualized";
@@ -35,11 +35,11 @@ export function Leaderboard() {
   };
 
   const cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-    const cellStyle = {
+    let cellStyle = {
       ...style,
-      padding: `${rowIndex === 0 ? 0 : 0}px 10px`,
+      padding: `${rowIndex === 0 ? 0 : 10}px 10px`,
       margin: `${rowIndex === 0 ? 10 : 0}px 0`,
-      lineHeight: `${rowIndex === 0 ? 40 : 30}px`,
+      lineHeight: `${rowIndex === 0 ? 40 : 60}px`,
       // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
 
       boxShadow: "0px 1px 0px #E8E8E8",
@@ -67,9 +67,18 @@ export function Leaderboard() {
         default:
           content = "";
       }
+
+      const tooltipTitle = columnIndex === 2 ? "# of days in a row" : columnIndex === 3 ? "Total collected" : null;
+
       return (
         <Box key={key} style={cellStyle}>
-          <Typography>{content}</Typography>
+          {tooltipTitle ? (
+            <Tooltip placement="top" style={{ cursor: "pointer" }} title={tooltipTitle}>
+              <Typography>{content}</Typography>
+            </Tooltip>
+          ) : (
+            <Typography>{content}</Typography>
+          )}
         </Box>
       );
     } else {
@@ -95,11 +104,23 @@ export function Leaderboard() {
         default:
           content = "";
       }
+
+      cellStyle = {
+        ...style,
+        padding: `${rowIndex === 0 || content.length > 11 ? 0 : 10}px 10px`,
+        margin: `${rowIndex === 0 ? 10 : 0}px 0`,
+        lineHeight: 60,
+        // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
+        background: item.profileId === visitor.profileId ? "lightgray" : "#FFF",
+        boxShadow: "0px 1px 0px #E8E8E8",
+        textAlign: columnIndex === 2 || columnIndex === 3 ? "end" : "inherit",
+        paddingRight: columnIndex === 2 ? 0 : 10,
+        paddingLeft: columnIndex === 0 || columnIndex === 1 ? 10 : 0,
+        borderBottom: "1px solid lightgray",
+      };
+
       return (
-        <Box
-          key={key}
-          style={item.profileId === visitor.profileId ? { ...cellStyle, background: "lightgray" } : cellStyle}
-        >
+        <Box key={key} style={cellStyle}>
           <Box sx={{ padding: "5px 0px" }}>
             <Typography>{content}</Typography>
           </Box>
@@ -115,8 +136,9 @@ export function Leaderboard() {
       container
       direction="column"
       justifyContent="space-around"
-      mt={3}
+      mt={1}
       p={3}
+      paddingTop={0}
       sx={{
         height: "60vh",
         // background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)",
@@ -142,7 +164,8 @@ export function Leaderboard() {
                 }
               }}
               rowCount={data.length + 1} // Plus 1 for header row
-              rowHeight={({ index }) => (index === 0 ? 40 : 30)} // 50px for body rows, 30px for the header
+              // rowHeight={({ index }) => (index === 0 ? 40 : 30)} // 50px for body rows, 30px for the header
+              rowHeight={({ index }) => (index === 0 ? 40 : 60)} // 60px for body rows, 40px for the header
               width={width}
             />
           )}

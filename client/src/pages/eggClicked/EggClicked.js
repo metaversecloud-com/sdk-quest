@@ -77,7 +77,7 @@ export function EggClicked() {
         //     default:
         //       numString = "";
         // }
-        setCollectedText(`${numberCollected}/${numberAllowedToCollect} collected`);
+        setCollectedText(`${numberCollected}/${numberAllowedToCollect} collected today`);
         setMessage(
           `🎉 Congratulations! You are one step closer to completing your daily quest!`,
 
@@ -92,7 +92,7 @@ export function EggClicked() {
         getLeaderboardData({ setLeaderboardData, globalDispatch });
       } else if (success) {
         setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
-        setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected`);
+        setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected today`);
         // setMessage(
         //   `You already found ${numberAllowedToCollect} ${
         //     numberAllowedToCollect === 1 ? "egg" : "eggs"
