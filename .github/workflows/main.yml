@@ -1,18 +1,16 @@
-name: CICD
+name: AWS-Deploy
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      env:
-        required: true
-        type: string
-        default: 'dev'
 env:
   REGISTRY: '368076259134.dkr.ecr.us-east-1.amazonaws.com'
   REPOSITORY: 'sdk-example'
-  IMAGE_TAG: 'sdk-easter-egg'
+  IMAGE_TAG: ${{ github.event.repository.name }}
+  GCP_PROJECT_ID: "topia-gcp" #${{ secrets.GCP_PROJECT_ID }}
+  #GCP_ARTIFACTORY: 'us-west1-docker.pkg.dev'
+  GCP_REPOSITORY: 'sdk-apps'
         
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -20,13 +18,17 @@ permissions:
 jobs:
   Build:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.env || 'dev' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 18.16
+      #     cache: 'npm'
+        
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
           
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2 
@@ -38,11 +40,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push docker image to Amazon ECR
+      - name: Build and  tag
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG  .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker buildx build --platform linux/amd64,linux/arm64 -t $REGISTRY/$REPOSITORY:$IMAGE_TAG  .
           
+      - name: push docker image to Amazon ECR
+        run: |
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
       - name: Publish
         run: |
           aws ecs update-service --service $IMAGE_TAG-svc --force-new-deployment --cluster SDK-Example-CLS
