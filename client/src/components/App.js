@@ -77,6 +77,7 @@ export function App() {
 
   useEffect(() => {
     getLeaderboardData({ setLeaderboardData, globalDispatch });
+    getLeaderboardData({ setLeaderboardData, globalDispatch }); // Force leaderboard autosizing.  If remove this, doesn't properly size until next poll.
     setInterval(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000 * 10);
   }, [globalDispatch]);
 

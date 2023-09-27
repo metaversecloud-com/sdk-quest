@@ -193,14 +193,22 @@ export function Admin() {
                     </Grid>
                     <Grid item xs={1}>
                       <Tooltip placement="left" title="Walk to">
-                        <IconButton aria-label="Walk to" onClick={() => moveVisitor(egg.position)}>
+                        <IconButton
+                          aria-label="Walk to"
+                          onClick={() => moveVisitor(egg.position)}
+                          style={{ minWidth: 20 }}
+                        >
                           <WalkIcon />
                         </IconButton>
                       </Tooltip>
                     </Grid>
                     <Grid item xs={1}>
                       <Tooltip placement="right" title="Remove">
-                        <IconButton aria-label="Remove from world" onClick={() => removeEgg(egg.id)}>
+                        <IconButton
+                          aria-label="Remove from world"
+                          onClick={() => removeEgg(egg.id)}
+                          style={{ minWidth: 20 }}
+                        >
                           <RemoveCircleOutline />
                         </IconButton>
                       </Tooltip>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // components
 import { Box, Grid, Tooltip, Typography } from "@mui/material";
@@ -14,6 +14,7 @@ import { useGlobalState } from "@context";
 
 const cache = new CellMeasurerCache({
   fixedWidth: true,
+  // defaultHeight: 60, // set minimum height for rows
   minHeight: 30, // set minimum height for rows
 });
 
@@ -26,9 +27,16 @@ export function Leaderboard() {
   } = useGlobalState();
   const [data, setData] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const gridRef = useRef(null);
 
   useEffect(() => {
-    if (leaderboardData && leaderboardData.length) setData(leaderboardData.slice(0, 25));
+    if (leaderboardData && leaderboardData.length) {
+      if (gridRef.current) {
+        cache.clearAll();
+        gridRef.current.forceUpdateGrids();
+      }
+      setData(leaderboardData.slice(0, 25));
+    }
   }, [leaderboardData]);
 
   const loadMoreRows = () => {
@@ -39,18 +47,23 @@ export function Leaderboard() {
     }
   };
 
-  const cellRenderer = ({ columnIndex, key, rowIndex, parent, style }) => {
-    let cellStyle = {
-      ...style,
-      padding: `${rowIndex === 0 ? 0 : 10}px 10px`,
-      margin: `${rowIndex === 0 ? 10 : 0}px 0`,
-      // lineHeight: `${rowIndex === 0 ? 40 : 60}px`,
-      // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
+  const cellRenderer = ({ columnIndex, key, rowIndex, parent, style }) => (
+    <CellMeasurer cache={cache} columnIndex={columnIndex} key={key} parent={parent} rowIndex={rowIndex}>
+      {({ registerChild, measure }) =>
+        renderCell({ columnIndex, key, registerChild, measure, rowIndex, parent, style })
+      }
+    </CellMeasurer>
+  );
 
-      boxShadow: "0px 1px 0px #E8E8E8",
-    };
-
+  const renderCell = ({ columnIndex, registerChild, rowIndex, style }) => {
     if (rowIndex === 0) {
+      let cellStyle = {
+        ...style,
+        height: 60,
+        padding: `0px 10px`,
+        margin: `10px 0`,
+        boxShadow: "0px 1px 0px #E8E8E8",
+      };
       // Render headers
       let content;
       switch (columnIndex) {
@@ -76,17 +89,15 @@ export function Leaderboard() {
       const tooltipTitle = columnIndex === 2 ? "# of days in a row" : columnIndex === 3 ? "Total collected" : null;
 
       return (
-        <CellMeasurer cache={cache} columnIndex={columnIndex} key={key} parent={parent} rowIndex={rowIndex}>
-          <Box style={cellStyle}>
-            {tooltipTitle ? (
-              <Tooltip placement="top" style={{ cursor: "pointer" }} title={tooltipTitle}>
-                <Typography>{content}</Typography>
-              </Tooltip>
-            ) : (
+        <Box ref={registerChild} style={cellStyle}>
+          {tooltipTitle ? (
+            <Tooltip placement="top" style={{ cursor: "pointer" }} title={tooltipTitle}>
               <Typography>{content}</Typography>
-            )}
-          </Box>
-        </CellMeasurer>
+            </Tooltip>
+          ) : (
+            <Typography>{content}</Typography>
+          )}
+        </Box>
       );
     } else {
       // Render body rows
@@ -112,12 +123,13 @@ export function Leaderboard() {
           content = "";
       }
 
-      cellStyle = {
+      let cellStyle = {
         ...style,
         // padding: `${rowIndex === 0 || content.length > 11 ? 0 : 10}px 10px`,
-        padding: `0px 10px`,
-        margin: `auto`,
-        // lineHeight: 60,
+        padding: `5px 10px`,
+        // lineHeight: content.length > 11 ? 60 : 30,
+        height: 60,
+        margin: "auto",
         // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
         background: item.profileId === visitor.profileId ? "lightgray" : "#FFF",
         boxShadow: "0px 1px 0px #E8E8E8",
@@ -128,24 +140,22 @@ export function Leaderboard() {
       };
 
       return (
-        <CellMeasurer cache={cache} columnIndex={columnIndex} key={key} parent={parent} rowIndex={rowIndex}>
-          <Box style={cellStyle}>
-            <Box sx={{ padding: "5px 0px" }}>
-              <Typography>{content}</Typography>
-            </Box>
-          </Box>
-        </CellMeasurer>
+        <Typography ref={registerChild} style={cellStyle}>
+          {content}
+        </Typography>
       );
     }
   };
 
-  if (!visitor || !leaderboardData) return;
+  if (!visitor || !data || !data.length) return;
 
   // const cache = new CellMeasurerCache({
   //   defaultWidth: 100,
   //   minWidth: 75,
   //   fixedHeight: true,
   // });
+
+  // console.log("Cached Row Height", cache._rowHeightCache);
 
   return (
     <Grid
@@ -181,6 +191,7 @@ export function Leaderboard() {
                   loadMoreRows();
                 }
               }}
+              ref={gridRef}
               rowCount={data.length + 1} // Plus 1 for header row
               // rowHeight={({ index }) => (index === 0 ? 40 : 30)} // 50px for body rows, 30px for the header
               // rowHeight={({ index }) => (index === 0 ? 40 : 60)} // 60px for body rows, 40px for the header
