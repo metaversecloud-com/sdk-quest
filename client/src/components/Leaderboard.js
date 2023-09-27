@@ -14,7 +14,7 @@ import { useGlobalState } from "@context";
 
 const cache = new CellMeasurerCache({
   fixedWidth: true,
-  // defaultHeight: 60, // set minimum height for rows
+  defaultHeight: 60, // set minimum height for rows
   minHeight: 30, // set minimum height for rows
 });
 
