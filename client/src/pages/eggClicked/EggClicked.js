@@ -26,6 +26,7 @@ import { getLeaderboardData } from "@utils/leaderboard";
 import { backendAPI } from "@utils";
 
 export function EggClicked() {
+  const [loaded, setLoaded] = useState(false);
   const [message, setMessage] = useState("");
   const [collectedText, setCollectedText] = useState("");
   const [eggImage, setEggImage] = useState("");
@@ -38,6 +39,7 @@ export function EggClicked() {
 
   // Get dropped eggs info
   useEffect(() => {
+    if (!loaded) setLoaded(true);
     if (hasInteractiveParams) {
       getEggImage();
     }
@@ -117,6 +119,8 @@ export function EggClicked() {
   useEffect(() => {
     if (hasInteractiveParams) handleEggClicked();
   }, [hasInteractiveParams, handleEggClicked]);
+
+  if (!loaded) return <div />;
 
   if (!hasInteractiveParams)
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
