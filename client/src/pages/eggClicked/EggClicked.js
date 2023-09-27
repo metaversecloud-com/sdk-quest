@@ -47,7 +47,6 @@ export function EggClicked() {
     try {
       const result = await backendAPI.get("/egg-image");
       if (result.data.success) {
-        console.log(result.data.eggImage);
         setEggImage(result.data.eggImage);
       } else return console.log("ERROR getting egg image");
     } catch (error) {
