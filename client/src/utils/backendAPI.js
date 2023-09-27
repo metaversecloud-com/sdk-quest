@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = process.env.API_URL || "";
+// const BASE_URL = process.env.API_URL || "http://localhost:3001";
 let backendAPI = axios;
 
 const initBackendAPI = function () {

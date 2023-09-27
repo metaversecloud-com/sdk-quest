@@ -72,7 +72,7 @@ export const eggClicked = async (req, res) => {
     const visitor = await getVisitor(req);
     const world = await getWorldDetails({ ...req, body: { ...req.body, includeDataObject: true } });
     const worldDataObject = world.dataObject;
-    const numberAllowedToCollect = 5;
+    const numberAllowedToCollect = 5; // TODO: Make it so admins can change this
     if (worldDataObject) {
       const { eggsCollectedByUser } = worldDataObject;
       //YYYY_MM_DD
@@ -130,7 +130,7 @@ export const eggClicked = async (req, res) => {
 
         collectedArray.push({ type: "egg", value: 1 });
         // SUCCESS: This is the first egg visitor collected today.
-        console.log(`${visitor.username} ${visitor.profileId} successfully got egg`, collectedArray);
+        console.log(`${visitor.username} ${visitor.profileId} successfully got`, collectedArray);
         await world.updateDataObject({
           eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
           profileMapper: { [visitor.profileId]: visitor.username }, // Update the username of the visitor to be shown in the leaderboard.
@@ -145,7 +145,7 @@ export const eggClicked = async (req, res) => {
       }
     }
   } catch (e) {
-    error("Handling egg click", e, res);
+    error("Handling click", e, res);
   }
 };
 
@@ -156,7 +156,6 @@ export const getEggLeaderboard = async (req, res) => {
     if (worldDataObject) {
       const { eggsCollectedByUser, profileMapper } = worldDataObject;
       if (eggsCollectedByUser) {
-        console.log("Eggs by user", eggsCollectedByUser);
         for (const profileId in eggsCollectedByUser) {
           // const streak = getStreak(eggsCollectedByUser[profileId]);
           const longestStreak = getLongestStreak(eggsCollectedByUser[profileId]);
@@ -212,6 +211,6 @@ export const getEggLeaderboard = async (req, res) => {
     }
     if (res) res.json({ leaderboard, success: true });
   } catch (e) {
-    error("Getting egg leaderboard", e, res);
+    error("Getting leaderboard", e, res);
   }
 };

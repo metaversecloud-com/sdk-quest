@@ -15,6 +15,7 @@ module.exports = {
     "plugin:testing-library/react",
   ],
   parser: "@babel/eslint-parser", // Uses babel-eslint transforms.
+  // parser: process.env.NODE_ENV === "development" ? "babel-eslint" : "@babel/eslint-parser", // Uses babel-eslint transforms.
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
