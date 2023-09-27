@@ -77,6 +77,7 @@ export function App() {
 
   useEffect(() => {
     getLeaderboardData({ setLeaderboardData, globalDispatch });
+    setInterval(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000 * 10);
   }, [globalDispatch]);
 
   return (

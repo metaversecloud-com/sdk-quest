@@ -4,7 +4,11 @@ import React, { useEffect, useState } from "react";
 import { Box, Grid, Tooltip, Typography } from "@mui/material";
 
 // React virtualized for infinite scroll
-import { AutoSizer, MultiGrid } from "react-virtualized";
+import {
+  AutoSizer,
+  // CellMeasurerCache,
+  MultiGrid,
+} from "react-virtualized";
 
 // context
 import { useGlobalState } from "@context";
@@ -39,7 +43,7 @@ export function Leaderboard() {
       ...style,
       padding: `${rowIndex === 0 ? 0 : 10}px 10px`,
       margin: `${rowIndex === 0 ? 10 : 0}px 0`,
-      lineHeight: `${rowIndex === 0 ? 40 : 60}px`,
+      // lineHeight: `${rowIndex === 0 ? 40 : 60}px`,
       // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
 
       boxShadow: "0px 1px 0px #E8E8E8",
@@ -107,9 +111,10 @@ export function Leaderboard() {
 
       cellStyle = {
         ...style,
-        padding: `${rowIndex === 0 || content.length > 11 ? 0 : 10}px 10px`,
-        margin: `${rowIndex === 0 ? 10 : 0}px 0`,
-        lineHeight: 60,
+        // padding: `${rowIndex === 0 || content.length > 11 ? 0 : 10}px 10px`,
+        padding: `0px 10px`,
+        margin: `auto`,
+        // lineHeight: 60,
         // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
         background: item.profileId === visitor.profileId ? "lightgray" : "#FFF",
         boxShadow: "0px 1px 0px #E8E8E8",
@@ -130,6 +135,12 @@ export function Leaderboard() {
   };
 
   if (!visitor || !leaderboardData) return;
+
+  // const cache = new CellMeasurerCache({
+  //   defaultWidth: 100,
+  //   minWidth: 75,
+  //   fixedHeight: true,
+  // });
 
   return (
     <Grid
@@ -155,6 +166,7 @@ export function Leaderboard() {
               columnWidth={({ index }) =>
                 index === 0 ? width / 6 : index === 1 ? width / 2.5 : index == 2 ? width / 5 : width / 6
               } // 50px for the first column, 100px for the others
+              // deferredMeasurementCache={cache}
               fixedRowCount={1}
               height={height}
               onSectionRendered={({ rowStopIndex }) => {
