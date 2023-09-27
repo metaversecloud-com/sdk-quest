@@ -34,7 +34,7 @@ export function Home() {
   return (
     <Grid alignItems="center" container direction="column" p={0}>
       <Grid item p={3} xs={12}>
-        <Typography variant="h4">Egg Hunt</Typography>
+        <Typography variant="h4">Quest</Typography>
       </Grid>
       {visitor && visitor.isAdmin && (
         <Grid item xs={12}>
@@ -45,8 +45,12 @@ export function Home() {
             onChange={(e) => setToggle(e.target.value)}
             value={toggle}
           >
-            <ToggleButton value="leaderboard">Leaderboard</ToggleButton>
-            <ToggleButton value="admin">Admin</ToggleButton>
+            <ToggleButton style={{ padding: 20 }} value="leaderboard">
+              Leaderboard
+            </ToggleButton>
+            <ToggleButton style={{ padding: 20 }} value="admin">
+              Admin
+            </ToggleButton>
           </ToggleButtonGroup>
         </Grid>
       )}

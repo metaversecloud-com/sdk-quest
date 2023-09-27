@@ -29,9 +29,11 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build -w client",
+    "build:dev": "npm run build",
     "link-sdk": "yalc link @rtsdk/topia",
     "unlink-sdk": "yalc remove @rtsdk/topia",
-    "start": "npm start -ws"
+    "start": "npm start -ws",
+    "start:dev": "concurrently \"node server/index.js\" \"npm start --prefix client\""
   },
   "type": "module",
   "version": "1.0.0"

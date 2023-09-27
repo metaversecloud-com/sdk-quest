@@ -135,12 +135,17 @@ export function Admin() {
       <Grid container direction="column" justifyContent="space-around" p={3}>
         <Grid alignItems="center" container direction="column" p={1}>
           <Grid item>
-            <Typography>{!dropping ? "Click to Hide an Egg in the world" : "Dropping egg..."}</Typography>
-          </Grid>
-          <Grid item>
             {eggImage ? (
-              <Button disabled={dropping} onClick={dropEgg}>
-                <img alt="Drop egg in world" className={dropping ? "dropping" : ""} src={eggImage} />
+              <Button disabled={dropping} onClick={dropEgg} variant="contained">
+                <Typography color="white">Hide </Typography>
+                <img
+                  alt="Drop in world"
+                  className={dropping ? "dropping" : ""}
+                  height={20}
+                  src={eggImage}
+                  style={{ paddingLeft: 4, paddingRight: 4 }}
+                />{" "}
+                <Typography color="white"> in the world</Typography>
               </Button>
             ) : (
               <div />
@@ -152,12 +157,12 @@ export function Admin() {
           <Grid alignItems="center" container direction="column">
             <Grid item p={1}>
               <Typography>
-                {droppedEggs.length} {droppedEggs.length === 1 ? "egg" : "eggs"} hidden in this world
+                {droppedEggs.length} {droppedEggs.length === 1 ? "" : ""} hidden in this world
               </Typography>
             </Grid>
             <Grid item>
               <Button onClick={removeAllEggs} variant="contained">
-                Remove all eggs
+                Remove all
               </Button>
             </Grid>
             <Grid item pt={4}>
@@ -181,21 +186,29 @@ export function Admin() {
                     sx={{ width: "80vw" }}
                   >
                     <Grid item xs={3}>
-                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>Egg {index + 1}</Typography>
+                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{index + 1}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{lastMovedFormatted}</Typography>
                     </Grid>
                     <Grid item xs={1}>
                       <Tooltip placement="left" title="Walk to">
-                        <IconButton aria-label="Walk to" onClick={() => moveVisitor(egg.position)}>
+                        <IconButton
+                          aria-label="Walk to"
+                          onClick={() => moveVisitor(egg.position)}
+                          style={{ minWidth: 20 }}
+                        >
                           <WalkIcon />
                         </IconButton>
                       </Tooltip>
                     </Grid>
                     <Grid item xs={1}>
                       <Tooltip placement="right" title="Remove">
-                        <IconButton aria-label="Remove from world" onClick={() => removeEgg(egg.id)}>
+                        <IconButton
+                          aria-label="Remove from world"
+                          onClick={() => removeEgg(egg.id)}
+                          style={{ minWidth: 20 }}
+                        >
                           <RemoveCircleOutline />
                         </IconButton>
                       </Tooltip>
