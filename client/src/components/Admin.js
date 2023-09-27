@@ -135,12 +135,17 @@ export function Admin() {
       <Grid container direction="column" justifyContent="space-around" p={3}>
         <Grid alignItems="center" container direction="column" p={1}>
           <Grid item>
-            <Typography>{!dropping ? "Click to Hide in the world" : "Dropping..."}</Typography>
-          </Grid>
-          <Grid item>
             {eggImage ? (
-              <Button disabled={dropping} onClick={dropEgg}>
-                <img alt="Drop in world" className={dropping ? "dropping" : ""} src={eggImage} />
+              <Button disabled={dropping} onClick={dropEgg} variant="contained">
+                <Typography color="white">Hide </Typography>
+                <img
+                  alt="Drop in world"
+                  className={dropping ? "dropping" : ""}
+                  height={20}
+                  src={eggImage}
+                  style={{ paddingLeft: 4, paddingRight: 4 }}
+                />{" "}
+                <Typography color="white"> in the world</Typography>
               </Button>
             ) : (
               <div />

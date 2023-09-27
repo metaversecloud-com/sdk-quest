@@ -1,8 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Leaderboard } from "../../components";
+import { Admin, Leaderboard } from "../../components";
 
 // components
-import { Accordion, AccordionDetails, AccordionSummary, Grid, Typography } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Grid,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 
 // context
@@ -21,8 +29,10 @@ export function EggClicked() {
   const [message, setMessage] = useState("");
   const [collectedText, setCollectedText] = useState("");
   const [eggImage, setEggImage] = useState("");
+  const [toggle, setToggle] = useState("leaderboard");
   const {
     hasInteractiveParams,
+    visitor,
     // selectedWorld
   } = useGlobalState();
 
@@ -120,8 +130,26 @@ export function EggClicked() {
       <Grid item p={3} paddingBottom={1} paddingTop={0} xs={12}>
         <Typography variant="h4">Quest</Typography>
       </Grid>
+      {visitor && visitor.isAdmin && (
+        <Grid item xs={12}>
+          <ToggleButtonGroup
+            aria-label="Admin vs Leaderboard"
+            color="primary"
+            exclusive
+            onChange={(e) => setToggle(e.target.value)}
+            value={toggle}
+          >
+            <ToggleButton style={{ padding: 20 }} value="leaderboard">
+              Leaderboard
+            </ToggleButton>
+            <ToggleButton style={{ padding: 20 }} value="admin">
+              Admin
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Grid>
+      )}
       <Grid container direction="column">
-        {message && (
+        {toggle !== "admin" && message && (
           <Grid item p={1} paddingTop={0}>
             <Accordion>
               <AccordionSummary
@@ -148,17 +176,17 @@ export function EggClicked() {
         )}
       </Grid>
       <Grid container direction="column">
-        {message && (
+        {toggle !== "admin" && message && (
           <Grid item p={1} paddingTop={0}>
             <Typography>{message}</Typography>
           </Grid>
         )}
-        {collectedText && (
+        {toggle !== "admin" && collectedText && (
           <Grid item p={1} paddingTop={0}>
             <Typography>{collectedText}</Typography>
           </Grid>
         )}
-        {message && <Leaderboard />}
+        {toggle === "admin" ? <Admin /> : <Leaderboard />}
       </Grid>
     </Grid>
   );

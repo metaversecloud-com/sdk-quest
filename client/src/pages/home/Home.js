@@ -45,8 +45,12 @@ export function Home() {
             onChange={(e) => setToggle(e.target.value)}
             value={toggle}
           >
-            <ToggleButton value="leaderboard">Leaderboard</ToggleButton>
-            <ToggleButton value="admin">Admin</ToggleButton>
+            <ToggleButton style={{ padding: 20 }} value="leaderboard">
+              Leaderboard
+            </ToggleButton>
+            <ToggleButton style={{ padding: 20 }} value="admin">
+              Admin
+            </ToggleButton>
           </ToggleButtonGroup>
         </Grid>
       )}
