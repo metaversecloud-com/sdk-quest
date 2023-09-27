@@ -55,7 +55,7 @@ export function EggClicked() {
         //       numString = "";
         // }
         setMessage(
-          `🎉 Congratulations! You’re one step closer to completing your daily quest! [${numberCollected}/${numberAllowedToCollect}] collected`,
+          `🎉 Congratulations! You are one step closer to completing your daily quest! [${numberCollected}/${numberAllowedToCollect}] collected`,
 
           // `You just found a ${numString} egg. ${
           //   numberCollected === numberAllowedToCollect
@@ -67,7 +67,7 @@ export function EggClicked() {
         getLeaderboardData({ setLeaderboardData, globalDispatch });
       } else if (success) {
         setMessage(
-          `🎉 Congratulations! You’ve already completed your daily quest! Continue tomorrow. [${numberCollected}/${numberAllowedToCollect}] collected`,
+          `🎉 Congratulations! You have already completed your daily quest! Continue tomorrow. [${numberCollected}/${numberAllowedToCollect}] collected`,
         );
         // setMessage(
         //   `You already found ${numberAllowedToCollect} ${
