@@ -124,7 +124,7 @@ export function EggClicked() {
 
   return (
     <Grid alignItems="center" container direction="column" p={0}>
-      <Grid item p={3} paddingBottom={0} xs={12}>
+      <Grid item p={3} paddingBottom={0} paddingTop={0} xs={12}>
         {eggImage ? <img alt="Find me" src={eggImage} /> : <div />}
       </Grid>
       <Grid item p={3} paddingBottom={1} paddingTop={0} xs={12}>
