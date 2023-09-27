@@ -50,7 +50,7 @@ export function Leaderboard() {
       let content;
       switch (columnIndex) {
         case 0:
-          content = "Rank";
+          content = "";
           break;
         // case 1:
         //   content = "Avatar";
@@ -95,14 +95,26 @@ export function Leaderboard() {
         default:
           content = "";
       }
+
+      let cellStyle = {
+        ...style,
+        // padding: `${rowIndex === 0 || content.length > 11 ? 0 : 10}px 10px`,
+        padding: `5px 10px`,
+        // lineHeight: content.length > 11 ? 60 : 30,
+        // height: 60,
+        // margin: "auto",
+        // textAlign: `${columnIndex === 2 || columnIndex === 3 ? "right" : "left"}`,
+        background: item.profileId === visitor.profileId ? "lightgray" : "#FFF",
+        boxShadow: "0px 1px 0px #E8E8E8",
+        textAlign: columnIndex === 2 || columnIndex === 3 ? "end" : "inherit",
+        paddingRight: columnIndex === 2 ? 0 : 10,
+        paddingLeft: columnIndex === 0 || columnIndex === 1 ? 10 : 0,
+        // borderBottom: "1px solid lightgray",
+      };
+
       return (
-        <Box
-          key={key}
-          style={item.profileId === visitor.profileId ? { ...cellStyle, background: "lightgray" } : cellStyle}
-        >
-          <Box sx={{ padding: "5px 0px" }}>
-            <Typography>{content}</Typography>
-          </Box>
+        <Box ref={registerChild} style={cellStyle}>
+          <Typography>{content}</Typography>
         </Box>
       );
     }
@@ -115,9 +127,16 @@ export function Leaderboard() {
       container
       direction="column"
       justifyContent="space-around"
-      mt={3}
-      p={3}
-      sx={{ height: "60vh", background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)", borderRadius: 15 }}
+      mt={1}
+      p={2}
+      paddingTop={0}
+      sx={{
+        height: "60vh",
+        // background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)",
+        border: "8px solid black",
+        borderRadius: 12,
+        width: "100%",
+      }}
     >
       <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 5, width: "100%" }}>
         <AutoSizer>
@@ -126,13 +145,13 @@ export function Leaderboard() {
               cellRenderer={cellRenderer}
               columnCount={4}
               columnWidth={({ index }) =>
-                index === 0 ? width / 6 : index === 1 ? width / 2.5 : index == 2 ? width / 5 : width / 6
+                index === 0 ? width / 7.9 : index === 1 ? width / 2 : index == 2 ? width / 5.2 : width / 6
               } // 50px for the first column, 100px for the others
               fixedRowCount={1}
               height={height}
               onSectionRendered={({ rowStopIndex }) => {
                 // Load more rows when we've rendered the last row
-                if (rowStopIndex === data.length - 1 && hasMore) {
+                if (rowStopIndex === data.length - 2 && hasMore) {
                   loadMoreRows();
                 }
               }}
