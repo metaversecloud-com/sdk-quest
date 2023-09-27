@@ -4,17 +4,18 @@ import React, { useEffect, useState } from "react";
 import { Box, Grid, Tooltip, Typography } from "@mui/material";
 
 // React virtualized for infinite scroll
-import {
-  AutoSizer,
-  // CellMeasurerCache,
-  MultiGrid,
-} from "react-virtualized";
+import { AutoSizer, CellMeasurer, CellMeasurerCache, MultiGrid } from "react-virtualized";
 
 // context
 import { useGlobalState } from "@context";
 
 // utils
 // import { backendAPI } from "@utils";
+
+const cache = new CellMeasurerCache({
+  fixedWidth: true,
+  minHeight: 30, // set minimum height for rows
+});
 
 export function Leaderboard() {
   const {
@@ -38,7 +39,7 @@ export function Leaderboard() {
     }
   };
 
-  const cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
+  const cellRenderer = ({ columnIndex, key, rowIndex, parent, style }) => {
     let cellStyle = {
       ...style,
       padding: `${rowIndex === 0 ? 0 : 10}px 10px`,
@@ -75,15 +76,17 @@ export function Leaderboard() {
       const tooltipTitle = columnIndex === 2 ? "# of days in a row" : columnIndex === 3 ? "Total collected" : null;
 
       return (
-        <Box key={key} style={cellStyle}>
-          {tooltipTitle ? (
-            <Tooltip placement="top" style={{ cursor: "pointer" }} title={tooltipTitle}>
+        <CellMeasurer cache={cache} columnIndex={columnIndex} key={key} parent={parent} rowIndex={rowIndex}>
+          <Box style={cellStyle}>
+            {tooltipTitle ? (
+              <Tooltip placement="top" style={{ cursor: "pointer" }} title={tooltipTitle}>
+                <Typography>{content}</Typography>
+              </Tooltip>
+            ) : (
               <Typography>{content}</Typography>
-            </Tooltip>
-          ) : (
-            <Typography>{content}</Typography>
-          )}
-        </Box>
+            )}
+          </Box>
+        </CellMeasurer>
       );
     } else {
       // Render body rows
@@ -121,15 +124,17 @@ export function Leaderboard() {
         textAlign: columnIndex === 2 || columnIndex === 3 ? "end" : "inherit",
         paddingRight: columnIndex === 2 ? 0 : 10,
         paddingLeft: columnIndex === 0 || columnIndex === 1 ? 10 : 0,
-        borderBottom: "1px solid lightgray",
+        // borderBottom: "1px solid lightgray",
       };
 
       return (
-        <Box key={key} style={cellStyle}>
-          <Box sx={{ padding: "5px 0px" }}>
-            <Typography>{content}</Typography>
+        <CellMeasurer cache={cache} columnIndex={columnIndex} key={key} parent={parent} rowIndex={rowIndex}>
+          <Box style={cellStyle}>
+            <Box sx={{ padding: "5px 0px" }}>
+              <Typography>{content}</Typography>
+            </Box>
           </Box>
-        </Box>
+        </CellMeasurer>
       );
     }
   };
@@ -167,6 +172,7 @@ export function Leaderboard() {
                 index === 0 ? width / 6 : index === 1 ? width / 2.5 : index == 2 ? width / 5 : width / 6
               } // 50px for the first column, 100px for the others
               // deferredMeasurementCache={cache}
+              deferredMeasurementCache={cache}
               fixedRowCount={1}
               height={height}
               onSectionRendered={({ rowStopIndex }) => {
@@ -177,7 +183,8 @@ export function Leaderboard() {
               }}
               rowCount={data.length + 1} // Plus 1 for header row
               // rowHeight={({ index }) => (index === 0 ? 40 : 30)} // 50px for body rows, 30px for the header
-              rowHeight={({ index }) => (index === 0 ? 40 : 60)} // 60px for body rows, 40px for the header
+              // rowHeight={({ index }) => (index === 0 ? 40 : 60)} // 60px for body rows, 40px for the header
+              rowHeight={cache.rowHeight}
               width={width}
             />
           )}
