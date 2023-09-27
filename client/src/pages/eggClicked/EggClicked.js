@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Leaderboard } from "../../components";
 
 // components
-import { Grid, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Grid, Typography } from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
 
 // context
 import {
@@ -76,7 +77,7 @@ export function EggClicked() {
         //     default:
         //       numString = "";
         // }
-        setCollectedText(`[${numberCollected}/${numberAllowedToCollect}] collected`);
+        setCollectedText(`${numberCollected}/${numberAllowedToCollect} collected`);
         setMessage(
           `🎉 Congratulations! You are one step closer to completing your daily quest!`,
 
@@ -91,7 +92,7 @@ export function EggClicked() {
         getLeaderboardData({ setLeaderboardData, globalDispatch });
       } else if (success) {
         setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
-        setCollectedText(`[${numberAllowedToCollect}/${numberAllowedToCollect}] collected`);
+        setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected`);
         // setMessage(
         //   `You already found ${numberAllowedToCollect} ${
         //     numberAllowedToCollect === 1 ? "egg" : "eggs"
@@ -118,6 +119,33 @@ export function EggClicked() {
       </Grid>
       <Grid item p={3} paddingBottom={1} paddingTop={0} xs={12}>
         <Typography variant="h4">Quest</Typography>
+      </Grid>
+      <Grid container direction="column">
+        {message && (
+          <Grid item p={1} paddingTop={0}>
+            <Accordion>
+              <AccordionSummary
+                aria-controls="panel1a-content"
+                expandIcon={<ExpandMore />}
+                id="panel1a-header"
+                style={{ height: 40, minHeight: 40 }}
+              >
+                <Typography>How To: Your Daily Quest</Typography>
+              </AccordionSummary>
+              <AccordionDetails style={{ padding: 0 }}>
+                <Typography>
+                  <ul>
+                    <li>
+                      Search the world to find <img alt="Find me" height={20} src={eggImage} />
+                    </li>
+                    <li>Collect up to 5 per day</li>
+                    <li>Keep up your daily quest to stay on top of the leaderboard</li>
+                  </ul>
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
+        )}
       </Grid>
       <Grid container direction="column">
         {message && (
