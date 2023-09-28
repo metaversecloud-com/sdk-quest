@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+  
 env:
   REGISTRY: '368076259134.dkr.ecr.us-east-1.amazonaws.com'
   REPOSITORY: 'sdk-example'
