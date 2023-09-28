@@ -132,8 +132,8 @@ export function Admin() {
 
   return (
     <>
-      <Grid container direction="column" justifyContent="space-around" p={3}>
-        <Grid alignItems="center" container direction="column" p={1}>
+      <Grid container direction="column" justifyContent="space-around" p={3} paddingTop={1}>
+        <Grid alignItems="center" container direction="column" p={1} paddingTop={0}>
           <Grid item>
             {eggImage ? (
               <Button disabled={dropping} onClick={dropEgg} variant="contained">
@@ -165,7 +165,7 @@ export function Admin() {
                 Remove all
               </Button>
             </Grid>
-            <Grid item pt={4}>
+            <Grid item pt={3}>
               {droppedEggs.map((egg, index) => {
                 if (!egg) return <div />;
                 let lastMovedFormatted = "-";
