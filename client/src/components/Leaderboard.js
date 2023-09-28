@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 
 // components
-import { Box, Grid, Tooltip, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Grid, Tooltip, Typography } from "@mui/material";
+
+import { ExpandMore } from "@mui/icons-material";
 
 // React virtualized for infinite scroll
 import { AutoSizer, CellMeasurer, CellMeasurerCache, MultiGrid } from "react-virtualized";
@@ -18,13 +20,15 @@ const cache = new CellMeasurerCache({
   minHeight: 30, // set minimum height for rows
 });
 
-export function Leaderboard() {
+export function Leaderboard(props) {
   const {
     // hasInteractiveParams,
     leaderboardData,
     visitor,
     // world,
   } = useGlobalState();
+
+  const { eggImage } = props;
   const [data, setData] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const gridRef = useRef(null);
@@ -159,50 +163,73 @@ export function Leaderboard() {
   // console.log("Cached Row Height", cache._rowHeightCache);
 
   return (
-    <Grid
-      container
-      direction="column"
-      justifyContent="space-around"
-      mt={1}
-      p={2}
-      paddingTop={0}
-      sx={{
-        height: "60vh",
-        // background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)",
-        border: "8px solid black",
-        borderRadius: 12,
-        width: "100%",
-      }}
-    >
-      <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 5, width: "100%" }}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <MultiGrid
-              cellRenderer={cellRenderer}
-              columnCount={4}
-              columnWidth={({ index }) =>
-                index === 0 ? width / 7.9 : index === 1 ? width / 2 : index == 2 ? width / 5.2 : width / 6
-              } // 50px for the first column, 100px for the others
-              // deferredMeasurementCache={cache}
-              deferredMeasurementCache={cache}
-              fixedRowCount={1}
-              height={height}
-              onSectionRendered={({ rowStopIndex }) => {
-                // Load more rows when we've rendered the last row
-                if (rowStopIndex === data.length - 2 && hasMore) {
-                  loadMoreRows();
-                }
-              }}
-              ref={gridRef}
-              rowCount={data.length + 1} // Plus 1 for header row
-              // rowHeight={({ index }) => (index === 0 ? 40 : 30)} // 50px for body rows, 30px for the header
-              // rowHeight={({ index }) => (index === 0 ? 40 : 60)} // 60px for body rows, 40px for the header
-              rowHeight={cache.rowHeight}
-              width={width}
-            />
-          )}
-        </AutoSizer>
-      </Box>
+    <Grid container direction="column">
+      <Grid item p={1} paddingTop={0}>
+        <Accordion>
+          <AccordionSummary
+            aria-controls="panel1a-content"
+            expandIcon={<ExpandMore />}
+            id="panel1a-header"
+            style={{ height: 40, minHeight: 40 }}
+          >
+            <Typography>How To: Your Daily Quest</Typography>
+          </AccordionSummary>
+          <AccordionDetails style={{ padding: 0 }}>
+            <Typography color="#3b5166" component="ul">
+              <Typography component="li">
+                Search the world to find <img alt="Find me" height={20} src={eggImage} />
+              </Typography>
+              <Typography component="li">Collect up to 5 per day</Typography>
+              <Typography component="li">Keep up your daily quest to stay on top of the leaderboard</Typography>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+      </Grid>
+      <Grid
+        container
+        direction="column"
+        justifyContent="space-around"
+        mt={1}
+        p={2}
+        paddingTop={0}
+        sx={{
+          height: "60vh",
+          // background: "linear-gradient(90deg, #6441A5 0%, #2A0845 100%)",
+          border: "8px solid black",
+          borderRadius: 12,
+          width: "100%",
+        }}
+      >
+        <Box sx={{ height: "100%", backgroundColor: "white", borderRadius: 5, width: "100%" }}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <MultiGrid
+                cellRenderer={cellRenderer}
+                columnCount={4}
+                columnWidth={({ index }) =>
+                  index === 0 ? width / 7.9 : index === 1 ? width / 2 : index == 2 ? width / 5.2 : width / 6
+                } // 50px for the first column, 100px for the others
+                // deferredMeasurementCache={cache}
+                deferredMeasurementCache={cache}
+                fixedRowCount={1}
+                height={height}
+                onSectionRendered={({ rowStopIndex }) => {
+                  // Load more rows when we've rendered the last row
+                  if (rowStopIndex === data.length - 2 && hasMore) {
+                    loadMoreRows();
+                  }
+                }}
+                ref={gridRef}
+                rowCount={data.length + 1} // Plus 1 for header row
+                // rowHeight={({ index }) => (index === 0 ? 40 : 30)} // 50px for body rows, 30px for the header
+                // rowHeight={({ index }) => (index === 0 ? 40 : 60)} // 60px for body rows, 40px for the header
+                rowHeight={cache.rowHeight}
+                width={width}
+              />
+            )}
+          </AutoSizer>
+        </Box>
+      </Grid>
     </Grid>
   );
 }

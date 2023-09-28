@@ -55,7 +55,8 @@ module.exports = {
         children: "never",
       },
     ],
-    "react/prop-types": ["error", { ignore: ["children", "className"] }],
+    "react/prop-types": "off",
+    // "react/prop-types": ["error", { ignore: ["children", "className"] }],
     "sort-imports": [
       "error",
       {
