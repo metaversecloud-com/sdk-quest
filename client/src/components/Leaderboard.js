@@ -176,11 +176,15 @@ export function Leaderboard(props) {
           </AccordionSummary>
           <AccordionDetails style={{ padding: 0 }}>
             <Typography color="#3b5166" component="ul">
-              <Typography component="li">
+              <Typography component="li" gutterBottom>
                 Search the world to find <img alt="Find me" height={20} src={eggImage} />
               </Typography>
-              <Typography component="li">Collect up to 5 per day</Typography>
-              <Typography component="li">Keep up your daily quest to stay on top of the leaderboard</Typography>
+              <Typography component="li" gutterBottom>
+                Collect up to 5 per day
+              </Typography>
+              <Typography component="li" gutterBottom>
+                Keep up your daily quest to stay on top of the leaderboard
+              </Typography>
             </Typography>
           </AccordionDetails>
         </Accordion>
