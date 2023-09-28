@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Admin, Leaderboard } from "../../components";
 
 // components
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Grid,
   // TextField,
   ToggleButton,
@@ -10,15 +13,18 @@ import {
   Typography,
 } from "@mui/material";
 
+import { ExpandMore } from "@mui/icons-material";
+
 // context
 import {
   // fetchWorld, useGlobalDispatch,
   useGlobalState,
 } from "@context";
 
+import { backendAPI } from "@utils";
+
 export function Home() {
   // const [droppedAsset, setDroppedAsset] = useState();
-  const [loaded, setLoaded] = useState(false);
   const [toggle, setToggle] = useState("leaderboard");
   const [eggImage, setEggImage] = useState("");
 
@@ -32,7 +38,6 @@ export function Home() {
 
   // Get dropped eggs info
   useEffect(() => {
-    if (!loaded) setLoaded(true);
     if (hasInteractiveParams) {
       getEggImage();
     }
@@ -48,8 +53,6 @@ export function Home() {
       console.log(error);
     }
   };
-
-  if (!loaded) return <div />;
 
   if (!hasInteractiveParams)
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
@@ -78,7 +81,7 @@ export function Home() {
               Admin
             </ToggleButton>
           </ToggleButtonGroup>
-          {toggle !== "admin" && message && (
+          {toggle !== "admin" && (
             <Grid item p={1} paddingTop={0}>
               <Accordion>
                 <AccordionSummary
