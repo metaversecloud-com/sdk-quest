@@ -107,6 +107,7 @@ export function Leaderboard(props) {
       // Render body rows
       if (!data || !data[rowIndex - 1] || !visitor) return <div style={{ height: 30 }} />;
       const item = data[rowIndex - 1]; // Subtract 1 for header row
+      if (!item || !item.profileId) return <div style={{ height: 30 }} />;
       let content;
       switch (columnIndex) {
         case 0:
