@@ -110,38 +110,47 @@ export const eggClicked = async (req, res) => {
           },
         });
 
-        await droppedAsset.updatePosition(position.x, position.y);
-        droppedAsset.updateClickType({
-          clickType: "link",
-          clickableLinkTitle: "Quest",
-          isOpenLinkInDrawer: true,
-          clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
-        });
+        try {
+          await droppedAsset.updatePosition(position.x, position.y);
+          droppedAsset.updateClickType({
+            clickType: "link",
+            clickableLinkTitle: "Quest",
+            isOpenLinkInDrawer: true,
+            clickableLink: getBaseURL(req) + "/egg-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+          });
 
-        // Add egg collected to leaderboard
-        let collectedArray = [];
-        if (
-          eggsCollectedByUser &&
-          eggsCollectedByUser[visitor.profileId] &&
-          eggsCollectedByUser[visitor.profileId][dateKey]
-        ) {
-          collectedArray = eggsCollectedByUser[visitor.profileId][dateKey];
+          // Add egg collected to leaderboard
+          let collectedArray = [];
+          if (
+            eggsCollectedByUser &&
+            eggsCollectedByUser[visitor.profileId] &&
+            eggsCollectedByUser[visitor.profileId][dateKey]
+          ) {
+            collectedArray = eggsCollectedByUser[visitor.profileId][dateKey];
+          }
+
+          collectedArray.push({ type: "egg", value: 1 });
+          // SUCCESS: This is the first egg visitor collected today.
+          // console.log(`${visitor.username} ${visitor.profileId} successfully got`, collectedArray);
+          await world.updateDataObject({
+            eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
+            profileMapper: { [visitor.profileId]: visitor.username }, // Update the username of the visitor to be shown in the leaderboard.
+          });
+
+          visitor.updateDataObject({
+            eggsCollectedByWorld: { [world.urlSlug]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
+          });
+          if (res)
+            res.json({
+              addedClick: true,
+              numberAllowedToCollect,
+              numberCollected: collectedArray.length,
+              success: true,
+            });
+          return;
+        } catch (e) {
+          error("Updating dropped asset update position, click type, and world/visitor data object", e);
         }
-
-        collectedArray.push({ type: "egg", value: 1 });
-        // SUCCESS: This is the first egg visitor collected today.
-        console.log(`${visitor.username} ${visitor.profileId} successfully got`, collectedArray);
-        await world.updateDataObject({
-          eggsCollectedByUser: { [visitor.profileId]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
-          profileMapper: { [visitor.profileId]: visitor.username }, // Update the username of the visitor to be shown in the leaderboard.
-        });
-
-        visitor.updateDataObject({
-          eggsCollectedByWorld: { [world.urlSlug]: { [dateKey]: collectedArray } }, // Add egg collection dateKey.
-        });
-        if (res)
-          res.json({ addedClick: true, numberAllowedToCollect, numberCollected: collectedArray.length, success: true });
-        return;
       }
     }
   } catch (e) {

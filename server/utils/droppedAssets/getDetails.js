@@ -26,7 +26,7 @@ export const getDroppedAssetDetails = async (req, res) => {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
     const { instanceId } = req.query;
     const { includeDataObject } = req.body;
-    console.log(instanceId, includeDataObject);
+    // console.log(instanceId, includeDataObject);
     const droppedAsset = await DroppedAsset.get(instanceId, urlSlug, {
       credentials: {
         assetId,
