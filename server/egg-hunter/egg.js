@@ -1,7 +1,7 @@
 import { dropWebImageAsset } from "../utils/droppedAssets/index.js";
 import { getWorldDataObject, getWorldDetails } from "../utils/world/index.js";
 import { getEmbeddedAssetDetails } from "../utils/droppedAssets/index.js";
-import { getVisitor } from "../utils/index.js";
+import { getVisitor, logger } from "../utils/index.js";
 import error from "../utils/errors.js";
 import { getStreak, getLongestStreak } from "./streaks.js";
 import { DroppedAsset } from "../utils/topiaInit.js";
@@ -148,8 +148,14 @@ export const eggClicked = async (req, res) => {
               success: true,
             });
           return;
-        } catch (e) {
-          error("Updating dropped asset update position, click type, and world/visitor data object", e);
+        } catch (error) {
+          logger.error({
+            error,
+            message: "Updating dropped asset update position, click type, and world/visitor data object",
+            functionname: "eggClicked",
+            req,
+          });
+          // error("Updating dropped asset update position, click type, and world/visitor data object", e);
         }
       }
     }

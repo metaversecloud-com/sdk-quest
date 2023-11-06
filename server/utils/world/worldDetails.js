@@ -3,9 +3,15 @@ import error from "../errors.js";
 
 export const getWorldDetails = async (req, res) => {
   try {
-    const { urlSlug } = req.query;
+    const { urlSlug, interactiveNonce, interactivePublicKey, visitorId } = req.query;
     const { includeDataObject } = req.body;
-    const world = World.create(urlSlug, { credentials: req.query });
+    const world = World.create(urlSlug, {
+      credentials: {
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+    });
     await world.fetchDetails();
     if (includeDataObject) await world.fetchDataObject();
     if (res) res.json({ world, success: true });
@@ -17,9 +23,15 @@ export const getWorldDetails = async (req, res) => {
 
 export const updateWorldDetails = async (req, res) => {
   try {
-    const { urlSlug } = req.query;
+    const { urlSlug, interactiveNonce, interactivePublicKey, visitorId } = req.query;
     const { controls, description, forceAuthOnLogin, height, name, spawnPosition, width } = req.body;
-    const world = World.create(urlSlug, { credentials: req.query });
+    const world = World.create(urlSlug, {
+      credentials: {
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+    });
     await world.updateDetails({ controls, description, forceAuthOnLogin, height, name, spawnPosition, width });
     if (res) res.json({ world, success: true });
     return;

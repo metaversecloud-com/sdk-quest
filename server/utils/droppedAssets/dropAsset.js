@@ -41,11 +41,10 @@ export const dropAsset = async (req, res) => {
 
 export const createAsset = async ({ id, isInteractive, req, position, uniqueName }) => {
   try {
-    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
 
     const asset = Asset.create(id, {
       credentials: {
-        assetId,
         interactiveNonce,
         interactivePublicKey,
         visitorId,
@@ -58,7 +57,8 @@ export const createAsset = async ({ id, isInteractive, req, position, uniqueName
       urlSlug,
     });
 
-    // This adds your public developer key to the dropped asset so visitors can interact with it in-world.
+    // console.log(droppedAsset);
+    // // This adds your public developer key to the dropped asset so visitors can interact with it in-world.
     if (droppedAsset && isInteractive)
       await droppedAsset.setInteractiveSettings({
         isInteractive: true,
