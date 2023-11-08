@@ -1,8 +1,8 @@
 import { error, getLongestStreak, getWorldDataObject } from "../utils/index.js";
 
 export const getLeaderboard = async (req, res) => {
-  const { interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
   try {
+    const { interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const worldDataObject = await getWorldDataObject(
       {
         interactiveNonce,

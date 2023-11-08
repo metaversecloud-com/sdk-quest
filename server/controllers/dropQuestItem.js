@@ -13,27 +13,28 @@ export const dropQuestItem = async (req, res) => {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const { uniqueName } = req.body;
 
-    const questItem = await getDroppedAssetDetails({
-      credentials: {
-        assetId,
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-      droppedAssetId: assetId,
-      includeDataObject: true,
-      urlSlug,
-    });
-
-    const world = await getWorldDetails({
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-      includeDataObject: true,
-      urlSlug,
-    });
+    const [questItem, world] = await Promise.all([
+      getDroppedAssetDetails({
+        credentials: {
+          assetId,
+          interactiveNonce,
+          interactivePublicKey,
+          visitorId,
+        },
+        droppedAssetId: assetId,
+        includeDataObject: true,
+        urlSlug,
+      }),
+      getWorldDetails({
+        credentials: {
+          interactiveNonce,
+          interactivePublicKey,
+          visitorId,
+        },
+        includeDataObject: true,
+        urlSlug,
+      }),
+    ]);
 
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
@@ -51,12 +52,16 @@ export const dropQuestItem = async (req, res) => {
         if (questItemDetails.bottomLayer) layers.bottom = questItemDetails.bottomLayer;
         if (questItemDetails.topLayer) layers.top = questItemDetails.topLayer;
       }
-      world.updateDataObject({
-        keyAssetDetails: {
-          bottomLayer: layers.bottom,
-          topLayer: layers.top,
+      const lockId = `${urlSlug}-keyAssetDetails-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
+      world.updateDataObject(
+        {
+          keyAssetDetails: {
+            bottomLayer: layers.bottom,
+            topLayer: layers.top,
+          },
         },
-      });
+        { lock: { lockId } },
+      );
     }
 
     const droppedAsset = await dropAsset({
@@ -71,14 +76,15 @@ export const dropQuestItem = async (req, res) => {
       urlSlug,
     });
 
-    await droppedAsset.updateClickType({
-      clickType: "link",
-      clickableLinkTitle: "Quest",
-      isOpenLinkInDrawer: true,
-      clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
-    });
-
-    await droppedAsset.updateWebImageLayers(layers.bottom, layers.top);
+    await Promise.all([
+      droppedAsset.updateClickType({
+        clickType: "link",
+        clickableLinkTitle: "Quest",
+        isOpenLinkInDrawer: true,
+        clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+      }),
+      droppedAsset.updateWebImageLayers(layers.bottom, layers.top),
+    ]);
 
     res.json({ droppedAsset, success: true });
   } catch (e) {

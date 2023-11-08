@@ -1,10 +1,9 @@
 import { error, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
 export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
-  const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
-  const { isPartial, uniqueName } = req.body;
-
   try {
+    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { isPartial, uniqueName } = req.body;
     const droppedAssets = await getDroppedAssetsWithUniqueName({
       credentials: {
         interactiveNonce,

@@ -1,9 +1,9 @@
 import { error, getVisitor } from "../utils/index.js";
 
 export const handleGetVisitor = async (req, res) => {
-  const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
-  const { includeDataObject } = req.body;
   try {
+    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { includeDataObject } = req.body;
     const visitor = await getVisitor({
       credentials: {
         interactiveNonce,

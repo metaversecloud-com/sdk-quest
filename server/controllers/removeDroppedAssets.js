@@ -2,21 +2,23 @@ import { DroppedAsset } from "../utils/topiaInit.js";
 import { error, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
 export const removeDroppedAssetsWithUniqueName = async (req, res) => {
-  const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
-  const { uniqueName } = req.body;
-  const droppedAssets = await getDroppedAssetsWithUniqueName({
-    credentials: {
-      interactiveNonce,
-      interactivePublicKey,
-      visitorId,
-    },
-    isPartial: false,
-    uniqueName,
-    urlSlug,
-  });
-  if (!droppedAssets) throw "No dropped assets found";
-  if (droppedAssets.error) throw droppedAssets.error;
-  if (droppedAssets && droppedAssets.length) {
+  try {
+    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { uniqueName } = req.body;
+    const droppedAssets = await getDroppedAssetsWithUniqueName({
+      credentials: {
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+      isPartial: false,
+      uniqueName,
+      urlSlug,
+    });
+
+    if (!droppedAssets || droppedAssets.length === 0) throw "No dropped assets found";
+    if (droppedAssets.error) throw droppedAssets.error;
+
     droppedAssets.forEach((droppedAsset) => {
       try {
         droppedAsset.deleteDroppedAsset();
@@ -26,16 +28,16 @@ export const removeDroppedAssetsWithUniqueName = async (req, res) => {
       }
     });
     res.json({ success: true });
-  } else {
-    error("Removing Dropped Assets by Unique Name", { message: "No dropped assets found" }, res);
+  } catch (e) {
+    error("Removing Dropped Asset by Unique Name", e, res);
   }
 };
 
 export const removeDroppedAsset = async (req, res) => {
-  const { droppedAssetId } = req.params;
-  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
   try {
-    const droppedAsset = await DroppedAsset.get(droppedAssetId, urlSlug, {
+    const { droppedAssetId } = req.params;
+    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const droppedAsset = DroppedAsset.create(droppedAssetId, urlSlug, {
       credentials: {
         assetId,
         interactiveNonce,
@@ -43,8 +45,7 @@ export const removeDroppedAsset = async (req, res) => {
         visitorId,
       },
     });
-    if (!droppedAsset) throw { message: "No dropped asset found" };
-    droppedAsset.deleteDroppedAsset();
+    await droppedAsset.deleteDroppedAsset();
     res.json({ success: true });
   } catch (e) {
     error("Removing Dropped Asset", e, res);
