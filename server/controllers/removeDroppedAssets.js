@@ -1,9 +1,19 @@
-import { fetchDroppedAssetsUniqueName } from "./fetchDroppedAssets.js";
-import { DroppedAsset } from "../topiaInit.js";
-import error from "../errors.js";
+import { DroppedAsset } from "../utils/topiaInit.js";
+import { error, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
-export const removeDroppedAssetsUniqueName = async (req, res) => {
-  const droppedAssets = await fetchDroppedAssetsUniqueName(req);
+export const removeDroppedAssetsWithUniqueName = async (req, res) => {
+  const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+  const { uniqueName } = req.body;
+  const droppedAssets = await getDroppedAssetsWithUniqueName({
+    credentials: {
+      interactiveNonce,
+      interactivePublicKey,
+      visitorId,
+    },
+    isPartial: false,
+    uniqueName,
+    urlSlug,
+  });
   if (!droppedAssets) throw "No dropped assets found";
   if (droppedAssets.error) throw droppedAssets.error;
   if (droppedAssets && droppedAssets.length) {
@@ -12,20 +22,20 @@ export const removeDroppedAssetsUniqueName = async (req, res) => {
         droppedAsset.deleteDroppedAsset();
       } catch (e) {
         console.log("Error on delete dropped asset", e);
-        if (res) return res.status(500).send({ error: e, success: false });
+        return res.status(500).send({ error: e, success: false });
       }
     });
-    if (res) res.json({ success: true });
+    res.json({ success: true });
   } else {
     error("Removing Dropped Assets by Unique Name", { message: "No dropped assets found" }, res);
   }
 };
 
 export const removeDroppedAsset = async (req, res) => {
-  const { instanceId } = req.params;
+  const { droppedAssetId } = req.params;
   const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
   try {
-    const droppedAsset = await DroppedAsset.get(instanceId, urlSlug, {
+    const droppedAsset = await DroppedAsset.get(droppedAssetId, urlSlug, {
       credentials: {
         assetId,
         interactiveNonce,
@@ -35,7 +45,7 @@ export const removeDroppedAsset = async (req, res) => {
     });
     if (!droppedAsset) throw { message: "No dropped asset found" };
     droppedAsset.deleteDroppedAsset();
-    if (res) res.json({ success: true });
+    res.json({ success: true });
   } catch (e) {
     error("Removing Dropped Asset", e, res);
   }
