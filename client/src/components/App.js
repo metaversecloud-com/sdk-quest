@@ -18,6 +18,16 @@ export function App() {
   const globalDispatch = useGlobalDispatch();
 
   useEffect(() => {
+    if (!hasInitBackendAPI) {
+      setupAPI();
+    } else {
+      getVisitor();
+      getLeaderboard();
+    }
+    // eslint-disable-next-line
+  }, [hasInitBackendAPI, searchParams]);
+
+  const setupAPI = async () => {
     const interactiveParams = {
       assetId: searchParams.get("assetId"),
       displayName: searchParams.get("displayName"),
@@ -38,16 +48,9 @@ export function App() {
       });
     }
 
-    const setupAPI = async () => {
-      await setupBackendAPI(interactiveParams);
-      setHasInitBackendAPI(true);
-    };
-    if (!hasInitBackendAPI) setupAPI();
-    else {
-      getVisitor();
-      getLeaderboard();
-    }
-  }, [globalDispatch, hasInitBackendAPI, searchParams]);
+    await setupBackendAPI(interactiveParams);
+    setHasInitBackendAPI(true);
+  };
 
   const getVisitor = async () => {
     const result = await backendAPI.get("/visitor");
@@ -63,8 +66,6 @@ export function App() {
 
   const getLeaderboard = async () => {
     await getLeaderboardData({ setLeaderboardData, globalDispatch });
-    setTimeout(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000); // Force leaderboard autosizing.  If remove this, doesn't properly size until next poll.
-    setInterval(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000 * 10);
   };
 
   return (

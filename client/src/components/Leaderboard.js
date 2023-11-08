@@ -16,7 +16,7 @@ const cache = new CellMeasurerCache({
   minHeight: 30, // set minimum height for rows
 });
 
-export function Leaderboard(keyAssetImage) {
+export function Leaderboard({ keyAssetImage }) {
   const [data, setData] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const gridRef = useRef(null);
