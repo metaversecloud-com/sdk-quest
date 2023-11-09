@@ -5,18 +5,18 @@ import { Admin, Leaderboard } from "@components";
 import { Grid, Typography } from "@mui/material";
 
 // context
-import { useGlobalState } from "@context";
+import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
 
 // utils
 import { backendAPI } from "@utils";
 
 export function Layout({ children }) {
   const [activeTab, setActiveTab] = useState("leaderboard");
-  const [keyAssetImage, setKeyAssetImage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const { visitor } = useGlobalState();
+  const { keyAssetImage, visitor } = useGlobalState();
+  const globalDispatch = useGlobalDispatch();
 
   useEffect(() => {
     getKeyAssetImage();
@@ -27,7 +27,10 @@ export function Layout({ children }) {
     try {
       const result = await backendAPI.get("/key-asset-image");
       if (result.data.success) {
-        setKeyAssetImage(result.data.keyAssetImage);
+        setKeyAssetImage({
+          dispatch: globalDispatch,
+          keyAssetImage: result.data.keyAssetImage,
+        });
       } else {
         return console.log("ERROR getting key asset image");
       }
@@ -61,7 +64,7 @@ export function Layout({ children }) {
       <Grid container direction="column">
         {children}
       </Grid>
-      {activeTab === "admin" ? <Admin /> : <Leaderboard keyAssetImage={keyAssetImage} />}
+      {activeTab === "admin" ? <Admin keyAssetImage={keyAssetImage} /> : <Leaderboard keyAssetImage={keyAssetImage} />}
     </Grid>
   );
 }

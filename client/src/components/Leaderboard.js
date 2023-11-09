@@ -10,6 +10,9 @@ import { AutoSizer, CellMeasurer, CellMeasurerCache, MultiGrid } from "react-vir
 // context
 import { useGlobalState } from "@context";
 
+// utils
+import { backendAPI } from "@utils";
+
 const cache = new CellMeasurerCache({
   fixedWidth: true,
   defaultHeight: 60, // set minimum height for rows
@@ -17,25 +20,36 @@ const cache = new CellMeasurerCache({
 });
 
 export function Leaderboard({ keyAssetImage }) {
-  const [data, setData] = useState([]);
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [visibleData, setVisibleData] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const gridRef = useRef(null);
 
-  const { leaderboardData, visitor } = useGlobalState();
+  const { visitor } = useGlobalState();
 
   useEffect(() => {
-    if (leaderboardData && leaderboardData.length) {
-      if (gridRef.current) {
-        cache.clearAll();
-        gridRef.current.forceUpdateGrids();
+    const getLeaderboardData = async () => {
+      try {
+        const result = await backendAPI.get("/leaderboard");
+        let { leaderboard } = result.data;
+        if (leaderboard && leaderboard.length > 0) {
+          if (gridRef.current) {
+            cache.clearAll();
+            gridRef.current.forceUpdateGrids();
+          }
+          setLeaderboardData(leaderboard);
+          setVisibleData(leaderboard.slice(0, 25));
+        }
+      } catch (error) {
+        console.log("There was a problem while retrieving leaderboard data. Please try again later.");
       }
-      setData(leaderboardData.slice(0, 25));
-    }
-  }, [leaderboardData]);
+    };
+    getLeaderboardData();
+  }, []);
 
   const loadMoreRows = () => {
-    if (data.length < leaderboardData.length) {
-      setData(leaderboardData.slice(0, data.length + 25));
+    if (visibleData.length < leaderboardData.length) {
+      setVisibleData(leaderboardData.slice(0, visibleData.length + 25));
     } else {
       setHasMore(false);
     }
@@ -92,8 +106,8 @@ export function Leaderboard({ keyAssetImage }) {
       );
     } else {
       // Render body rows
-      if (!data || !data[rowIndex - 1] || !visitor) return <div style={{ height: 30 }} />;
-      const item = data[rowIndex - 1]; // Subtract 1 for header row
+      if (!visibleData || !visibleData[rowIndex - 1] || !visitor) return <div style={{ height: 30 }} />;
+      const item = visibleData[rowIndex - 1]; // Subtract 1 for header row
       if (!item || !item.profileId) return <div style={{ height: 30 }} />;
       let content;
       switch (columnIndex) {
@@ -186,12 +200,12 @@ export function Leaderboard({ keyAssetImage }) {
                 height={height}
                 onSectionRendered={({ rowStopIndex }) => {
                   // Load more rows when we've rendered the last row
-                  if (rowStopIndex === data.length - 2 && hasMore) {
+                  if (rowStopIndex === visibleData.length - 2 && hasMore) {
                     loadMoreRows();
                   }
                 }}
                 ref={gridRef}
-                rowCount={data.length + 1} // Plus 1 for header row
+                rowCount={visibleData.length + 1} // Plus 1 for header row
                 rowHeight={cache.rowHeight}
                 width={width}
               />

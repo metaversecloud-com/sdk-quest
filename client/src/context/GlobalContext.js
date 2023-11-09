@@ -16,10 +16,10 @@ function globalReducer(state, action) {
         ...state,
         visitor: action.payload.visitor,
       };
-    case "SET_LEADERBOARD_DATA":
+    case "SET_KEY_ASSET_IMAGE":
       return {
         ...state,
-        leaderboardData: action.payload.leaderboardData,
+        keyAssetImage: action.payload.keyAssetImage,
       };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -97,13 +97,13 @@ function setVisitorInfo({ dispatch, visitor }) {
   });
 }
 
-function setLeaderboardData({ dispatch, leaderboardData }) {
+function setKeyAssetImage({ dispatch, keyAssetImage }) {
   dispatch({
-    type: "SET_LEADERBOARD_DATA",
+    type: "SET_KEY_ASSET_IMAGE",
     payload: {
-      leaderboardData,
+      keyAssetImage,
     },
   });
 }
 
-export { GlobalProvider, setInteractiveParams, setLeaderboardData, setVisitorInfo, useGlobalState, useGlobalDispatch };
+export { GlobalProvider, setInteractiveParams, setKeyAssetImage, setVisitorInfo, useGlobalState, useGlobalDispatch };
