@@ -8,7 +8,7 @@ import cors from "cors";
 import { findObjectKeyPath } from "./utils/findObjectKeyPath.js";
 dotenv.config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 const app = express();
 
 app.use(bodyParser.json());
