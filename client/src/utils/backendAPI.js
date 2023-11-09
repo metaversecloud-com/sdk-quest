@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const BASE_URL = process.env.API_URL || "";
-// const BASE_URL = process.env.API_URL || "http://localhost:3001";
 let backendAPI = axios;
 
 const initBackendAPI = function () {
@@ -22,10 +21,15 @@ const setupBackendAPI = (interactiveParams) => {
       if (!config?.params) config.params = {};
       config.params = { ...config.params };
       config.params["assetId"] = interactiveParams.assetId;
-      config.params["visitorId"] = interactiveParams.visitorId;
+      config.params["displayName"] = interactiveParams.displayName;
       config.params["interactiveNonce"] = interactiveParams.interactiveNonce;
       config.params["interactivePublicKey"] = interactiveParams.interactivePublicKey;
+      config.params["profileId"] = interactiveParams.profileId;
+      config.params["sceneDropId"] = interactiveParams.sceneDropId;
+      config.params["uniqueName"] = interactiveParams.uniqueName;
       config.params["urlSlug"] = interactiveParams.urlSlug;
+      config.params["username"] = interactiveParams.username;
+      config.params["visitorId"] = interactiveParams.visitorId;
       return config;
     });
   }

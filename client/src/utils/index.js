@@ -1,1 +1,2 @@
-export { backendAPI } from "./backendAPI";
+export * from "./backendAPI";
+export * from "./getLeaderboardData";

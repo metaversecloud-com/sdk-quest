@@ -1,23 +1,20 @@
-import { World } from "../topiaInit.js";
-import error from "../errors.js";
+import { error, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
-export const fetchDroppedAssetsUniqueName = async (req, res) => {
-  const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
-  const { isPartial, uniqueName } = req.body;
-
+export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
   try {
-    const world = World.create(urlSlug, {
+    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { isPartial, uniqueName } = req.body;
+    const droppedAssets = await getDroppedAssetsWithUniqueName({
       credentials: {
-        assetId,
         interactiveNonce,
         interactivePublicKey,
         visitorId,
       },
-    });
-    const droppedAssets = await world.fetchDroppedAssetsWithUniqueName({
       isPartial,
       uniqueName,
+      urlSlug,
     });
+
     const normalized = droppedAssets.map((asset) => {
       let normalizedAsset = { ...asset };
       delete normalizedAsset["topia"];
@@ -26,8 +23,7 @@ export const fetchDroppedAssetsUniqueName = async (req, res) => {
       delete normalizedAsset["requestOptions"];
       return normalizedAsset;
     });
-    if (res) res.json({ droppedAssets: normalized, success: true });
-    return droppedAssets;
+    res.json({ droppedAssets: normalized, success: true });
   } catch (e) {
     error("Fetching dropped assets with unique name", e, res);
   }

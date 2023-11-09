@@ -4,7 +4,6 @@ dotenv.config();
 import { Topia, AssetFactory, DroppedAssetFactory, UserFactory, VisitorFactory, WorldFactory } from "@rtsdk/topia";
 
 const config = {
-  // apiDomain: process.env.INSTANCE_DOMAIN || "api-stage.topia.io",
   apiDomain: process.env.INSTANCE_DOMAIN || "api.topia.io",
   apiKey: process.env.API_KEY,
   apiProtocol: process.env.INSTANCE_PROTOCOL || "https",

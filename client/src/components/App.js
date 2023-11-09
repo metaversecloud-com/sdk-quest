@@ -2,16 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 
 // pages
-import { Error, Home } from "@pages";
+import { Error, Home, QuestItemFound } from "@pages";
 
 // utils
-import { backendAPI } from "@utils";
+import { backendAPI, getLeaderboardData, setupBackendAPI } from "@utils";
 
 // context
-import { setInteractiveParams, setLeaderboardData, setVisitorInfo, setWorldInfo, useGlobalDispatch } from "@context";
-import { setupBackendAPI } from "../utils/backendAPI";
-import { getLeaderboardData } from "../utils/leaderboard";
-import { EggClicked } from "../pages";
+import { setInteractiveParams, setLeaderboardData, setVisitorInfo, useGlobalDispatch } from "@context";
 
 export function App() {
   const [searchParams] = useSearchParams();
@@ -21,12 +18,27 @@ export function App() {
   const globalDispatch = useGlobalDispatch();
 
   useEffect(() => {
+    if (!hasInitBackendAPI) {
+      setupAPI();
+    } else {
+      getVisitor();
+      getLeaderboard();
+    }
+    // eslint-disable-next-line
+  }, [hasInitBackendAPI, searchParams]);
+
+  const setupAPI = async () => {
     const interactiveParams = {
       assetId: searchParams.get("assetId"),
+      displayName: searchParams.get("displayName"),
       interactiveNonce: searchParams.get("interactiveNonce"),
       interactivePublicKey: searchParams.get("interactivePublicKey"),
-      visitorId: searchParams.get("visitorId"),
+      profileId: searchParams.get("profileId"),
+      sceneDropId: searchParams.get("sceneDropId"),
+      uniqueName: searchParams.get("uniqueName"),
       urlSlug: searchParams.get("urlSlug"),
+      username: searchParams.get("username"),
+      visitorId: searchParams.get("visitorId"),
     };
 
     if (interactiveParams.assetId) {
@@ -36,59 +48,32 @@ export function App() {
       });
     }
 
-    const setupAPI = async () => {
-      await setupBackendAPI(interactiveParams);
-      setHasInitBackendAPI(true);
-    };
-    if (!hasInitBackendAPI) setupAPI();
-  }, [globalDispatch, hasInitBackendAPI, searchParams]);
+    await setupBackendAPI(interactiveParams);
+    setHasInitBackendAPI(true);
+  };
 
-  // Get Visitor info
-  useEffect(() => {
-    const getVisitor = async () => {
-      const result = await backendAPI.get("/visitor");
-      if (result.data.success) {
-        setVisitorInfo({
-          dispatch: globalDispatch,
-          visitor: result.data.visitor,
-        });
-      } else {
-        console.log("Error getting visitor");
-      }
-    };
-    getVisitor();
-  }, [globalDispatch]);
+  const getVisitor = async () => {
+    const result = await backendAPI.get("/visitor");
+    if (result.data.success) {
+      setVisitorInfo({
+        dispatch: globalDispatch,
+        visitor: result.data.visitor,
+      });
+    } else {
+      console.log("Error getting visitor");
+    }
+  };
 
-  // Get Visitor info
-  useEffect(() => {
-    const getWorld = async () => {
-      const result = await backendAPI.get("/world");
-      if (result.data.success) {
-        setWorldInfo({
-          dispatch: globalDispatch,
-          world: result.data.world,
-        });
-      } else {
-        console.log("Error getting world");
-      }
-    };
-    getWorld();
-  }, [globalDispatch]);
-
-  useEffect(() => {
-    getLeaderboardData({ setLeaderboardData, globalDispatch });
-    setTimeout(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000); // Force leaderboard autosizing.  If remove this, doesn't properly size until next poll.
-    setInterval(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000 * 10);
-  }, [globalDispatch]);
+  const getLeaderboard = async () => {
+    await getLeaderboardData({ setLeaderboardData, globalDispatch });
+  };
 
   return (
     <Routes>
-      {/* {routes.map((route, index) => {
-        return <Route element={<route.component />} key={index} path={route.path} />
-      })} */}
       <Route element={<Home />} exact path="/" />
-      <Route element={<EggClicked />} exact path="/egg-clicked" />
-      <Route element={<Error />} exact path="*" />
+      <Route element={<QuestItemFound />} path="/egg-clicked" />
+      <Route element={<QuestItemFound />} path="/quest-item-clicked" />
+      <Route element={<Error />} path="*" />
     </Routes>
   );
 }
