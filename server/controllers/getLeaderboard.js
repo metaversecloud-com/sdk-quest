@@ -3,7 +3,7 @@ import { error, getLongestStreak, getWorldDataObject } from "../utils/index.js";
 export const getLeaderboard = async (req, res) => {
   try {
     const { interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
-    const worldDataObject = await getWorldDataObject(
+    const { dataObject } = await getWorldDataObject(
       {
         interactiveNonce,
         interactivePublicKey,
@@ -11,9 +11,10 @@ export const getLeaderboard = async (req, res) => {
       },
       urlSlug,
     );
+
     let leaderboard = [];
-    if (worldDataObject) {
-      const { eggsCollectedByUser, itemsCollectedByUser, profileMapper } = worldDataObject;
+    if (dataObject) {
+      const { eggsCollectedByUser, itemsCollectedByUser, profileMapper } = dataObject;
       const itemsCollected = itemsCollectedByUser || eggsCollectedByUser;
       if (itemsCollected) {
         for (const profileId in itemsCollected) {
@@ -21,7 +22,7 @@ export const getLeaderboard = async (req, res) => {
           let collected = 0;
           Object.values(itemsCollected[profileId]).forEach((day) => {
             if (day === true) collected++;
-            if (day.length) collected += day.length;
+            if (day.length > 0) collected += day.length;
           });
 
           leaderboard.push({

@@ -1,12 +1,13 @@
+/* eslint-disable */
 import React, { useEffect, useState } from "react";
 
 // components
-import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import { Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import { WalkIcon } from "./SVGs.js";
 
 // context
-import { useGlobalState } from "@context";
+import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
 
 // utils
 import { backendAPI } from "@utils";
@@ -15,27 +16,34 @@ import { backendAPI } from "@utils";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-const keyItemUniqueName = "sdk-quest-item";
+const uniqueName = "sdk-quest-item";
 
-export function Admin() {
+export function Admin({ keyAssetImage }) {
+  const [numberAllowedToCollect, setNumberAllowedToCollect] = useState(5);
+  const [questItemImage, setQuestItemImage] = useState("");
   const [droppedItems, setQuestItems] = useState([]);
-  const [keyAssetImage, setKeyAssetImage] = useState("");
   const [isDropping, setIsDropping] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // context
   const { hasInteractiveParams } = useGlobalState();
+  const globalDispatch = useGlobalDispatch();
 
   useEffect(() => {
     if (hasInteractiveParams) {
+      getWorldDataObject();
       getQuestItems();
-      getKeyAssetImage();
+      setIsLoading(false);
     }
   }, [hasInteractiveParams]);
 
-  const getKeyAssetImage = async () => {
+  const getWorldDataObject = async () => {
     try {
-      const result = await backendAPI.get("/key-asset-image");
-      if (result.data.success) {
-        setKeyAssetImage(result.data.keyAssetImage);
-      } else return console.log("ERROR getting key asset image");
+      const result = await backendAPI.get("/world-data-object");
+      const { dataObject } = result.data.world;
+      if (dataObject.numberAllowedToCollect) setNumberAllowedToCollect(dataObject.numberAllowedToCollect);
+      if (dataObject.questItemImage) setQuestItemImage(dataObject.questItemImage);
     } catch (error) {
       console.log(error);
     }
@@ -43,9 +51,7 @@ export function Admin() {
 
   const getQuestItems = async () => {
     try {
-      const result = await backendAPI.post("/dropped-asset/uniqueNameSearch", {
-        uniqueName: keyItemUniqueName,
-      });
+      const result = await backendAPI.get("/quest-items");
       if (result.data.success) {
         setQuestItems(result.data.droppedAssets);
       } else return console.log("ERROR getting quest items");
@@ -58,11 +64,11 @@ export function Admin() {
     try {
       setIsDropping(true);
       const result = await backendAPI.post("/drop-quest-item", {
-        uniqueName: keyItemUniqueName,
+        uniqueName,
       });
       if (result.data.success) {
         getQuestItems();
-      } else return console.log("ERROR getting data object");
+      } else return console.log("ERROR dropping quest item");
       setIsDropping(false);
     } catch (error) {
       setIsDropping(false);
@@ -72,12 +78,12 @@ export function Admin() {
 
   const removeAllQuestItems = async () => {
     try {
-      const result = await backendAPI.post("/dropped-asset/removeAllWithUniqueName", {
-        uniqueName: keyItemUniqueName,
+      const result = await backendAPI.post("/dropped-asset/remove-all-with-unique-name", {
+        uniqueName,
       });
       if (result.data.success) {
         setQuestItems([]);
-      } else return console.log("ERROR getting data object");
+      } else return console.log("ERROR removing all quest items");
     } catch (error) {
       console.log(error);
     }
@@ -95,7 +101,7 @@ export function Admin() {
 
   const moveVisitor = async (position) => {
     try {
-      const result = await backendAPI.put(`/visitor/move`, { moveTo: position });
+      const result = await backendAPI.put("/visitor/move", { moveTo: position });
       if (result.data.success) console.log("Moved successfully");
       else return console.log("ERROR moving visitor");
     } catch (error) {
@@ -103,101 +109,137 @@ export function Admin() {
     }
   };
 
-  if (!hasInteractiveParams)
+  const saveAdminUpdates = async () => {
+    setIsSaving(true);
+    try {
+      await backendAPI.post("/number-allowed-to-collect", { numberAllowedToCollect });
+      if (droppedItems.length > 0) await backendAPI.post("/quest-item-image", { questItemImage });
+      setKeyAssetImage({
+        dispatch: globalDispatch,
+        keyAssetImage: questItemImage,
+      });
+      setIsSaving(false);
+    } catch (error) {
+      console.log(error);
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) return <div />;
+
+  if (!hasInteractiveParams) {
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
+  }
 
   return (
-    <>
-      <Grid container direction="column" justifyContent="space-around" p={3} paddingTop={1}>
-        <Grid alignItems="center" container direction="column" p={1} paddingTop={0}>
-          <Grid item>
-            {keyAssetImage ? (
-              <Button disabled={isDropping} onClick={dropItem} variant="contained">
-                <Typography color="white">Hide </Typography>
-                <img
-                  alt="Drop in world"
-                  className={isDropping ? "isDropping" : ""}
-                  height={20}
-                  src={keyAssetImage}
-                  style={{ paddingLeft: 4, paddingRight: 4 }}
-                />{" "}
-                <Typography color="white"> in the world</Typography>
-              </Button>
-            ) : (
-              <div />
-            )}
-          </Grid>
-        </Grid>
+    <Grid container direction="column" gap={2}>
+      <hr style={{ margin: 1 }} />
+      <div>
+        <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
+        <input
+          id="numberAllowedToCollect"
+          onChange={(e) => setNumberAllowedToCollect(e.target.value)}
+          type="text"
+          value={numberAllowedToCollect}
+        />
+      </div>
 
-        {droppedItems.length ? (
-          <Grid alignItems="center" container direction="column">
-            <Grid item p={1}>
-              <Typography>
-                {droppedItems.length} {droppedItems.length === 1 ? "" : ""} hidden in this world
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Button onClick={removeAllQuestItems} variant="contained">
-                Remove all
-              </Button>
-            </Grid>
-            <Grid item pt={3}>
-              {droppedItems.map((item, index) => {
-                if (!item) return <div />;
-                let lastMovedFormatted = "-";
-                if (item.clickableLink) {
-                  const clickableLink = new URL(item.clickableLink);
-                  let params = new URLSearchParams(clickableLink.search);
-                  const lastMoved = new Date(parseInt(params.get("lastMoved")));
-                  dayjs.extend(relativeTime);
-                  lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
-                }
-                return (
-                  <Grid
-                    alignItems="center"
-                    container
-                    direction="row"
-                    justifyContent="space-between"
-                    key={item.id}
-                    sx={{ width: "80vw" }}
-                  >
-                    <Grid item xs={3}>
-                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{index + 1}</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{lastMovedFormatted}</Typography>
-                    </Grid>
-                    <Grid item xs={1}>
-                      <Tooltip placement="left" title="Walk to">
-                        <IconButton
-                          aria-label="Walk to"
-                          onClick={() => moveVisitor(item.position)}
-                          style={{ minWidth: 20 }}
-                        >
-                          <WalkIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Grid>
-                    <Grid item xs={1}>
-                      <Tooltip placement="right" title="Remove">
-                        <IconButton
-                          aria-label="Remove from world"
-                          onClick={() => removeQuestItem(item.id)}
-                          style={{ minWidth: 20 }}
-                        >
-                          <RemoveCircleOutline />
-                        </IconButton>
-                      </Tooltip>
-                    </Grid>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Grid>
-        ) : (
-          <></>
-        )}
+      <div>
+        <label htmlFor="questItemImage">Quest Item Image URL:</label>
+        <input
+          id="questItemImage"
+          onChange={(e) => setQuestItemImage(e.target.value)}
+          type="text"
+          value={questItemImage}
+        />
+        <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
+      </div>
+
+      <button disabled={isSaving} onClick={saveAdminUpdates}>
+        Save
+      </button>
+
+      <hr style={{ margin: 1 }} />
+
+      <Grid container direction="row" gap={2} justifyContent="center" mt={2}>
+        <h5>
+          {droppedItems.length}{" "}
+          {keyAssetImage && (
+            <img
+              alt="Drop in world"
+              className={isDropping ? "isDropping" : ""}
+              height={20}
+              src={keyAssetImage}
+              style={{ paddingLeft: 4, paddingRight: 4 }}
+            />
+          )}{" "}
+          hidden in this world
+        </h5>
+        <Grid item>
+          <button disabled={isDropping} onClick={dropItem}>
+            Hide
+            {keyAssetImage && (
+              <img
+                alt="Drop in world"
+                className={isDropping ? "isDropping" : ""}
+                height={20}
+                src={keyAssetImage}
+                style={{ paddingLeft: 4, paddingRight: 4 }}
+              />
+            )}{" "}
+            in world
+          </button>
+        </Grid>
+        <Grid item mb={2}>
+          <button className="btn-outline" disabled={droppedItems.length === 0} onClick={removeAllQuestItems}>
+            Remove all
+          </button>
+        </Grid>
       </Grid>
-    </>
+
+      {droppedItems.length > 0 && (
+        <>
+          <h5>Placed Items</h5>
+          <table>
+            {droppedItems.map((item, index) => {
+              if (!item) return <div />;
+              let lastMovedFormatted = "-";
+              if (item.clickableLink) {
+                const clickableLink = new URL(item.clickableLink);
+                let params = new URLSearchParams(clickableLink.search);
+                const lastMoved = new Date(parseInt(params.get("lastMoved")));
+                dayjs.extend(relativeTime);
+                lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
+              }
+              return (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <div className="tooltip">
+                      <span className="tooltip-content">Last Moved</span>
+                      {lastMovedFormatted}
+                    </div>
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <div className="tooltip">
+                      <span className="tooltip-content">Walk to Item</span>
+                      <button className="btn-icon" onClick={() => moveVisitor(item.position)}>
+                        <WalkIcon />
+                      </button>
+                    </div>
+                    <div className="tooltip">
+                      <span className="tooltip-content">Remove Item</span>
+                      <button className="btn-icon" onClick={() => removeQuestItem(item.id)}>
+                        <RemoveCircleOutline />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </table>
+        </>
+      )}
+    </Grid>
   );
 }

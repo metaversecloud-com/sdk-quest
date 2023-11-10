@@ -5,10 +5,10 @@ import { Layout } from "@components";
 import { Grid, Typography } from "@mui/material";
 
 // context
-import { setLeaderboardData, useGlobalDispatch, useGlobalState } from "@context";
+import { useGlobalDispatch, useGlobalState } from "@context";
 
 // utils
-import { backendAPI, getLeaderboardData } from "@utils";
+import { backendAPI } from "@utils";
 
 export function QuestItemFound() {
   const [message, setMessage] = useState("");
@@ -33,12 +33,12 @@ export function QuestItemFound() {
       if (addedClick) {
         setCollectedText(`${numberCollected}/${numberAllowedToCollect} collected today`);
         setMessage(`🎉 Congratulations! You are one step closer to completing your daily quest!`);
-        // Refresh the leaderboard
-        getLeaderboardData({ setLeaderboardData, globalDispatch });
       } else if (success) {
         setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
         setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected today`);
-      } else return console.log("ERROR getting data object");
+      } else {
+        return console.log("ERROR getting data object");
+      }
     } catch (error) {
       console.log(error);
     }

@@ -4,7 +4,7 @@ export * from "./world/index.js";
 export * from "./error.js";
 export * from "./findObjectKeyPath.js";
 export * from "./getBaseURL.js";
-export * from "./getKeyAssetImage.js";
+export * from "./getDefaultKeyAssetImage.js";
 export * from "./getLongestStreak.js";
 export * from "./getRandomCoordinates.js";
 export * from "./logger.js";

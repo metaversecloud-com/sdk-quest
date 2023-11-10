@@ -1,17 +1,20 @@
-import { error, getDroppedAssetsWithUniqueName } from "../utils/index.js";
+import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../utils/index.js";
 
 export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
   try {
     const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
-    const { isPartial, uniqueName } = req.body;
+
+    const world = await getWorldDataObject({ interactiveNonce, interactivePublicKey, urlSlug, visitorId }, urlSlug);
+    if (!world.dataObject?.keyAssetId) throw "No dropped assets related to key asset found";
+
     const droppedAssets = await getDroppedAssetsWithUniqueName({
       credentials: {
         interactiveNonce,
         interactivePublicKey,
         visitorId,
       },
-      isPartial,
-      uniqueName,
+      isPartial: true,
+      uniqueName: world.dataObject?.keyAssetId,
       urlSlug,
     });
 
@@ -23,6 +26,7 @@ export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
       delete normalizedAsset["requestOptions"];
       return normalizedAsset;
     });
+
     res.json({ droppedAssets: normalized, success: true });
   } catch (e) {
     error("Fetching dropped assets with unique name", e, res);

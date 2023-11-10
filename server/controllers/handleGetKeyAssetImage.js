@@ -1,9 +1,10 @@
-import { getKeyAssetImage } from "../utils/index.js";
+import { getDefaultKeyAssetImage, getWorldDataObject } from "../utils/index.js";
 
 export const handleGetKeyAssetImage = async (req, res) => {
   try {
-    const { urlSlug } = req.query;
-    const keyAssetImage = getKeyAssetImage(urlSlug);
+    const { interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
+    const world = await getWorldDataObject({ interactiveNonce, interactivePublicKey, urlSlug, visitorId }, urlSlug);
+    const keyAssetImage = world.dataObject?.questItemImage || getDefaultKeyAssetImage(urlSlug);
     res.json({ keyAssetImage, success: true });
   } catch (e) {
     error("Fetching dropped assets with unique name", e, res);

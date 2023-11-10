@@ -4,7 +4,6 @@ import { error, getBaseURL, getRandomCoordinates, getWorldDetails, logger } from
 export const handleQuestItemClicked = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, profileId, urlSlug, username, visitorId } = req.query;
-    const numberAllowedToCollect = 5; // TODO: Make it so admins can change this
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so we add 1
@@ -21,7 +20,7 @@ export const handleQuestItemClicked = async (req, res) => {
       urlSlug,
     });
 
-    let { eggsCollectedByUser, itemsCollectedByUser } = world.dataObject;
+    let { eggsCollectedByUser, itemsCollectedByUser, numberAllowedToCollect = 5 } = world.dataObject;
     if (eggsCollectedByUser) itemsCollectedByUser = eggsCollectedByUser;
 
     if (
@@ -70,10 +69,10 @@ export const handleQuestItemClicked = async (req, res) => {
         },
       });
 
-      const visitorLockId = `${visitorId}-itemsCollectedByWorld-${new Date(
+      const visitorLockId = `${visitorId}-${assetId}-itemsCollectedByWorld-${new Date(
         Math.round(new Date().getTime() / 60000) * 60000,
       )}`;
-      const worldLockId = `${urlSlug}-itemsCollectedByUser-${new Date(
+      const worldLockId = `${urlSlug}-${assetId}-itemsCollectedByUser-${new Date(
         Math.round(new Date().getTime() / 60000) * 60000,
       )}`;
       await Promise.all([

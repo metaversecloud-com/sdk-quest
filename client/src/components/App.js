@@ -5,10 +5,10 @@ import { Route, Routes, useSearchParams } from "react-router-dom";
 import { Error, Home, QuestItemFound } from "@pages";
 
 // utils
-import { backendAPI, getLeaderboardData, setupBackendAPI } from "@utils";
+import { backendAPI, setupBackendAPI } from "@utils";
 
 // context
-import { setInteractiveParams, setLeaderboardData, setVisitorInfo, useGlobalDispatch } from "@context";
+import { setInteractiveParams, setVisitorInfo, useGlobalDispatch } from "@context";
 
 export function App() {
   const [searchParams] = useSearchParams();
@@ -22,7 +22,6 @@ export function App() {
       setupAPI();
     } else {
       getVisitor();
-      getLeaderboard();
     }
     // eslint-disable-next-line
   }, [hasInitBackendAPI, searchParams]);
@@ -64,9 +63,7 @@ export function App() {
     }
   };
 
-  const getLeaderboard = async () => {
-    await getLeaderboardData({ setLeaderboardData, globalDispatch });
-  };
+  if (!setHasInitBackendAPI) return <div />;
 
   return (
     <Routes>
