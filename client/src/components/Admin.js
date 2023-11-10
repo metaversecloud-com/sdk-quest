@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useState } from "react";
 
 // components
@@ -23,6 +24,7 @@ export function Admin({ keyAssetImage }) {
   const [droppedItems, setQuestItems] = useState([]);
   const [isDropping, setIsDropping] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // context
   const { hasInteractiveParams } = useGlobalState();
@@ -32,6 +34,7 @@ export function Admin({ keyAssetImage }) {
     if (hasInteractiveParams) {
       getWorldDataObject();
       getQuestItems();
+      setIsLoading(false);
     }
   }, [hasInteractiveParams]);
 
@@ -122,28 +125,35 @@ export function Admin({ keyAssetImage }) {
     }
   };
 
+  if (isLoading) return <div />;
+
   if (!hasInteractiveParams) {
     return <Typography>You can only access this application from within a Topia world embed.</Typography>;
   }
 
   return (
-    <Grid container direction="column" gap={2} justifyContent="space-around" p={3} paddingTop={1}>
+    <Grid container direction="column" gap={2}>
       <hr style={{ margin: 1 }} />
-      <label htmlFor="numberAllowedToCollect">Number Allowed To Collect:</label>
-      <input
-        id="numberAllowedToCollect"
-        onChange={(e) => setNumberAllowedToCollect(e.target.value)}
-        type="text"
-        value={numberAllowedToCollect}
-      />
+      <div>
+        <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
+        <input
+          id="numberAllowedToCollect"
+          onChange={(e) => setNumberAllowedToCollect(e.target.value)}
+          type="text"
+          value={numberAllowedToCollect}
+        />
+      </div>
 
-      <label htmlFor="questItemImage">Quest Item Image URL:</label>
-      <input
-        id="questItemImage"
-        onChange={(e) => setQuestItemImage(e.target.value)}
-        type="text"
-        value={questItemImage}
-      />
+      <div>
+        <label htmlFor="questItemImage">Quest Item Image URL:</label>
+        <input
+          id="questItemImage"
+          onChange={(e) => setQuestItemImage(e.target.value)}
+          type="text"
+          value={questItemImage}
+        />
+        <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
+      </div>
 
       <button disabled={isSaving} onClick={saveAdminUpdates}>
         Save
@@ -151,8 +161,8 @@ export function Admin({ keyAssetImage }) {
 
       <hr style={{ margin: 1 }} />
 
-      <Grid container direction="row" gap={2} justifyContent="center">
-        <Typography pt={1}>
+      <Grid container direction="row" gap={2} justifyContent="center" mt={2}>
+        <h5>
           {droppedItems.length}{" "}
           {keyAssetImage && (
             <img
@@ -164,7 +174,7 @@ export function Admin({ keyAssetImage }) {
             />
           )}{" "}
           hidden in this world
-        </Typography>
+        </h5>
         <Grid item>
           <button disabled={isDropping} onClick={dropItem}>
             Hide
@@ -180,13 +190,17 @@ export function Admin({ keyAssetImage }) {
             in world
           </button>
         </Grid>
-        <Grid item>
+        <Grid item mb={2}>
           <button className="btn-outline" disabled={droppedItems.length === 0} onClick={removeAllQuestItems}>
             Remove all
           </button>
         </Grid>
-        {droppedItems.length > 0 && (
-          <Grid item>
+      </Grid>
+
+      {droppedItems.length > 0 && (
+        <>
+          <h5>Placed Items</h5>
+          <table>
             {droppedItems.map((item, index) => {
               if (!item) return <div />;
               let lastMovedFormatted = "-";
@@ -198,48 +212,34 @@ export function Admin({ keyAssetImage }) {
                 lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
               }
               return (
-                <Grid
-                  alignItems="center"
-                  container
-                  direction="row"
-                  justifyContent="space-between"
-                  key={item.id}
-                  sx={{ width: "80vw" }}
-                >
-                  <Grid item xs={3}>
-                    <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{index + 1}</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography sx={{ color: "rgba(0, 0, 0, 0.54)" }}>{lastMovedFormatted}</Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Tooltip placement="left" title="Walk to">
-                      <IconButton
-                        aria-label="Walk to"
-                        onClick={() => moveVisitor(item.position)}
-                        style={{ minWidth: 20 }}
-                      >
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <div className="tooltip">
+                      <span className="tooltip-content">Last Moved</span>
+                      {lastMovedFormatted}
+                    </div>
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <div className="tooltip">
+                      <span className="tooltip-content">Walk to Item</span>
+                      <button className="btn-icon" onClick={() => moveVisitor(item.position)}>
                         <WalkIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Tooltip placement="right" title="Remove">
-                      <IconButton
-                        aria-label="Remove from world"
-                        onClick={() => removeQuestItem(item.id)}
-                        style={{ minWidth: 20 }}
-                      >
+                      </button>
+                    </div>
+                    <div className="tooltip">
+                      <span className="tooltip-content">Remove Item</span>
+                      <button className="btn-icon" onClick={() => removeQuestItem(item.id)}>
                         <RemoveCircleOutline />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                </Grid>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               );
             })}
-          </Grid>
-        )}
-      </Grid>
+          </table>
+        </>
+      )}
     </Grid>
   );
 }
