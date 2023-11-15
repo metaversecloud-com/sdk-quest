@@ -1,19 +1,17 @@
 {
-    "author": "metaversecloud.com | topia.io",
-    "name": "@egg-hunter/server",
-    "private": true,
-    "description": "",
-    "engines": {
-        "node": "18.16"
-    },
-    "keywords": [],
-    "license": "ISC",
-    "main": "index.js",
-    "scripts": {
-        "link-sdk": "yalc link @rtsdk/topia",
-        "unlink-sdk": "yalc remove @rtsdk/topia",
-        "start": "node index.js"
-    },
-    "type": "module",
-    "version": "1.0.0"
+  "author": "metaversecloud.com | topia.io",
+  "name": "@quest/server",
+  "private": true,
+  "description": "",
+  "engines": {
+    "node": "18.16"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "type": "module",
+  "version": "1.0.0"
 }
