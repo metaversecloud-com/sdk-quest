@@ -2,9 +2,10 @@ import { error, getVisitor } from "../utils/index.js";
 
 export const handleGetVisitor = async (req, res) => {
   try {
-    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
     const { includeDataObject } = req.body;
     const visitor = await getVisitor({
+      assetId,
       credentials: {
         interactiveNonce,
         interactivePublicKey,
