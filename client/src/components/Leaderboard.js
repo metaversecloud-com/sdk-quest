@@ -31,7 +31,6 @@ export function Leaderboard({ keyAssetImage }) {
         setVisibleData(leaderboard.slice(0, 20));
         setIsLoading(false);
       } catch (error) {
-        console.log("🚀 ~ file: Leaderboard.js:34 ~ getLeaderboardData ~ error:", error);
         setIsLoading(false);
         console.log("There was a problem while retrieving leaderboard data. Please try again later.");
       }
@@ -43,7 +42,7 @@ export function Leaderboard({ keyAssetImage }) {
 
   return (
     <Grid container direction="column">
-      {currentPosition > 0 ? (
+      {currentPosition && currentPosition > 0 ? (
         <>
           <h4>My Stats</h4>
           <table>

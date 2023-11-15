@@ -35,7 +35,7 @@ router.post("/quest-item-clicked", handleQuestItemClicked);
 
 // Visitor
 // visitorId comes from interactive nonce
-router.get("/visitor", handleGetVisitor); // { includeDataObject: boolean }
+router.get("/visitor", handleGetVisitor);
 router.put("/visitor/move", moveVisitor);
 
 export default router;

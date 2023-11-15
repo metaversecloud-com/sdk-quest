@@ -22,7 +22,6 @@ export const dropQuestItem = async (req, res) => {
           visitorId,
         },
         droppedAssetId: assetId,
-        includeDataObject: true,
         urlSlug,
       }),
       getWorldDetails({
@@ -31,7 +30,6 @@ export const dropQuestItem = async (req, res) => {
           interactivePublicKey,
           visitorId,
         },
-        includeDataObject: true,
         urlSlug,
       }),
     ]);

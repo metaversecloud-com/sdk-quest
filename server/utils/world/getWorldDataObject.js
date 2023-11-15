@@ -6,10 +6,7 @@ export const getWorldDataObject = async (credentials, urlSlug) => {
     const world = World.create(urlSlug, { credentials });
     await world.fetchDataObject();
     if (!world.dataObject) {
-      console.log("no data object");
-      const lockId = `${urlSlug}-${assetId}-itemsCollectedByUser-${new Date(
-        Math.round(new Date().getTime() / 60000) * 60000,
-      )}`;
+      const lockId = `${urlSlug}-itemsCollectedByUser-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
       await world.setDataObject(
         {
           itemsCollectedByUser: {},

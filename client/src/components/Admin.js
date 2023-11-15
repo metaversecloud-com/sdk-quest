@@ -201,42 +201,44 @@ export function Admin({ keyAssetImage }) {
         <>
           <h5>Placed Items</h5>
           <table>
-            {droppedItems.map((item, index) => {
-              if (!item) return <div />;
-              let lastMovedFormatted = "-";
-              if (item.clickableLink) {
-                const clickableLink = new URL(item.clickableLink);
-                let params = new URLSearchParams(clickableLink.search);
-                const lastMoved = new Date(parseInt(params.get("lastMoved")));
-                dayjs.extend(relativeTime);
-                lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
-              }
-              return (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <div className="tooltip">
-                      <span className="tooltip-content">Last Moved</span>
-                      {lastMovedFormatted}
-                    </div>
-                  </td>
-                  <td style={{ textAlign: "right" }}>
-                    <div className="tooltip">
-                      <span className="tooltip-content">Walk to Item</span>
-                      <button className="btn-icon" onClick={() => moveVisitor(item.position)}>
-                        <WalkIcon />
-                      </button>
-                    </div>
-                    <div className="tooltip">
-                      <span className="tooltip-content">Remove Item</span>
-                      <button className="btn-icon" onClick={() => removeQuestItem(item.id)}>
-                        <RemoveCircleOutline />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+            <tbody>
+              {droppedItems.map((item, index) => {
+                if (!item) return <div />;
+                let lastMovedFormatted = "-";
+                if (item.clickableLink) {
+                  const clickableLink = new URL(item.clickableLink);
+                  let params = new URLSearchParams(clickableLink.search);
+                  const lastMoved = new Date(parseInt(params.get("lastMoved")));
+                  dayjs.extend(relativeTime);
+                  lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
+                }
+                return (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>
+                      <div className="tooltip">
+                        <span className="tooltip-content">Last Moved</span>
+                        {lastMovedFormatted}
+                      </div>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <div className="tooltip">
+                        <span className="tooltip-content">Walk to Item</span>
+                        <button className="btn-icon" onClick={() => moveVisitor(item.position)}>
+                          <WalkIcon />
+                        </button>
+                      </div>
+                      <div className="tooltip">
+                        <span className="tooltip-content">Remove Item</span>
+                        <button className="btn-icon" onClick={() => removeQuestItem(item.id)}>
+                          <RemoveCircleOutline />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </>
       )}

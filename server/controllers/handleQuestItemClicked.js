@@ -16,7 +16,6 @@ export const handleQuestItemClicked = async (req, res) => {
         interactivePublicKey,
         visitorId,
       },
-      includeDataObject: true,
       urlSlug,
     });
 
