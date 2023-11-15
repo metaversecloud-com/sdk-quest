@@ -91,7 +91,7 @@ export const handleQuestItemClicked = async (req, res) => {
         ),
       ]);
 
-      res.json({
+      return res.json({
         addedClick: true,
         numberAllowedToCollect,
         numberCollected: collectedArray.length,

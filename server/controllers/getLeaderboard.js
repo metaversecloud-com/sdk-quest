@@ -35,7 +35,7 @@ export const getLeaderboard = async (req, res) => {
       }
       leaderboard.sort((a, b) => b.collected - a.collected);
     }
-    res.json({ leaderboard, success: true });
+    return res.json({ leaderboard, success: true });
   } catch (e) {
     error("Getting leaderboard", e, res);
   }

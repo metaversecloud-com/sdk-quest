@@ -14,7 +14,7 @@ export const handleGetVisitor = async (req, res) => {
       urlSlug,
       visitorId,
     });
-    res.json({ visitor, success: true });
+    return res.json({ visitor, success: true });
   } catch (e) {
     error("Error getting visitor", e, res);
   }

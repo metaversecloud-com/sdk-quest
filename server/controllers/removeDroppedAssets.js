@@ -14,7 +14,7 @@ export const removeDroppedAsset = async (req, res) => {
       },
     });
     await droppedAsset.deleteDroppedAsset();
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (e) {
     error("Removing Dropped Asset", e, res);
   }

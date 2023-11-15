@@ -6,7 +6,7 @@ export const handleGetWorldDataObject = async (req, res) => {
 
     const world = await getWorldDataObject({ interactiveNonce, interactivePublicKey, urlSlug, visitorId }, urlSlug);
 
-    res.json({ world });
+    return res.json({ world });
   } catch (e) {
     error("Error updating world data object", e, res);
   }

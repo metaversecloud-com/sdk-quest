@@ -11,7 +11,7 @@ export const updateKeyAssetId = async (req, res) => {
       world.updateDataObject({ keyAssetId: assetId }, { lock: { lockId } });
     }
 
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (e) {
     error("Error updating world data object", e, res);
   }

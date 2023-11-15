@@ -29,7 +29,7 @@ export const removeDroppedAssetsWithUniqueName = async (req, res) => {
         return res.status(500).send({ error: e, success: false });
       }
     });
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (e) {
     error("Removing Dropped Asset by Unique Name", e, res);
   }

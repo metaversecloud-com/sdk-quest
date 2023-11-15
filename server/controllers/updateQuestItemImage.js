@@ -28,7 +28,7 @@ export const updateQuestItemImage = async (req, res) => {
       }
     }
 
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (e) {
     error("Error updating quest items", e, res);
   }

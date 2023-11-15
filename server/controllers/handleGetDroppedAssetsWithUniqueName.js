@@ -27,7 +27,7 @@ export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
       return normalizedAsset;
     });
 
-    res.json({ droppedAssets: normalized, success: true });
+    return res.json({ droppedAssets: normalized, success: true });
   } catch (e) {
     error("Fetching dropped assets with unique name", e, res);
   }

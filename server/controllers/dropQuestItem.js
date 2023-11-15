@@ -63,7 +63,7 @@ export const dropQuestItem = async (req, res) => {
       droppedAsset.updateWebImageLayers("", questItemImage),
     ]);
 
-    res.json({ droppedAsset, success: true });
+    return res.json({ droppedAsset, success: true });
   } catch (e) {
     error("Error dropping asset", e, res);
   }
