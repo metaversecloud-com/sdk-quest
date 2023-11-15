@@ -6,7 +6,7 @@ export const getVisitor = async ({ credentials, urlSlug, visitorId }) => {
     const visitor = await Visitor.get(visitorId, urlSlug, { credentials });
     if (!visitor || !visitor.username) throw "Not in world";
     await visitor.fetchDataObject();
-    if (!visitor.dataObject) {
+    if (!visitor.dataObject || !visitor.dataObject.hasOwnProperty("itemsCollectedByWorld")) {
       const lockId = `${visitorId}-itemsCollectedByWorld-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
       await visitor.setDataObject(
         {

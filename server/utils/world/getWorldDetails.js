@@ -8,7 +8,7 @@ export const getWorldDetails = async ({ credentials, urlSlug }) => {
     });
     await world.fetchDetails();
     await world.fetchDataObject();
-    if (!world.dataObject) {
+    if (!world.dataObject || !world.dataObject.hasOwnProperty("itemsCollectedByUser")) {
       const lockId = `${urlSlug}-itemsCollectedByUser-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
       await world.setDataObject(
         {
