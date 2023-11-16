@@ -112,7 +112,7 @@ export function Admin({ keyAssetImage }) {
     setIsSaving(true);
     try {
       await backendAPI.post("/number-allowed-to-collect", { numberAllowedToCollect });
-      if (droppedItems.length > 0) await backendAPI.post("/quest-item-image", { questItemImage });
+      await backendAPI.post("/quest-item-image", { questItemImage });
       setKeyAssetImage({
         dispatch: globalDispatch,
         keyAssetImage: questItemImage,

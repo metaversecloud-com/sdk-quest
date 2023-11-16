@@ -31,8 +31,10 @@ export const updateQuestItemImage = async (req, res) => {
           urlSlug,
         });
 
-        const promises = droppedAssets.map((droppedAsset) => droppedAsset.updateWebImageLayers("", questItemImage));
-        await Promise.all(promises);
+        if (droppedAssets.length > 0) {
+          const promises = droppedAssets.map((droppedAsset) => droppedAsset.updateWebImageLayers("", questItemImage));
+          await Promise.all(promises);
+        }
       }
     }
 
