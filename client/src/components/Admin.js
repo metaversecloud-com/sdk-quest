@@ -18,7 +18,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 const uniqueName = "sdk-quest-item";
 
 export function Admin({ keyAssetImage }) {
-  const [numberAllowedToCollect, setNumberAllowedToCollect] = useState(5);
+  const [numberAllowedToCollect, setNumberAllowedToCollect] = useState();
   const [questItemImage, setQuestItemImage] = useState("");
   const [droppedItems, setQuestItems] = useState([]);
   const [isDropping, setIsDropping] = useState(false);
@@ -109,10 +109,7 @@ export function Admin({ keyAssetImage }) {
   const saveAdminUpdates = async () => {
     setIsSaving(true);
     try {
-      await Promise.all([
-        backendAPI.post("/quest-item-image", { questItemImage }),
-        backendAPI.post("/number-allowed-to-collect", { numberAllowedToCollect }),
-      ]);
+      await backendAPI.post("/admin-settings", { numberAllowedToCollect, questItemImage });
       setKeyAssetImage({
         dispatch: globalDispatch,
         keyAssetImage: questItemImage,

@@ -10,8 +10,7 @@ import {
   removeDroppedAsset,
   removeDroppedAssetsWithUniqueName,
   updateKeyAssetId,
-  updateNumberAllowedToCollect,
-  updateQuestItemImage,
+  updateAdminSettings,
 } from "./controllers/index.js";
 
 import express from "express";
@@ -21,8 +20,7 @@ const router = express.Router();
 router.get("/leaderboard", getLeaderboard);
 router.get("/key-asset-image", handleGetKeyAssetImage);
 router.post("/key-asset-id", updateKeyAssetId);
-router.post("/number-allowed-to-collect", updateNumberAllowedToCollect);
-router.post("/quest-item-image", updateQuestItemImage);
+router.post("/admin-settings", updateAdminSettings);
 router.get("/world-data-object", handleGetWorldDataObject);
 
 // Dropped Asset

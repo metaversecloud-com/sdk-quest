@@ -8,6 +8,5 @@ export * from "./handleQuestItemClicked.js";
 export * from "./moveVisitor.js";
 export * from "./removeDroppedAssets.js";
 export * from "./removeDroppedAssetsWithUniqueName.js";
+export * from "./updateAdminSettings.js";
 export * from "./updateKeyAssetId.js";
-export * from "./updateNumberAllowedToCollect.js";
-export * from "./updateQuestItemImage.js";
