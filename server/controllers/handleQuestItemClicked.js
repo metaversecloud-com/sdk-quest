@@ -77,14 +77,14 @@ export const handleQuestItemClicked = async (req, res) => {
       await Promise.all([
         visitor.updateDataObject(
           {
-            [`itemsCollectedByWorld".${world.urlSlug}.${dateKey}`]: collectedArray, // Add quest item collection dateKey.
+            [`itemsCollectedByWorld.${world.urlSlug}`]: { [dateKey]: collectedArray }, // Add quest item collection dateKey.
           },
           { lock: { lockId: visitorLockId, releaseLock: true } },
         ),
         world.updateDataObject(
           {
-            [`itemsCollectedByUser".${profileId}.${dateKey}`]: collectedArray, // Add quest item collection dateKey.
-            [`profileMapper".${profileId}`]: username, // Update the username of the visitor to be shown in the leaderboard.
+            [`itemsCollectedByUser.${profileId}`]: { [dateKey]: collectedArray }, // Add quest item collection dateKey.
+            [`profileMapper.${profileId}`]: username, // Update the username of the visitor to be shown in the leaderboard.
           },
           { lock: { lockId: worldLockId, releaseLock: true } },
         ),

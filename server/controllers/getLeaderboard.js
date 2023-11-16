@@ -2,15 +2,16 @@ import { error, getLongestStreak, getWorldDataObject } from "../utils/index.js";
 
 export const getLeaderboard = async (req, res) => {
   try {
-    const { interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
-    const { dataObject } = await getWorldDataObject(
-      {
+    const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
+    const { dataObject } = await getWorldDataObject({
+      assetId,
+      credentials: {
         interactiveNonce,
         interactivePublicKey,
         visitorId,
       },
       urlSlug,
-    );
+    });
 
     let leaderboard = [];
     if (dataObject) {

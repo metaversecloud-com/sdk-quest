@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 
 // components
 import { Layout } from "@components";
-import { Grid, Typography } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 
 // context
 import { useGlobalDispatch, useGlobalState } from "@context";
@@ -21,7 +21,6 @@ export function QuestItemFound() {
 
   useEffect(() => {
     if (hasInteractiveParams) handleItemAssetClicked();
-    if (isLoading) setIsLoading(false);
     // eslint-disable-next-line
   }, [hasInteractiveParams]);
 
@@ -37,17 +36,19 @@ export function QuestItemFound() {
         setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
         setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected today`);
       } else {
-        return console.log("ERROR getting data object");
+        console.log("ERROR getting data object");
       }
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   }, [globalDispatch]);
 
-  if (isLoading) return <div />;
+  if (isLoading) return <CircularProgress />;
 
   if (!hasInteractiveParams) {
-    return <Typography>You can only access this application from within a Topia world embed.</Typography>;
+    return <h5>You can only access this application from within a Topia world embed.</h5>;
   }
 
   return (
@@ -56,12 +57,12 @@ export function QuestItemFound() {
         <Grid container direction="column">
           {message && (
             <Grid item p={1} paddingTop={0}>
-              <Typography>{message}</Typography>
+              <p>{message}</p>
             </Grid>
           )}
           {collectedText && (
             <Grid item p={1} paddingBottom={2} paddingTop={0}>
-              <Typography>{collectedText}</Typography>
+              <p>{collectedText}</p>
             </Grid>
           )}
         </Grid>

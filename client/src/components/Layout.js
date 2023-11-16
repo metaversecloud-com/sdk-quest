@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 // components
 import { Admin, Leaderboard } from "@components";
-import { Grid, Typography } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 
 // context
 import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
@@ -39,7 +39,7 @@ export function Layout({ children }) {
     }
   };
 
-  if (isLoading) return <div />;
+  if (isLoading) return <CircularProgress />;
 
   return (
     <Grid alignItems="center" container direction="column" p={0}>
@@ -59,7 +59,7 @@ export function Layout({ children }) {
         {keyAssetImage ? <img alt="Find me" src={keyAssetImage} /> : <div />}
       </Grid>
       <Grid item p={3} xs={12}>
-        <Typography variant="h4">Quest</Typography>
+        <h1>Quest</h1>
       </Grid>
       <Grid container direction="column">
         {children}

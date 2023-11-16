@@ -1,8 +1,7 @@
-/* eslint-disable */
 import React, { useEffect, useState } from "react";
 
 // components
-import { Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import { WalkIcon } from "./SVGs.js";
 
@@ -125,41 +124,42 @@ export function Admin({ keyAssetImage }) {
     }
   };
 
-  if (isLoading) return <div />;
+  if (isLoading) return <CircularProgress />;
 
   if (!hasInteractiveParams) {
-    return <Typography>You can only access this application from within a Topia world embed.</Typography>;
+    return <h4>You can only access this application from within a Topia world embed.</h4>;
   }
 
   return (
-    <Grid container direction="column" gap={2}>
-      <hr style={{ margin: 1 }} />
-      <div>
-        <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
-        <input
-          id="numberAllowedToCollect"
-          onChange={(e) => setNumberAllowedToCollect(e.target.value)}
-          type="text"
-          value={numberAllowedToCollect}
-        />
-      </div>
+    <>
+      <Grid container direction="column" gap={2}>
+        <hr style={{ margin: 1 }} />
+        <div>
+          <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
+          <input
+            id="numberAllowedToCollect"
+            onChange={(e) => setNumberAllowedToCollect(e.target.value)}
+            type="text"
+            value={numberAllowedToCollect}
+          />
+        </div>
 
-      <div>
-        <label htmlFor="questItemImage">Quest Item Image URL:</label>
-        <input
-          id="questItemImage"
-          onChange={(e) => setQuestItemImage(e.target.value)}
-          type="text"
-          value={questItemImage}
-        />
-        <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
-      </div>
+        <div>
+          <label htmlFor="questItemImage">Quest Item Image URL:</label>
+          <input
+            id="questItemImage"
+            onChange={(e) => setQuestItemImage(e.target.value)}
+            type="text"
+            value={questItemImage}
+          />
+          <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
+        </div>
 
-      <button disabled={isSaving} onClick={saveAdminUpdates}>
-        Save
-      </button>
-
-      <hr style={{ margin: 1 }} />
+        <button disabled={isSaving} onClick={saveAdminUpdates}>
+          Save
+        </button>
+        <hr style={{ margin: 1 }} />
+      </Grid>
 
       <Grid container direction="row" gap={2} justifyContent="center" mt={2}>
         <h5>
@@ -198,8 +198,8 @@ export function Admin({ keyAssetImage }) {
       </Grid>
 
       {droppedItems.length > 0 && (
-        <>
-          <h5>Placed Items</h5>
+        <Grid container direction="column" mt={1}>
+          <h4>Placed Items</h4>
           <table>
             <tbody>
               {droppedItems.map((item, index) => {
@@ -240,8 +240,8 @@ export function Admin({ keyAssetImage }) {
               })}
             </tbody>
           </table>
-        </>
+        </Grid>
       )}
-    </Grid>
+    </>
   );
 }

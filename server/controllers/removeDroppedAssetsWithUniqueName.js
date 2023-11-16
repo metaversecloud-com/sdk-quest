@@ -2,10 +2,18 @@ import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../ut
 
 export const removeDroppedAssetsWithUniqueName = async (req, res) => {
   try {
-    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
     const { uniqueName } = req.body;
 
-    const world = await getWorldDataObject({ interactiveNonce, interactivePublicKey, urlSlug, visitorId }, urlSlug);
+    const world = await getWorldDataObject({
+      assetId,
+      credentials: {
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+      urlSlug,
+    });
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
       credentials: {

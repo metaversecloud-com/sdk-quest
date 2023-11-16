@@ -2,10 +2,18 @@ import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../ut
 
 export const updateQuestItemImage = async (req, res) => {
   try {
-    const { interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
+    const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const { questItemImage } = req.body;
 
-    const world = await getWorldDataObject({ interactiveNonce, interactivePublicKey, urlSlug, visitorId }, urlSlug);
+    const world = await getWorldDataObject({
+      assetId,
+      credentials: {
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+      urlSlug,
+    });
 
     if (world.dataObject?.questItemImage !== questItemImage) {
       const lockId = `${urlSlug}-questItemImage-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;

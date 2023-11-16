@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // components
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 
 // context
 import { useGlobalState } from "@context";
@@ -23,7 +22,7 @@ export function Leaderboard({ keyAssetImage }) {
     const getLeaderboardData = async () => {
       try {
         const result = await backendAPI.get("/leaderboard");
-        let { leaderboard } = result.data;
+        const { leaderboard } = result.data;
         const index = leaderboard.findIndex((item) => item.profileId === visitor.profileId);
         setMyData(leaderboard[index]);
         setCurrentPosition(index + 1);
@@ -38,7 +37,7 @@ export function Leaderboard({ keyAssetImage }) {
     if (visitor) getLeaderboardData();
   }, [visitor]);
 
-  if (isLoading) return <div />;
+  if (isLoading) return <CircularProgress />;
 
   return (
     <Grid container direction="column">

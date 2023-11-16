@@ -2,9 +2,17 @@ import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../ut
 
 export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
   try {
-    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
 
-    const world = await getWorldDataObject({ interactiveNonce, interactivePublicKey, urlSlug, visitorId }, urlSlug);
+    const world = await getWorldDataObject({
+      assetId,
+      credentials: {
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+      urlSlug,
+    });
     if (!world.dataObject?.keyAssetId) throw "No dropped assets related to key asset found";
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({

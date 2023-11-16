@@ -4,7 +4,15 @@ export const updateKeyAssetId = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
 
-    const world = await getWorldDataObject({ interactiveNonce, interactivePublicKey, urlSlug, visitorId }, urlSlug);
+    const world = await getWorldDataObject({
+      assetId,
+      credentials: {
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+      urlSlug,
+    });
 
     if (!world.dataObject?.keyAssetId) {
       const lockId = `${urlSlug}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;

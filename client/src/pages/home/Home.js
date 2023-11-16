@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 // components
 import { Layout } from "@components";
-import { Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 
 // context
 import { useGlobalState } from "@context";
@@ -18,7 +18,7 @@ export function Home() {
   }, [hasInteractiveParams]);
 
   if (!hasInteractiveParams) {
-    return <Typography>You can only access this application from within a Topia world embed.</Typography>;
+    return <h4>You can only access this application from within a Topia world embed.</h4>;
   }
 
   return (
