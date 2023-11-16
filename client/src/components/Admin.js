@@ -162,19 +162,21 @@ export function Admin({ keyAssetImage }) {
       </Grid>
 
       <Grid container direction="row" gap={2} justifyContent="center" mt={2}>
-        <h5>
-          {droppedItems.length}{" "}
-          {keyAssetImage && (
-            <img
-              alt="Drop in world"
-              className={isDropping ? "isDropping" : ""}
-              height={20}
-              src={keyAssetImage}
-              style={{ paddingLeft: 4, paddingRight: 4 }}
-            />
-          )}{" "}
-          hidden in this world
-        </h5>
+        <Grid item xs={12}>
+          <h5 style={{ textAlign: "center" }}>
+            {droppedItems.length}{" "}
+            {keyAssetImage && (
+              <img
+                alt="Drop in world"
+                className={isDropping ? "isDropping" : ""}
+                height={20}
+                src={keyAssetImage}
+                style={{ paddingLeft: 4, paddingRight: 4 }}
+              />
+            )}{" "}
+            hidden in this world
+          </h5>
+        </Grid>
         <Grid item>
           <button disabled={isDropping} onClick={dropItem}>
             Hide
