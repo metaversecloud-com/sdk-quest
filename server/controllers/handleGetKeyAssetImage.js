@@ -12,7 +12,7 @@ export const handleGetKeyAssetImage = async (req, res) => {
       },
       urlSlug,
     });
-    const keyAssetImage = world.dataObject.keyAssets[assetId].questItemImage || getDefaultKeyAssetImage(urlSlug);
+    const keyAssetImage = world.dataObject?.keyAssets[assetId]?.questItemImage || getDefaultKeyAssetImage(urlSlug);
     return res.json({ keyAssetImage, success: true });
   } catch (e) {
     error("Error getting key asset image", e, res);
