@@ -109,9 +109,10 @@ export function Admin({ keyAssetImage }) {
   const saveAdminUpdates = async () => {
     setIsSaving(true);
     try {
-      await backendAPI.post("/number-allowed-to-collect", { numberAllowedToCollect });
-      const result = await backendAPI.post("/quest-item-image", { questItemImage });
-      console.log("🚀 ~ file: Admin.js:114 ~ saveAdminUpdates ~ result:", result);
+      await Promise.all([
+        backendAPI.post("/quest-item-image", { questItemImage }),
+        backendAPI.post("/number-allowed-to-collect", { numberAllowedToCollect }),
+      ]);
       setKeyAssetImage({
         dispatch: globalDispatch,
         keyAssetImage: questItemImage,
