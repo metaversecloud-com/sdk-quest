@@ -100,9 +100,7 @@ export function Admin({ keyAssetImage }) {
 
   const moveVisitor = async (position) => {
     try {
-      const result = await backendAPI.put("/visitor/move", { moveTo: position });
-      if (result.data.success) console.log("Moved successfully");
-      else return console.log("ERROR moving visitor");
+      await backendAPI.put("/visitor/move", { moveTo: position });
     } catch (error) {
       console.log(error);
     }
@@ -112,7 +110,8 @@ export function Admin({ keyAssetImage }) {
     setIsSaving(true);
     try {
       await backendAPI.post("/number-allowed-to-collect", { numberAllowedToCollect });
-      await backendAPI.post("/quest-item-image", { questItemImage });
+      const result = await backendAPI.post("/quest-item-image", { questItemImage });
+      console.log("🚀 ~ file: Admin.js:114 ~ saveAdminUpdates ~ result:", result);
       setKeyAssetImage({
         dispatch: globalDispatch,
         keyAssetImage: questItemImage,
