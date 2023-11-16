@@ -1,23 +1,15 @@
 import { World } from "../topiaInit.js";
 import { error } from "../error.js";
+import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
 
-export const getWorldDetails = async ({ credentials, urlSlug }) => {
+export const getWorldDetails = async ({ assetId, credentials, urlSlug }) => {
   try {
     const world = World.create(urlSlug, {
       credentials,
     });
     await world.fetchDetails();
     await world.fetchDataObject();
-    if (!world.dataObject || !world.dataObject.hasOwnProperty("itemsCollectedByUser")) {
-      const lockId = `${urlSlug}-itemsCollectedByUser-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
-      await world.setDataObject(
-        {
-          itemsCollectedByUser: {},
-          profileMapper: {},
-        },
-        { lock: { lockId } },
-      );
-    }
+    await initializeWorldDataObject({ assetId, world, urlSlug });
     return world;
   } catch (e) {
     error("Error getting world details", e);

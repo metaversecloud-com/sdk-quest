@@ -11,7 +11,6 @@ import {
 export const dropQuestItem = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
-    const { uniqueName } = req.body;
 
     const [questItem, world] = await Promise.all([
       getDroppedAssetDetails({
@@ -25,6 +24,7 @@ export const dropQuestItem = async (req, res) => {
         urlSlug,
       }),
       getWorldDetails({
+        assetId,
         credentials: {
           interactiveNonce,
           interactivePublicKey,
@@ -37,7 +37,7 @@ export const dropQuestItem = async (req, res) => {
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
     // Use questItemImage from world data object or fallback to default
-    const questItemImage = world?.dataObject?.questItemImage || getDefaultKeyAssetImage(urlSlug);
+    const questItemImage = world.dataObject?.keyAssets[assetId]?.questItemImage || getDefaultKeyAssetImage(urlSlug);
 
     const droppedAsset = await dropAsset({
       assetId: questItem.assetId,
@@ -47,7 +47,7 @@ export const dropQuestItem = async (req, res) => {
         visitorId,
       },
       position,
-      uniqueName: `${assetId}-${uniqueName}`,
+      uniqueName: assetId,
       urlSlug,
     });
 
@@ -59,6 +59,7 @@ export const dropQuestItem = async (req, res) => {
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
       droppedAsset.updateWebImageLayers("", questItemImage),
+      world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}.count`]: 0 }),
     ]);
 
     return res.json({ droppedAsset, success: true });

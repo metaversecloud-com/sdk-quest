@@ -6,7 +6,6 @@ export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, urlS
     const droppedAsset = await DroppedAsset.get(droppedAssetId, urlSlug, {
       credentials,
     });
-    await droppedAsset.fetchDataObject();
     return droppedAsset;
   } catch (e) {
     error("Getting dropped asset and data object", e);

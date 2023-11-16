@@ -10,7 +10,17 @@ export const handleQuestItemClicked = async (req, res) => {
     const day = String(currentDate.getDate()).padStart(2, "0");
     const dateKey = `${year}_${month}_${day}`;
 
+    const droppedAsset = await DroppedAsset.get(assetId, urlSlug, {
+      credentials: {
+        assetId,
+        interactiveNonce,
+        interactivePublicKey,
+        visitorId,
+      },
+    });
+    const keyAssetId = droppedAsset.uniqueName;
     const world = await getWorldDetails({
+      assetId: keyAssetId,
       credentials: {
         interactiveNonce,
         interactivePublicKey,
@@ -19,27 +29,23 @@ export const handleQuestItemClicked = async (req, res) => {
       urlSlug,
     });
 
-    let { eggsCollectedByUser, itemsCollectedByUser, numberAllowedToCollect = 5 } = world.dataObject;
-    if (eggsCollectedByUser) itemsCollectedByUser = eggsCollectedByUser;
+    if (!world.dataObject?.keyAssets[keyAssetId]) {
+      throw "Key asset not found";
+    }
+
+    const questDetails = world.dataObject.keyAssets[keyAssetId];
+    const { itemsCollectedByUser, numberAllowedToCollect } = questDetails;
+    let numberCollected = 0;
 
     if (
       itemsCollectedByUser &&
       itemsCollectedByUser[profileId] &&
       itemsCollectedByUser[profileId][dateKey] &&
-      itemsCollectedByUser[profileId][dateKey].length >= numberAllowedToCollect
+      itemsCollectedByUser[profileId][dateKey].count >= numberAllowedToCollect
     ) {
       console.log(`FAIL: Visitor has already collected ${numberAllowedToCollect} quest items today.`);
       return res.json({ addedClick: false, numberAllowedToCollect, success: true });
     } else {
-      const droppedAsset = DroppedAsset.create(assetId, urlSlug, {
-        credentials: {
-          assetId,
-          interactiveNonce,
-          interactivePublicKey,
-          visitorId,
-        },
-      });
-
       // Move the quest item to a new random location
       const position = getRandomCoordinates(world.width, world.height);
 
@@ -53,13 +59,6 @@ export const handleQuestItemClicked = async (req, res) => {
         }),
       ]);
 
-      // Add quest item collected to leaderboard
-      let collectedArray = [];
-      if (itemsCollectedByUser && itemsCollectedByUser[profileId] && itemsCollectedByUser[profileId][dateKey]) {
-        collectedArray = itemsCollectedByUser[profileId][dateKey];
-      }
-      collectedArray.push({ type: "questItem", value: 1 });
-
       const visitor = Visitor.create(visitorId, urlSlug, {
         credentials: {
           interactiveNonce,
@@ -68,32 +67,31 @@ export const handleQuestItemClicked = async (req, res) => {
         },
       });
 
-      const visitorLockId = `${visitorId}-${assetId}-itemsCollectedByWorld-${new Date(
-        Math.round(new Date().getTime() / 60000) * 60000,
-      )}`;
-      const worldLockId = `${urlSlug}-${assetId}-itemsCollectedByUser-${new Date(
-        Math.round(new Date().getTime() / 60000) * 60000,
-      )}`;
+      if (!itemsCollectedByUser[profileId] || !itemsCollectedByUser[profileId][dateKey]) {
+        await world.updateDataObject({
+          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 0 } },
+        });
+        numberCollected = 1;
+      } else {
+        numberCollected = itemsCollectedByUser[profileId][dateKey].count + 1;
+      }
+
       await Promise.all([
-        visitor.updateDataObject(
-          {
-            [`itemsCollectedByWorld.${world.urlSlug}`]: { [dateKey]: collectedArray }, // Add quest item collection dateKey.
-          },
-          { lock: { lockId: visitorLockId, releaseLock: true } },
+        visitor.incrementDataObjectValue([`${world.urlSlug}.${keyAssetId}.${dateKey}`], 1),
+        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1),
+        world.incrementDataObjectValue(
+          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}.count`],
+          1,
         ),
-        world.updateDataObject(
-          {
-            [`itemsCollectedByUser.${profileId}`]: { [dateKey]: collectedArray }, // Add quest item collection dateKey.
-            [`profileMapper.${profileId}`]: username, // Update the username of the visitor to be shown in the leaderboard.
-          },
-          { lock: { lockId: worldLockId, releaseLock: true } },
-        ),
+        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`], 1),
+        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.questItems.${assetId}.count`], 1),
+        world.updateDataObject({ [`profileMapper.${profileId}`]: username }),
       ]);
 
       return res.json({
         addedClick: true,
         numberAllowedToCollect,
-        numberCollected: collectedArray.length,
+        numberCollected,
         success: true,
       });
     }

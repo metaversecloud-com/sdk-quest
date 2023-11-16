@@ -4,17 +4,6 @@ export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
 
-    const world = await getWorldDataObject({
-      assetId,
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-      urlSlug,
-    });
-    if (!world.dataObject?.keyAssetId) throw "No dropped assets related to key asset found";
-
     const droppedAssets = await getDroppedAssetsWithUniqueName({
       credentials: {
         interactiveNonce,
@@ -22,7 +11,7 @@ export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
         visitorId,
       },
       isPartial: true,
-      uniqueName: world.dataObject?.keyAssetId,
+      uniqueName: assetId,
       urlSlug,
     });
 

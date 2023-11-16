@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 
-import { CircularProgress } from "@mui/material";
+// components
+import { CircularProgress, Grid } from "@mui/material";
 
 // pages
-import { Error, Home, QuestItemFound } from "@pages";
+import { Error, Home, QuestItemClicked } from "@pages";
 
 // utils
 import { backendAPI, setupBackendAPI } from "@utils";
@@ -15,6 +16,7 @@ import { setInteractiveParams, setVisitorInfo, useGlobalDispatch } from "@contex
 export function App() {
   const [searchParams] = useSearchParams();
   const [hasInitBackendAPI, setHasInitBackendAPI] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // context
   const globalDispatch = useGlobalDispatch();
@@ -24,6 +26,7 @@ export function App() {
       setupAPI();
     } else {
       getVisitor();
+      setIsLoading(false);
     }
     // eslint-disable-next-line
   }, [hasInitBackendAPI, searchParams]);
@@ -65,13 +68,18 @@ export function App() {
     }
   };
 
-  if (!hasInitBackendAPI) return <CircularProgress />;
+  if (!hasInitBackendAPI || isLoading) {
+    return (
+      <Grid container justifyContent="center" mt={4}>
+        <CircularProgress />
+      </Grid>
+    );
+  }
 
   return (
     <Routes>
       <Route element={<Home />} exact path="/" />
-      <Route element={<QuestItemFound />} path="/egg-clicked" />
-      <Route element={<QuestItemFound />} path="/quest-item-clicked" />
+      <Route element={<QuestItemClicked />} path="/quest-item-clicked" />
       <Route element={<Error />} path="*" />
     </Routes>
   );

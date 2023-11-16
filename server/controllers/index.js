@@ -9,4 +9,3 @@ export * from "./moveVisitor.js";
 export * from "./removeDroppedAssets.js";
 export * from "./removeDroppedAssetsWithUniqueName.js";
 export * from "./updateAdminSettings.js";
-export * from "./updateKeyAssetId.js";

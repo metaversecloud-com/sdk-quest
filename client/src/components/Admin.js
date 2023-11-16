@@ -15,8 +15,6 @@ import { backendAPI } from "@utils";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-const uniqueName = "sdk-quest-item";
-
 export function Admin({ keyAssetImage }) {
   const [numberAllowedToCollect, setNumberAllowedToCollect] = useState();
   const [questItemImage, setQuestItemImage] = useState("");
@@ -26,7 +24,7 @@ export function Admin({ keyAssetImage }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const { hasInteractiveParams } = useGlobalState();
+  const { hasInteractiveParams, keyAssetId } = useGlobalState();
   const globalDispatch = useGlobalDispatch();
 
   useEffect(() => {
@@ -41,8 +39,10 @@ export function Admin({ keyAssetImage }) {
     try {
       const result = await backendAPI.get("/world-data-object");
       const { dataObject } = result.data.world;
-      if (dataObject.numberAllowedToCollect) setNumberAllowedToCollect(dataObject.numberAllowedToCollect);
-      if (dataObject.questItemImage) setQuestItemImage(dataObject.questItemImage);
+      if (keyAssetId && dataObject.keyAssets[keyAssetId]?.numberAllowedToCollect)
+        setNumberAllowedToCollect(dataObject.keyAssets[keyAssetId].numberAllowedToCollect);
+      if (keyAssetId && dataObject.keyAssets[keyAssetId]?.questItemImage)
+        setQuestItemImage(dataObject.keyAssets[keyAssetId].questItemImage);
     } catch (error) {
       console.log(error);
     }
@@ -62,9 +62,7 @@ export function Admin({ keyAssetImage }) {
   const dropItem = async () => {
     try {
       setIsDropping(true);
-      const result = await backendAPI.post("/drop-quest-item", {
-        uniqueName,
-      });
+      const result = await backendAPI.post("/drop-quest-item");
       if (result.data.success) {
         getQuestItems();
       } else return console.log("ERROR dropping quest item");
@@ -77,9 +75,7 @@ export function Admin({ keyAssetImage }) {
 
   const removeAllQuestItems = async () => {
     try {
-      const result = await backendAPI.post("/dropped-asset/remove-all-with-unique-name", {
-        uniqueName,
-      });
+      const result = await backendAPI.post("/dropped-asset/remove-all-with-unique-name");
       if (result.data.success) {
         setQuestItems([]);
       } else return console.log("ERROR removing all quest items");

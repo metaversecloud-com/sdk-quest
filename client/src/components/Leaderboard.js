@@ -9,7 +9,7 @@ import { useGlobalState } from "@context";
 // utils
 import { backendAPI } from "@utils";
 
-export function Leaderboard({ keyAssetImage }) {
+export function Leaderboard({ isKeyAsset, keyAssetImage }) {
   const [visibleData, setVisibleData] = useState([]);
   const [total, setTotal] = useState();
   const [currentPosition, setCurrentPosition] = useState(true);
@@ -21,7 +21,7 @@ export function Leaderboard({ keyAssetImage }) {
   useEffect(() => {
     const getLeaderboardData = async () => {
       try {
-        const result = await backendAPI.get("/leaderboard");
+        const result = await backendAPI.get(`/leaderboard?isKeyAsset=${isKeyAsset}`);
         const { leaderboard } = result.data;
         const index = leaderboard.findIndex((item) => item.profileId === visitor.profileId);
         setMyData(leaderboard[index]);

@@ -3,17 +3,6 @@ import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../ut
 export const removeDroppedAssetsWithUniqueName = async (req, res) => {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
-    const { uniqueName } = req.body;
-
-    const world = await getWorldDataObject({
-      assetId,
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-      urlSlug,
-    });
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
       credentials: {
@@ -22,7 +11,7 @@ export const removeDroppedAssetsWithUniqueName = async (req, res) => {
         visitorId,
       },
       isPartial: true,
-      uniqueName: world.dataObject?.keyAssetId || uniqueName,
+      uniqueName: assetId,
       urlSlug,
     });
 
