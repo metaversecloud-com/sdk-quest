@@ -38,8 +38,6 @@ export const dropQuestItem = async (req, res) => {
     const position = getRandomCoordinates(world.width, world.height);
     // Use questItemImage from world data object or fallback to default
     const questItemImage = world?.dataObject?.questItemImage || getDefaultKeyAssetImage(urlSlug);
-    console.log("🚀 ~ file: dropQuestItem.js:41 ~ dropQuestItem ~ world?.dataObject:", world?.dataObject);
-    console.log("🚀 ~ file: dropQuestItem.js:41 ~ dropQuestItem ~ questItemImage:", questItemImage);
 
     const droppedAsset = await dropAsset({
       assetId: questItem.assetId,
@@ -53,7 +51,7 @@ export const dropQuestItem = async (req, res) => {
       urlSlug,
     });
 
-    const [test1, test2] = await Promise.all([
+    await Promise.all([
       droppedAsset.updateClickType({
         clickType: "link",
         clickableLinkTitle: "Quest",
@@ -62,8 +60,6 @@ export const dropQuestItem = async (req, res) => {
       }),
       droppedAsset.updateWebImageLayers("", questItemImage),
     ]);
-    console.log("🚀 ~ file: dropQuestItem.js:65 ~ dropQuestItem ~ test1:", test1);
-    console.log("🚀 ~ file: dropQuestItem.js:57 ~ dropQuestItem ~ test2:", test2);
 
     return res.json({ droppedAsset, success: true });
   } catch (e) {
