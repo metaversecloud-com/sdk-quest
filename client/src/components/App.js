@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 
+import { CircularProgress } from "@mui/material";
+
 // pages
 import { Error, Home, QuestItemFound } from "@pages";
 
@@ -63,7 +65,7 @@ export function App() {
     }
   };
 
-  if (!setHasInitBackendAPI) return <div />;
+  if (!hasInitBackendAPI) return <CircularProgress />;
 
   return (
     <Routes>
