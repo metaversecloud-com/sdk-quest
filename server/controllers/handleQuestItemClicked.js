@@ -67,12 +67,12 @@ export const handleQuestItemClicked = async (req, res) => {
         },
       });
 
-      if (!itemsCollectedByUser[profileId]) {
+      if (!itemsCollectedByUser?.[profileId]) {
         await world.updateDataObject({
           [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 0 } },
         });
         numberCollected = 1;
-      } else if (!itemsCollectedByUser[profileId][dateKey]) {
+      } else if (!itemsCollectedByUser?.[profileId]?.[dateKey]) {
         await world.updateDataObject({
           [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 0 },
         });

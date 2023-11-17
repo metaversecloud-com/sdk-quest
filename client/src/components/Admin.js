@@ -39,9 +39,9 @@ export function Admin({ keyAssetImage }) {
     try {
       const result = await backendAPI.get("/world-data-object");
       const { dataObject } = result.data.world;
-      if (keyAssetId && dataObject.keyAssets[keyAssetId]?.numberAllowedToCollect)
+      if (keyAssetId && dataObject.keyAssets?.[keyAssetId]?.numberAllowedToCollect)
         setNumberAllowedToCollect(dataObject.keyAssets[keyAssetId].numberAllowedToCollect);
-      if (keyAssetId && dataObject.keyAssets[keyAssetId]?.questItemImage)
+      if (keyAssetId && dataObject.keyAssets?.[keyAssetId]?.questItemImage)
         setQuestItemImage(dataObject.keyAssets[keyAssetId].questItemImage);
     } catch (error) {
       console.log(error);
