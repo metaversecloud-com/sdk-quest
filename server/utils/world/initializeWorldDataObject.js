@@ -3,8 +3,8 @@ import { error } from "../error.js";
 export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => {
   try {
     if (!world.dataObject || !world.dataObject?.keyAssets?.[assetId]) {
-      const lockId = `${urlSlug}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
-      world.setDataObject(
+      const lockId = `${urlSlug}-${assetId}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
+      await world.setDataObject(
         {
           [`keyAssets.${assetId}`]: {
             itemsCollectedByUser: {},
@@ -18,8 +18,9 @@ export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => 
         { lock: { lockId }, releaseLock: true },
       );
     }
-    return world;
+    return;
   } catch (e) {
     error("Error initializing world data object", e);
+    return await world.fetchDataObject();
   }
 };
