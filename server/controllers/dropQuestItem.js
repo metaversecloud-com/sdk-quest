@@ -36,8 +36,6 @@ export const dropQuestItem = async (req, res) => {
 
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
-    // Use questItemImage from world data object or fallback to default
-    const questItemImage = world.dataObject?.keyAssets[assetId]?.questItemImage || getDefaultKeyAssetImage(urlSlug);
 
     const droppedAsset = await dropAsset({
       assetId: questItem.assetId,
@@ -50,6 +48,10 @@ export const dropQuestItem = async (req, res) => {
       uniqueName: assetId,
       urlSlug,
     });
+
+    // Use questItemImage from world data object or fallback to default
+    const questItemImage =
+      world.dataObject?.keyAssets?.[assetId]?.questItemImage || droppedAsset.layer1 || getDefaultKeyAssetImage(urlSlug);
 
     await Promise.all([
       droppedAsset.updateClickType({

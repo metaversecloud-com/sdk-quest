@@ -30,21 +30,22 @@ export const getLeaderboard = async (req, res) => {
     });
 
     let leaderboard = [];
-    const itemsCollectedByUser = dataObject.keyAssets[keyAssetId]?.itemsCollectedByUser;
-    if (itemsCollectedByUser) {
-      for (const profileId in itemsCollectedByUser) {
-        const longestStreak = getLongestStreak(itemsCollectedByUser[profileId]);
+    if (dataObject && dataObject.keyAssets && dataObject?.keyAssets?.[keyAssetId]) {
+      const itemsCollectedByUser = dataObject.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
+      if (itemsCollectedByUser) {
+        for (const profileId in itemsCollectedByUser) {
+          const longestStreak = getLongestStreak(itemsCollectedByUser[profileId]);
 
-        leaderboard.push({
-          name: dataObject.profileMapper[profileId],
-          collected: itemsCollectedByUser[profileId].total,
-          profileId,
-          streak: longestStreak,
-        });
+          leaderboard.push({
+            name: dataObject.profileMapper[profileId],
+            collected: itemsCollectedByUser[profileId].total,
+            profileId,
+            streak: longestStreak,
+          });
+        }
+        leaderboard.sort((a, b) => b.collected - a.collected);
       }
-      leaderboard.sort((a, b) => b.collected - a.collected);
     }
-
     return res.json({ leaderboard, success: true });
   } catch (e) {
     error("Getting leaderboard", e, res);

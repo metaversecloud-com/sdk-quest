@@ -39,6 +39,8 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
 
   if (isLoading) return <CircularProgress />;
 
+  if (visibleData.length === 0) return <p>No quest items have been found yet. Search the world and be the first!</p>;
+
   return (
     <Grid container direction="column">
       {currentPosition && currentPosition > 0 ? (

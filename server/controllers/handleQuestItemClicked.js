@@ -29,7 +29,7 @@ export const handleQuestItemClicked = async (req, res) => {
       urlSlug,
     });
 
-    if (!world.dataObject?.keyAssets[keyAssetId]) {
+    if (!world.dataObject?.keyAssets?.[keyAssetId]) {
       throw "Key asset not found";
     }
 
@@ -78,16 +78,16 @@ export const handleQuestItemClicked = async (req, res) => {
         });
         numberCollected = 1;
       } else {
+        await world.incrementDataObjectValue(
+          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}.count`],
+          1,
+        );
         numberCollected = itemsCollectedByUser[profileId][dateKey].count + 1;
       }
 
       await Promise.all([
         visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.${keyAssetId}.${dateKey}.count`], 1),
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1),
-        world.incrementDataObjectValue(
-          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}.count`],
-          1,
-        ),
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`], 1),
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.questItems.${assetId}.count`], 1),
         world.updateDataObject({ [`profileMapper.${profileId}`]: username }),
