@@ -4,7 +4,7 @@ export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => 
   try {
     if (!world.dataObject || !world.dataObject?.keyAssets?.[assetId]) {
       const lockId = `${urlSlug}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
-      world.updateDataObject(
+      world.setDataObject(
         {
           [`keyAssets.${assetId}`]: {
             itemsCollectedByUser: {},
