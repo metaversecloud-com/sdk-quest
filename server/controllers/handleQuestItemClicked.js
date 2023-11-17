@@ -67,9 +67,14 @@ export const handleQuestItemClicked = async (req, res) => {
         },
       });
 
-      if (!itemsCollectedByUser[profileId] || !itemsCollectedByUser[profileId][dateKey]) {
+      if (!itemsCollectedByUser[profileId]) {
         await world.updateDataObject({
           [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 0 } },
+        });
+        numberCollected = 1;
+      } else if (!itemsCollectedByUser[profileId][dateKey]) {
+        await world.updateDataObject({
+          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 0 },
         });
         numberCollected = 1;
       } else {
@@ -77,7 +82,7 @@ export const handleQuestItemClicked = async (req, res) => {
       }
 
       await Promise.all([
-        visitor.incrementDataObjectValue([`${world.urlSlug}.${keyAssetId}.${dateKey}`], 1),
+        visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.${keyAssetId}.${dateKey}.count`], 1),
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1),
         world.incrementDataObjectValue(
           [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}.count`],

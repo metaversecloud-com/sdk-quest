@@ -10,7 +10,7 @@ export const getVisitor = async ({ credentials, urlSlug, visitorId }) => {
       const lockId = `${visitorId}-itemsCollectedByWorld-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
       await visitor.setDataObject(
         {
-          itemsCollectedByWorld: {},
+          [`itemsCollectedByWorld.${urlSlug}`]: { [keyAssetId]: {} },
         },
         { lock: { lockId } },
       );
