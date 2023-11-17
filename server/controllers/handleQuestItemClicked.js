@@ -86,7 +86,7 @@ export const handleQuestItemClicked = async (req, res) => {
       }
 
       await Promise.all([
-        visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.${keyAssetId}.${dateKey}.count`], 1),
+        visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1),
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1),
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`], 1),
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.questItems.${assetId}.count`], 1),

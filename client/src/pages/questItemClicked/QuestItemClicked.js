@@ -53,10 +53,6 @@ export function QuestItemClicked() {
     );
   }
 
-  if (!hasInteractiveParams) {
-    return <h5>You can only access this application from within a Topia world embed.</h5>;
-  }
-
   return (
     <Grid alignItems="center" container direction="column" p={0}>
       <Grid item p={3} paddingBottom={0} paddingTop={0} xs={12}>

@@ -11,7 +11,7 @@ import { Error, Home, QuestItemClicked } from "@pages";
 import { backendAPI, setupBackendAPI } from "@utils";
 
 // context
-import { setInteractiveParams, setVisitorInfo, useGlobalDispatch } from "@context";
+import { setInteractiveParams, setVisitorInfo, useGlobalDispatch, useGlobalState } from "@context";
 
 export function App() {
   const [searchParams] = useSearchParams();
@@ -20,6 +20,7 @@ export function App() {
 
   // context
   const globalDispatch = useGlobalDispatch();
+  const { hasInteractiveParams } = useGlobalState();
 
   useEffect(() => {
     if (!hasInitBackendAPI) {
@@ -74,6 +75,10 @@ export function App() {
         <CircularProgress />
       </Grid>
     );
+  }
+
+  if (!hasInteractiveParams) {
+    return <h5>You can only access this application from within a Topia world embed.</h5>;
   }
 
   return (

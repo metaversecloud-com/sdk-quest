@@ -119,10 +119,6 @@ export function Admin({ keyAssetImage }) {
 
   if (isLoading) return <CircularProgress />;
 
-  if (!hasInteractiveParams) {
-    return <h4>You can only access this application from within a Topia world embed.</h4>;
-  }
-
   return (
     <>
       <Grid container direction="column" gap={2}>
