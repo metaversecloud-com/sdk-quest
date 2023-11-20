@@ -6,7 +6,6 @@ export const moveVisitor = async (req, res) => {
     const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
     const { moveTo, shouldTeleportVisitor } = req.body;
 
-    throw "Invalid movement coordinates";
     if (!moveTo || !moveTo.x || !moveTo.y) throw "Invalid movement coordinates";
 
     const visitor = Visitor.create(visitorId, urlSlug, {

@@ -4,8 +4,8 @@ export const handleGetKeyAssetImage = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const world = await getWorldDataObject({
-      assetId,
       credentials: {
+        assetId,
         interactiveNonce,
         interactivePublicKey,
         visitorId,
@@ -14,10 +14,18 @@ export const handleGetKeyAssetImage = async (req, res) => {
     });
 
     let keyAssetImage;
-    if (world.dataObject && world.dataObject?.keyAssets?.[assetId]) {
+    if (world.dataObject && world.dataObject?.keyAssets && world.dataObject?.keyAssets?.[assetId]) {
       keyAssetImage = world.dataObject?.keyAssets?.[assetId]?.questItemImage;
     } else {
-      await getDefaultKeyAssetImage({ assetId, urlSlug });
+      await getDefaultKeyAssetImage({
+        credentials: {
+          assetId,
+          interactiveNonce,
+          interactivePublicKey,
+          visitorId,
+        },
+        urlSlug,
+      });
     }
 
     return res.json({ keyAssetImage, success: true });

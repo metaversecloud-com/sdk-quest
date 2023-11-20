@@ -1,11 +1,12 @@
 import { errorHandler } from "../errorHandler.js";
 import { getDefaultKeyAssetImage } from "../getDefaultKeyAssetImage.js";
 
-export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => {
+export const initializeWorldDataObject = async ({ credentials, world, urlSlug }) => {
   try {
+    const { assetId } = credentials;
     const lockId = `${urlSlug}-${assetId}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
     if (!world.dataObject || !world.dataObject?.keyAssets) {
-      const questItemImage = await getDefaultKeyAssetImage({ assetId, urlSlug });
+      const questItemImage = await getDefaultKeyAssetImage({ credentials, urlSlug });
       await world.setDataObject(
         {
           keyAssets: {
@@ -22,7 +23,7 @@ export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => 
         { lock: { lockId }, releaseLock: true },
       );
     } else if (!world.dataObject?.keyAssets?.[assetId]) {
-      const questItemImage = await getDefaultKeyAssetImage({ assetId, urlSlug });
+      const questItemImage = await getDefaultKeyAssetImage({ credentials, urlSlug });
       await world.updateDataObject(
         {
           [`keyAssets.${assetId}`]: {

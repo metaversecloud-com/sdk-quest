@@ -20,8 +20,8 @@ export const getLeaderboard = async (req, res) => {
     }
 
     const { dataObject } = await getWorldDataObject({
-      assetId: keyAssetId,
       credentials: {
+        assetId: keyAssetId,
         interactiveNonce,
         interactivePublicKey,
         visitorId,

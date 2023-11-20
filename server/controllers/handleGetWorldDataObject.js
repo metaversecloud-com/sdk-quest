@@ -4,8 +4,8 @@ export const handleGetWorldDataObject = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const world = await getWorldDataObject({
-      assetId,
       credentials: {
+        assetId,
         interactiveNonce,
         interactivePublicKey,
         visitorId,

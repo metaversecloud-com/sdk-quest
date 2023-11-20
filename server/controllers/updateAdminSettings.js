@@ -6,8 +6,8 @@ export const updateAdminSettings = async (req, res) => {
     const { numberAllowedToCollect, questItemImage } = req.body;
 
     const world = await getWorldDataObject({
-      assetId,
       credentials: {
+        assetId,
         interactiveNonce,
         interactivePublicKey,
         visitorId,
