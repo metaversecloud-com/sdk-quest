@@ -1,6 +1,6 @@
-import { getDroppedAssetDetails } from "./droppedAssets/getDroppedAssetDetails";
+import { getDroppedAssetDetails } from "./droppedAssets/getDroppedAssetDetails.js";
 
-export const getDefaultKeyAssetImage = ({ assetId, urlSlug }) => {
+export const getDefaultKeyAssetImage = async ({ assetId, urlSlug }) => {
   let keyAssetImage = "https://topiaimages.s3.us-west-1.amazonaws.com/default_egg.png";
   if (urlSlug.includes("ingda")) {
     keyAssetImage = "https://topiaimages.s3.us-west-1.amazonaws.com/ingda_egg.png";
