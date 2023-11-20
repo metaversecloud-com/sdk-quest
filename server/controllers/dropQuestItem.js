@@ -51,7 +51,9 @@ export const dropQuestItem = async (req, res) => {
 
     // Use questItemImage from world data object or fallback to default
     const questItemImage =
-      world.dataObject?.keyAssets?.[assetId]?.questItemImage || droppedAsset.layer1 || getDefaultKeyAssetImage(urlSlug);
+      world.dataObject?.keyAssets?.[assetId]?.questItemImage ||
+      droppedAsset.layer1 ||
+      getDefaultKeyAssetImage({ urlSlug });
 
     await Promise.all([
       droppedAsset.updateClickType({

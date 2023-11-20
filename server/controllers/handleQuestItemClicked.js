@@ -69,12 +69,12 @@ export const handleQuestItemClicked = async (req, res) => {
 
       if (!itemsCollectedByUser?.[profileId]) {
         await world.updateDataObject({
-          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 0 } },
+          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 1 } },
         });
         numberCollected = 1;
       } else if (!itemsCollectedByUser?.[profileId]?.[dateKey]) {
         await world.updateDataObject({
-          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 0 },
+          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 1 },
         });
         numberCollected = 1;
       } else {

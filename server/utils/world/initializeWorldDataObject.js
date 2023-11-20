@@ -1,9 +1,11 @@
 import { error } from "../error.js";
+import { getDefaultKeyAssetImage } from "../getDefaultKeyAssetImage.js";
 
 export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => {
   try {
     const lockId = `${urlSlug}-${assetId}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
     if (!world.dataObject || !world.dataObject?.keyAssets) {
+      const questItemImage = await getDefaultKeyAssetImage({ assetId, urlSlug });
       await world.setDataObject(
         {
           keyAssets: {
@@ -12,7 +14,7 @@ export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => 
               keyAssetId: assetId,
               numberAllowedToCollect: 5,
               totalItemsCollected: 0,
-              questItemImage: "",
+              questItemImage,
               questItems: {},
             },
           },
@@ -20,6 +22,7 @@ export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => 
         { lock: { lockId }, releaseLock: true },
       );
     } else if (!world.dataObject?.keyAssets?.[assetId]) {
+      const questItemImage = await getDefaultKeyAssetImage({ assetId, urlSlug });
       await world.updateDataObject(
         {
           [`keyAssets.${assetId}`]: {
@@ -27,7 +30,7 @@ export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => 
             keyAssetId: assetId,
             numberAllowedToCollect: 5,
             totalItemsCollected: 0,
-            questItemImage: "",
+            questItemImage,
             questItems: {},
           },
         },

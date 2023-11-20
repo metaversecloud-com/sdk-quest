@@ -17,7 +17,7 @@ export const handleGetKeyAssetImage = async (req, res) => {
     if (world.dataObject && world.dataObject?.keyAssets?.[assetId]) {
       keyAssetImage = world.dataObject?.keyAssets?.[assetId]?.questItemImage;
     } else {
-      getDefaultKeyAssetImage(urlSlug);
+      getDefaultKeyAssetImage({ assetId, urlSlug });
     }
 
     return res.json({ keyAssetImage, success: true });
