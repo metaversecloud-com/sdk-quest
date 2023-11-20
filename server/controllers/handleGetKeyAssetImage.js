@@ -1,4 +1,4 @@
-import { error, getDefaultKeyAssetImage, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getDefaultKeyAssetImage, getWorldDataObject } from "../utils/index.js";
 
 export const handleGetKeyAssetImage = async (req, res) => {
   try {
@@ -17,11 +17,17 @@ export const handleGetKeyAssetImage = async (req, res) => {
     if (world.dataObject && world.dataObject?.keyAssets?.[assetId]) {
       keyAssetImage = world.dataObject?.keyAssets?.[assetId]?.questItemImage;
     } else {
-      getDefaultKeyAssetImage({ assetId, urlSlug });
+      await getDefaultKeyAssetImage({ assetId, urlSlug });
     }
 
     return res.json({ keyAssetImage, success: true });
-  } catch (e) {
-    error("Error getting key asset image", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "handleGetKeyAssetImage",
+      message: "Error getting key asset image",
+      req,
+      res,
+    });
   }
 };

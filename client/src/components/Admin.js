@@ -22,6 +22,7 @@ export function Admin({ keyAssetImage }) {
   const [isDropping, setIsDropping] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // context
   const { hasInteractiveParams, keyAssetId } = useGlobalState();
@@ -44,7 +45,7 @@ export function Admin({ keyAssetImage }) {
       if (keyAssetId && dataObject.keyAssets?.[keyAssetId]?.questItemImage)
         setQuestItemImage(dataObject.keyAssets[keyAssetId].questItemImage);
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
 
@@ -55,7 +56,7 @@ export function Admin({ keyAssetImage }) {
         setQuestItems(result.data.droppedAssets);
       } else return console.log("ERROR getting quest items");
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
 
@@ -69,7 +70,7 @@ export function Admin({ keyAssetImage }) {
       setIsDropping(false);
     } catch (error) {
       setIsDropping(false);
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
 
@@ -80,7 +81,7 @@ export function Admin({ keyAssetImage }) {
         setQuestItems([]);
       } else return console.log("ERROR removing all quest items");
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
 
@@ -90,7 +91,7 @@ export function Admin({ keyAssetImage }) {
       if (result.data.success) getQuestItems();
       else return console.log("ERROR deleting quest item");
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
 
@@ -98,7 +99,7 @@ export function Admin({ keyAssetImage }) {
     try {
       await backendAPI.put("/visitor/move", { moveTo: position });
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
 
@@ -112,7 +113,7 @@ export function Admin({ keyAssetImage }) {
       });
       setIsSaving(false);
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error.message);
       setIsSaving(false);
     }
   };
@@ -233,6 +234,7 @@ export function Admin({ keyAssetImage }) {
           </table>
         </Grid>
       )}
+      {errorMessage && <p className="p3 text-error">{errorMessage}</p>}
     </>
   );
 }

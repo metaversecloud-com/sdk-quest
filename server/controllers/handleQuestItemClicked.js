@@ -1,5 +1,5 @@
 import { DroppedAsset, Visitor } from "../utils/topiaInit.js";
-import { error, getBaseURL, getRandomCoordinates, getWorldDetails, logger } from "../utils/index.js";
+import { errorHandler, getBaseURL, getRandomCoordinates, getWorldDetails } from "../utils/index.js";
 
 export const handleQuestItemClicked = async (req, res) => {
   try {
@@ -100,13 +100,13 @@ export const handleQuestItemClicked = async (req, res) => {
         success: true,
       });
     }
-  } catch (e) {
-    error("Handling quest item click", e, res);
-    logger.error({
+  } catch (error) {
+    errorHandler({
       error,
-      message: "Updating dropped asset update position, click type, and world/visitor data object",
       functionName: "handleQuestItemClicked",
+      message: "Error updating dropped asset update position, click type, and world/visitor data object",
       req,
+      res,
     });
   }
 };

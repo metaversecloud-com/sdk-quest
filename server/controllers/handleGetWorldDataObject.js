@@ -1,4 +1,4 @@
-import { error, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getWorldDataObject } from "../utils/index.js";
 
 export const handleGetWorldDataObject = async (req, res) => {
   try {
@@ -13,7 +13,13 @@ export const handleGetWorldDataObject = async (req, res) => {
       urlSlug,
     });
     return res.json({ world });
-  } catch (e) {
-    error("Error updating world data object", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "handleGetWorldDataObject",
+      message: "Error updating world data object",
+      req,
+      res,
+    });
   }
 };

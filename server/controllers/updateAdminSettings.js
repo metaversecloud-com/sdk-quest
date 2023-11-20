@@ -1,4 +1,4 @@
-import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../utils/index.js";
 
 export const updateAdminSettings = async (req, res) => {
   try {
@@ -41,7 +41,13 @@ export const updateAdminSettings = async (req, res) => {
     }
 
     return res.json({ success: true });
-  } catch (e) {
-    error("Error updating quest items", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "updateAdminSettings",
+      message: "Error updating quest items",
+      req,
+      res,
+    });
   }
 };

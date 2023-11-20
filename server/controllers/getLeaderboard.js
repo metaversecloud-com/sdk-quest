@@ -1,4 +1,4 @@
-import { error, getDroppedAssetDetails, getLongestStreak, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getDroppedAssetDetails, getLongestStreak, getWorldDataObject } from "../utils/index.js";
 
 export const getLeaderboard = async (req, res) => {
   try {
@@ -47,7 +47,13 @@ export const getLeaderboard = async (req, res) => {
       }
     }
     return res.json({ leaderboard, success: true });
-  } catch (e) {
-    error("Getting leaderboard", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "getLeaderboard",
+      message: "Error getting leaderboard",
+      req,
+      res,
+    });
   }
 };

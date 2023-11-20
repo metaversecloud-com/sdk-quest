@@ -1,5 +1,5 @@
 import { Visitor } from "../topiaInit.js";
-import { error } from "../error.js";
+import { errorHandler } from "../errorHandler.js";
 
 export const getVisitor = async ({ credentials, urlSlug, visitorId }) => {
   try {
@@ -17,8 +17,8 @@ export const getVisitor = async ({ credentials, urlSlug, visitorId }) => {
       );
     }
     return visitor;
-  } catch (e) {
-    error("Error getting visitor", e);
+  } catch (error) {
+    errorHandler({ error, functionName: "getVisitor", message: "Error getting visitor" });
     return await visitor.fetchDataObject();
   }
 };

@@ -1,5 +1,5 @@
 import { DroppedAsset } from "../utils/topiaInit.js";
-import { error } from "../utils/index.js";
+import { errorHandler } from "../utils/index.js";
 
 export const removeDroppedAsset = async (req, res) => {
   try {
@@ -15,7 +15,13 @@ export const removeDroppedAsset = async (req, res) => {
     });
     await droppedAsset.deleteDroppedAsset();
     return res.json({ success: true });
-  } catch (e) {
-    error("Removing Dropped Asset", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "removeDroppedAsset",
+      message: "Error removing dropped asset",
+      req,
+      res,
+    });
   }
 };

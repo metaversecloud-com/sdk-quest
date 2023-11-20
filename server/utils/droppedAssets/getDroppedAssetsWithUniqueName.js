@@ -1,5 +1,5 @@
 import { World } from "../topiaInit.js";
-import { error } from "../error.js";
+import { errorHandler } from "../errorHandler.js";
 
 export const getDroppedAssetsWithUniqueName = async ({ credentials, isPartial, uniqueName, urlSlug }) => {
   try {
@@ -11,7 +11,11 @@ export const getDroppedAssetsWithUniqueName = async ({ credentials, isPartial, u
       uniqueName,
     });
     return droppedAssets;
-  } catch (e) {
-    error("Fetching dropped assets with unique name", e);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "getDroppedAssetsWithUniqueName",
+      message: "Error fetching dropped assets with unique name",
+    });
   }
 };

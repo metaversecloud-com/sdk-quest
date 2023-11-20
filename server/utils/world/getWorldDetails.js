@@ -1,5 +1,5 @@
 import { World } from "../topiaInit.js";
-import { error } from "../error.js";
+import { errorHandler } from "../errorHandler.js";
 import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
 
 export const getWorldDetails = async ({ assetId, credentials, urlSlug }) => {
@@ -11,7 +11,7 @@ export const getWorldDetails = async ({ assetId, credentials, urlSlug }) => {
     await world.fetchDataObject();
     await initializeWorldDataObject({ assetId, world, urlSlug });
     return world;
-  } catch (e) {
-    error("Error getting world details", e);
+  } catch (error) {
+    errorHandler({ error, functionName: "getWorldDetails", message: "Error getting world details" });
   }
 };

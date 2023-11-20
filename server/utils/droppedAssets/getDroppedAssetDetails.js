@@ -1,5 +1,5 @@
 import { DroppedAsset } from "../topiaInit.js";
-import { error } from "../error.js";
+import { errorHandler } from "../errorHandler.js";
 
 export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, urlSlug }) => {
   try {
@@ -7,7 +7,11 @@ export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, urlS
       credentials,
     });
     return droppedAsset;
-  } catch (e) {
-    error("Getting dropped asset and data object", e);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "getDroppedAssetDetails",
+      message: "Error getting dropped asset and data object",
+    });
   }
 };

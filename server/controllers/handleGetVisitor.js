@@ -1,4 +1,4 @@
-import { error, getVisitor } from "../utils/index.js";
+import { errorHandler, getVisitor } from "../utils/index.js";
 
 export const handleGetVisitor = async (req, res) => {
   try {
@@ -13,7 +13,7 @@ export const handleGetVisitor = async (req, res) => {
       visitorId,
     });
     return res.json({ visitor, success: true });
-  } catch (e) {
-    error("Error getting visitor", e, res);
+  } catch (error) {
+    errorHandler({ error, functionName: "handleGetVisitor", message: "Error getting visitor", req, res });
   }
 };

@@ -1,4 +1,4 @@
-import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
 export const removeDroppedAssetsWithUniqueName = async (req, res) => {
   try {
@@ -21,13 +21,19 @@ export const removeDroppedAssetsWithUniqueName = async (req, res) => {
     droppedAssets.forEach((droppedAsset) => {
       try {
         droppedAsset.deleteDroppedAsset();
-      } catch (e) {
+      } catch (error) {
         console.log("Error on delete dropped asset", e);
-        return res.status(500).send({ error: e, success: false });
+        return res.status(500).send({ error: error, success: false });
       }
     });
     return res.json({ success: true });
-  } catch (e) {
-    error("Removing Dropped Asset by Unique Name", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "removeDroppedAssetsWithUniqueName",
+      message: "Error removing dropped asset by uniqueName",
+      req,
+      res,
+    });
   }
 };

@@ -1,4 +1,4 @@
-import { error, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
 export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
   try {
@@ -25,7 +25,13 @@ export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
     });
 
     return res.json({ droppedAssets: normalized, success: true });
-  } catch (e) {
-    error("Fetching dropped assets with unique name", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "handleGetDroppedAssetsWithUniqueName",
+      message: "Error fetching dropped assets with unique name",
+      req,
+      res,
+    });
   }
 };

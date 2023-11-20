@@ -1,4 +1,4 @@
-import { error } from "../error.js";
+import { errorHandler } from "../errorHandler.js";
 import { getDefaultKeyAssetImage } from "../getDefaultKeyAssetImage.js";
 
 export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => {
@@ -38,8 +38,12 @@ export const initializeWorldDataObject = async ({ assetId, world, urlSlug }) => 
       );
     }
     return;
-  } catch (e) {
-    error("Error initializing world data object", e);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "initializeWorldDataObject",
+      message: "Error initializing world data object",
+    });
     return await world.fetchDataObject();
   }
 };

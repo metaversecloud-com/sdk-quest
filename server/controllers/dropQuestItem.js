@@ -1,6 +1,6 @@
 import {
   dropAsset,
-  error,
+  errorHandler,
   getBaseURL,
   getDroppedAssetDetails,
   getDefaultKeyAssetImage,
@@ -67,7 +67,13 @@ export const dropQuestItem = async (req, res) => {
     ]);
 
     return res.json({ droppedAsset, success: true });
-  } catch (e) {
-    error("Error dropping asset", e, res);
+  } catch (error) {
+    errorHandler({
+      error,
+      functionName: "dropQuestItem",
+      message: "Error dropping asset",
+      req,
+      res,
+    });
   }
 };
