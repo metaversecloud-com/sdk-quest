@@ -6,7 +6,7 @@ export const initializeWorldDataObject = async ({ credentials, world, urlSlug })
     const { assetId } = credentials;
     const lockId = `${urlSlug}-${assetId}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
     if (!world.dataObject || !world.dataObject?.keyAssets) {
-      const questItemImage = await getDefaultKeyAssetImage({ credentials, urlSlug });
+      const questItemImage = await getDefaultKeyAssetImage({ urlSlug });
       await world.setDataObject(
         {
           keyAssets: {
@@ -23,7 +23,7 @@ export const initializeWorldDataObject = async ({ credentials, world, urlSlug })
         { lock: { lockId }, releaseLock: true },
       );
     } else if (!world.dataObject?.keyAssets?.[assetId]) {
-      const questItemImage = await getDefaultKeyAssetImage({ credentials, urlSlug });
+      const questItemImage = await getDefaultKeyAssetImage({ urlSlug });
       await world.updateDataObject(
         {
           [`keyAssets.${assetId}`]: {
