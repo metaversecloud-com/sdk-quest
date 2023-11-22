@@ -21,8 +21,7 @@ export const errorHandler = ({ error, functionName, message, req, res }) => {
     if (res) return res.status(error.status || 500).send({ error, message, success: false });
     return { error };
   } catch (e) {
-    console.error("❌ Error printing the logs");
-    console.error(e);
+    console.error("❌ Error printing the logs", e);
     if (res) return res.status(500).send({ error: e, message, success: false });
     return { e };
   }

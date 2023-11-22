@@ -1,11 +1,11 @@
 import { DroppedAsset } from "../topiaInit.js";
-import { errorHandler } from "../errorHandler.js";
+import { errorHandler } from "../index.js";
+import { initializeDroppedAssetDataObject } from "./initializeDroppedAssetDataObject.js";
 
-export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, urlSlug }) => {
+export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, isKeyAsset, urlSlug }) => {
   try {
-    const droppedAsset = await DroppedAsset.get(droppedAssetId, urlSlug, {
-      credentials,
-    });
+    const droppedAsset = await DroppedAsset.get(droppedAssetId, urlSlug, { credentials });
+    if (isKeyAsset) await initializeDroppedAssetDataObject({ droppedAsset, urlSlug });
     return droppedAsset;
   } catch (error) {
     errorHandler({

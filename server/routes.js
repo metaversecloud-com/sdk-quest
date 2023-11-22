@@ -2,9 +2,9 @@ import {
   dropQuestItem,
   getLeaderboard,
   moveVisitor,
+  handleGetDroppedAssetDataObject,
   handleGetDroppedAssetsWithUniqueName,
   handleGetKeyAssetImage,
-  handleGetWorldDataObject,
   handleQuestItemClicked,
   handleGetVisitor,
   removeDroppedAsset,
@@ -19,9 +19,9 @@ const router = express.Router();
 router.get("/leaderboard", getLeaderboard);
 router.get("/key-asset-image", handleGetKeyAssetImage);
 router.post("/admin-settings", updateAdminSettings);
-router.get("/world-data-object", handleGetWorldDataObject);
 
 // Dropped Asset
+router.get("/dropped-asset/data-object", handleGetDroppedAssetDataObject);
 router.get("/quest-items", handleGetDroppedAssetsWithUniqueName); // { isPartial: boolean, uniqueName: string }
 router.post("/dropped-asset/remove-all-with-unique-name", removeDroppedAssetsWithUniqueName); // { isPartial: boolean, uniqueName: string }
 router.delete("/dropped-asset/:droppedAssetId", removeDroppedAsset);

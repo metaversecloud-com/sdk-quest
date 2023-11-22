@@ -10,7 +10,6 @@ function globalReducer(state, action) {
         ...state,
         ...action.payload,
         hasInteractiveParams: true,
-        keyAssetId: action.payload.assetId,
       };
     case "SET_VISITOR_INFO":
       return {

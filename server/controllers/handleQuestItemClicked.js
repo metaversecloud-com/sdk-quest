@@ -1,5 +1,11 @@
-import { DroppedAsset, Visitor } from "../utils/topiaInit.js";
-import { errorHandler, getBaseURL, getRandomCoordinates, getWorldDetails } from "../utils/index.js";
+import {
+  errorHandler,
+  getBaseURL,
+  getDroppedAssetDetails,
+  getRandomCoordinates,
+  getVisitor,
+  getWorldDetails,
+} from "../utils/index.js";
 
 export const handleQuestItemClicked = async (req, res) => {
   try {
@@ -10,31 +16,44 @@ export const handleQuestItemClicked = async (req, res) => {
     const day = String(currentDate.getDate()).padStart(2, "0");
     const dateKey = `${year}_${month}_${day}`;
 
-    const droppedAsset = await DroppedAsset.get(assetId, urlSlug, {
-      credentials: {
-        assetId,
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-    });
-    const keyAssetId = droppedAsset.uniqueName;
-    const world = await getWorldDetails({
-      assetId: keyAssetId,
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
+    const credentials = {
+      assetId,
+      interactiveNonce,
+      interactivePublicKey,
+      visitorId,
+    };
+
+    const droppedAsset = await getDroppedAssetDetails({
+      credentials,
+      droppedAssetId: assetId,
       urlSlug,
     });
 
-    if (!world.dataObject?.keyAssets?.[keyAssetId]) {
+    if (!droppedAsset.uniqueName) throw "Key asset not found";
+    const keyAssetId = droppedAsset.uniqueName;
+
+    const [keyAsset, world] = await Promise.all([
+      getDroppedAssetDetails({
+        credentials,
+        droppedAssetId: keyAssetId,
+        isKeyAsset: true,
+        urlSlug,
+      }),
+      getWorldDetails({
+        credentials,
+        urlSlug,
+      }),
+    ]);
+
+    if (
+      !keyAsset.dataObject?.numberAllowedToCollect ||
+      !world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser
+    ) {
       throw "Key asset not found";
     }
 
-    const questDetails = world.dataObject.keyAssets[keyAssetId];
-    const { itemsCollectedByUser, numberAllowedToCollect } = questDetails;
+    const itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
+    const numberAllowedToCollect = keyAsset.dataObject?.numberAllowedToCollect;
     let numberCollected = 0;
 
     if (
@@ -59,14 +78,6 @@ export const handleQuestItemClicked = async (req, res) => {
         }),
       ]);
 
-      const visitor = Visitor.create(visitorId, urlSlug, {
-        credentials: {
-          interactiveNonce,
-          interactivePublicKey,
-          visitorId,
-        },
-      });
-
       if (!itemsCollectedByUser?.[profileId]) {
         await world.updateDataObject({
           [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 1 } },
@@ -84,6 +95,12 @@ export const handleQuestItemClicked = async (req, res) => {
         );
         numberCollected = itemsCollectedByUser[profileId][dateKey].count + 1;
       }
+
+      const visitor = await getVisitor({
+        credentials,
+        urlSlug,
+        visitorId,
+      });
 
       await Promise.all([
         visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1),

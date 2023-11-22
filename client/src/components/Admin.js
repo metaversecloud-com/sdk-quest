@@ -25,25 +25,24 @@ export function Admin({ keyAssetImage }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   // context
-  const { hasInteractiveParams, keyAssetId } = useGlobalState();
+  const { hasInteractiveParams } = useGlobalState();
   const globalDispatch = useGlobalDispatch();
 
   useEffect(() => {
     if (hasInteractiveParams) {
-      getWorldDataObject();
+      getDataObject();
       getQuestItems();
       setIsLoading(false);
     }
   }, [hasInteractiveParams]);
 
-  const getWorldDataObject = async () => {
+  const getDataObject = async () => {
     try {
-      const result = await backendAPI.get("/world-data-object");
-      const { dataObject } = result.data.world;
-      if (keyAssetId && dataObject.keyAssets?.[keyAssetId]?.numberAllowedToCollect)
-        setNumberAllowedToCollect(dataObject.keyAssets[keyAssetId].numberAllowedToCollect);
-      if (keyAssetId && dataObject.keyAssets?.[keyAssetId]?.questItemImage)
-        setQuestItemImage(dataObject.keyAssets[keyAssetId].questItemImage);
+      const result = await backendAPI.get("/dropped-asset/data-object");
+      const dataObject = result.data.droppedAsset.dataObject;
+      if (dataObject.numberAllowedToCollect) setNumberAllowedToCollect(dataObject.numberAllowedToCollect);
+      if (dataObject.questItemImage) setQuestItemImage(dataObject.questItemImage);
+      setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
     }
@@ -52,9 +51,8 @@ export function Admin({ keyAssetImage }) {
   const getQuestItems = async () => {
     try {
       const result = await backendAPI.get("/quest-items");
-      if (result.data.success) {
-        setQuestItems(result.data.droppedAssets);
-      } else return console.log("ERROR getting quest items");
+      setQuestItems(result.data.droppedAssets);
+      setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
     }
@@ -63,11 +61,10 @@ export function Admin({ keyAssetImage }) {
   const dropItem = async () => {
     try {
       setIsDropping(true);
-      const result = await backendAPI.post("/drop-quest-item");
-      if (result.data.success) {
-        getQuestItems();
-      } else return console.log("ERROR dropping quest item");
+      await backendAPI.post("/drop-quest-item");
+      getQuestItems();
       setIsDropping(false);
+      setErrorMessage("");
     } catch (error) {
       setIsDropping(false);
       setErrorMessage(error?.response?.data?.message || error.message);
@@ -76,10 +73,9 @@ export function Admin({ keyAssetImage }) {
 
   const removeAllQuestItems = async () => {
     try {
-      const result = await backendAPI.post("/dropped-asset/remove-all-with-unique-name");
-      if (result.data.success) {
-        setQuestItems([]);
-      } else return console.log("ERROR removing all quest items");
+      await backendAPI.post("/dropped-asset/remove-all-with-unique-name");
+      setQuestItems([]);
+      setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
     }
@@ -87,9 +83,9 @@ export function Admin({ keyAssetImage }) {
 
   const removeQuestItem = async (id) => {
     try {
-      const result = await backendAPI.delete(`/dropped-asset/${id}`);
-      if (result.data.success) getQuestItems();
-      else return console.log("ERROR deleting quest item");
+      await backendAPI.delete(`/dropped-asset/${id}`);
+      getQuestItems();
+      setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
     }
@@ -98,6 +94,7 @@ export function Admin({ keyAssetImage }) {
   const moveVisitor = async (position) => {
     try {
       await backendAPI.put("/visitor/move", { moveTo: position });
+      setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
     }
@@ -112,6 +109,7 @@ export function Admin({ keyAssetImage }) {
         keyAssetImage: questItemImage,
       });
       setIsSaving(false);
+      setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
       setIsSaving(false);

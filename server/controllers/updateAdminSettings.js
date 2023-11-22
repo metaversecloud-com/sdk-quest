@@ -1,35 +1,28 @@
-import { errorHandler, getDroppedAssetsWithUniqueName, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getDroppedAssetDetails, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
 export const updateAdminSettings = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const { numberAllowedToCollect, questItemImage } = req.body;
+    const credentials = {
+      assetId,
+      interactiveNonce,
+      interactivePublicKey,
+      visitorId,
+    };
 
-    const world = await getWorldDataObject({
-      credentials: {
-        assetId,
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
+    const droppedAsset = await getDroppedAssetDetails({
+      credentials,
+      droppedAssetId: assetId,
+      isKeyAsset: true,
       urlSlug,
     });
 
-    const lockId = `${urlSlug}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
-    world.updateDataObject(
-      {
-        [`keyAssets.${assetId}.numberAllowedToCollect`]: numberAllowedToCollect,
-        [`keyAssets.${assetId}.questItemImage`]: questItemImage,
-      },
-      { lock: { lockId }, releaseLock: true },
-    );
+    const lockId = `${assetId}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
+    droppedAsset.updateDataObject({ numberAllowedToCollect, questItemImage }, { lock: { lockId }, releaseLock: true });
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
+      credentials,
       isPartial: true,
       uniqueName: assetId,
       urlSlug,

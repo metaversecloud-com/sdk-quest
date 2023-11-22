@@ -11,25 +11,22 @@ import {
 export const dropQuestItem = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
+    const credentials = {
+      assetId,
+      interactiveNonce,
+      interactivePublicKey,
+      visitorId,
+    };
 
-    const [questItem, world] = await Promise.all([
+    const [keyAsset, world] = await Promise.all([
       getDroppedAssetDetails({
-        credentials: {
-          assetId,
-          interactiveNonce,
-          interactivePublicKey,
-          visitorId,
-        },
+        credentials,
         droppedAssetId: assetId,
+        isKeyAsset: true,
         urlSlug,
       }),
       getWorldDetails({
-        assetId,
-        credentials: {
-          interactiveNonce,
-          interactivePublicKey,
-          visitorId,
-        },
+        credentials,
         urlSlug,
       }),
     ]);
@@ -38,22 +35,16 @@ export const dropQuestItem = async (req, res) => {
     const position = getRandomCoordinates(world.width, world.height);
 
     const droppedAsset = await dropAsset({
-      assetId: questItem.assetId,
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
+      assetId: keyAsset.assetId,
+      credentials,
       position,
       uniqueName: assetId,
       urlSlug,
     });
 
-    // Use questItemImage from world data object or fallback to default
-    const questItemImage =
-      world.dataObject?.keyAssets?.[assetId]?.questItemImage ||
-      droppedAsset.layer1 ||
-      getDefaultKeyAssetImage({ urlSlug });
+    // Use questItemImage from key asset data object or fallback to default
+    const questItemImage = keyAsset.dataObject?.questItemImage;
+    getDefaultKeyAssetImage({ urlSlug });
 
     await Promise.all([
       droppedAsset.updateClickType({
