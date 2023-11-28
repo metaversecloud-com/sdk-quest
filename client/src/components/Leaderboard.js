@@ -67,12 +67,9 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
         </>
       ) : (
         <Grid item>
-          <h4>How To: Your Daily Quest</h4>
           <p>
-            * Search the world to find <img alt="Find me" height={20} src={keyAssetImage} />
+            Explore and find <img alt="Find me" height={20} src={keyAssetImage} /> to complete your daily quest.
           </p>
-          <p>* Collect up to 5 per day</p>
-          <p>* Keep up your daily quest to stay on top of the leaderboard</p>
         </Grid>
       )}
       <Grid item mt={2}>
