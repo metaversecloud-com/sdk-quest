@@ -54,6 +54,7 @@ export const dropQuestItem = async (req, res) => {
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
       droppedAsset.updateWebImageLayers("", questItemImage),
+      droppedAsset.setDataObject({ keyAssetId: keyAsset.id }),
       world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}.count`]: 0 }),
     ]);
 

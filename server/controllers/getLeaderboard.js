@@ -16,7 +16,8 @@ export const getLeaderboard = async (req, res) => {
         droppedAssetId: assetId,
         urlSlug,
       });
-      keyAssetId = droppedAsset.uniqueName.slice(-20);
+      if (!droppedAsset.dataObject?.keyAssetId) throw "Key asset not found";
+      keyAssetId = droppedAsset.dataObject.keyAssetId;
     }
 
     const { dataObject } = await getWorldDataObject({

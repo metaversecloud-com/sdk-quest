@@ -29,13 +29,13 @@ export const handleQuestItemClicked = async (req, res) => {
       urlSlug,
     });
 
-    if (!droppedAsset.uniqueName) throw "Key asset not found";
-    const keyAssetUniqueName = droppedAsset.uniqueName.slice(-20);
+    if (!droppedAsset.dataObject?.keyAssetId) throw "Key asset not found";
+    const keyAssetId = droppedAsset.dataObject.keyAssetId;
 
     const [keyAsset, world] = await Promise.all([
       getDroppedAssetDetails({
         credentials,
-        droppedAssetId: keyAssetUniqueName,
+        droppedAssetId: keyAssetId,
         isKeyAsset: true,
         urlSlug,
       }),
@@ -44,13 +44,12 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
       }),
     ]);
-    const keyAssetId = keyAsset.id;
 
     if (
       !keyAsset.dataObject?.numberAllowedToCollect ||
       !world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser
     ) {
-      throw "Key asset not found";
+      throw "Data objects not found";
     }
 
     const itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
@@ -63,7 +62,7 @@ export const handleQuestItemClicked = async (req, res) => {
       itemsCollectedByUser[profileId][dateKey] &&
       itemsCollectedByUser[profileId][dateKey].count >= numberAllowedToCollect
     ) {
-      console.log(`FAIL: Visitor has already collected ${numberAllowedToCollect} quest items today.`);
+      console.log(`Visitor has already collected ${numberAllowedToCollect} quest items today.`);
       return res.json({ addedClick: false, numberAllowedToCollect, success: true });
     } else {
       // Move the quest item to a new random location
