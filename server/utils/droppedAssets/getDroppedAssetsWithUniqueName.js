@@ -11,7 +11,7 @@ export const getDroppedAssetsWithUniqueName = async ({ assetId, credentials, isP
         droppedAssetId: assetId,
         urlSlug,
       });
-      keyAssetUniqueName = droppedAsset.uniqueName || assetId;
+      keyAssetUniqueName = droppedAsset.uniqueName;
     }
 
     const world = World.create(urlSlug, {
@@ -19,7 +19,7 @@ export const getDroppedAssetsWithUniqueName = async ({ assetId, credentials, isP
     });
     const droppedAssets = await world.fetchDroppedAssetsWithUniqueName({
       isPartial,
-      uniqueName: `questItem_${keyAssetUniqueName}`,
+      uniqueName: `questItem_${keyAssetUniqueName}_${assetId}`,
     });
 
     return droppedAssets;

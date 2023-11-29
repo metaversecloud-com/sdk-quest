@@ -119,6 +119,7 @@ export const handleQuestItemClicked = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     errorHandler({
       error,
       functionName: "handleQuestItemClicked",
