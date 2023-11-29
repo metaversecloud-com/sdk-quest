@@ -38,13 +38,13 @@ export const dropQuestItem = async (req, res) => {
       assetId: keyAsset.assetId,
       credentials,
       position,
-      uniqueName: assetId,
+      sceneId: `${assetId}_${keyAsset.uniqueName}`,
+      uniqueName: `questItem_${keyAsset.uniqueName}_${keyAsset.id}`,
       urlSlug,
     });
 
     // Use questItemImage from key asset data object or fallback to default
-    const questItemImage = keyAsset.dataObject?.questItemImage;
-    getDefaultKeyAssetImage({ urlSlug });
+    const questItemImage = keyAsset.dataObject?.questItemImage || getDefaultKeyAssetImage({ urlSlug });
 
     await Promise.all([
       droppedAsset.updateClickType({

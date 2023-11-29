@@ -3,15 +3,17 @@ import { errorHandler, getDroppedAssetsWithUniqueName } from "../utils/index.js"
 export const removeDroppedAssetsWithUniqueName = async (req, res) => {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const credentials = {
+      assetId,
+      interactiveNonce,
+      interactivePublicKey,
+      visitorId,
+    };
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-      isPartial: true,
-      uniqueName: assetId,
+      assetId,
+      credentials,
+      isPartial: false,
       urlSlug,
     });
 

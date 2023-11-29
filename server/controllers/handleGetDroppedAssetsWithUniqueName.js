@@ -5,13 +5,13 @@ export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
+      assetId,
       credentials: {
         interactiveNonce,
         interactivePublicKey,
         visitorId,
       },
       isPartial: true,
-      uniqueName: assetId,
       urlSlug,
     });
 

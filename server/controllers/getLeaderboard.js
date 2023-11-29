@@ -16,7 +16,7 @@ export const getLeaderboard = async (req, res) => {
         droppedAssetId: assetId,
         urlSlug,
       });
-      keyAssetId = droppedAsset.uniqueName;
+      keyAssetId = droppedAsset.uniqueName.slice(-20);
     }
 
     const { dataObject } = await getWorldDataObject({

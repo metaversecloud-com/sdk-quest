@@ -6,6 +6,6 @@ export * from "./handleGetKeyAssetImage.js";
 export * from "./handleGetVisitor.js";
 export * from "./handleQuestItemClicked.js";
 export * from "./moveVisitor.js";
-export * from "./removeDroppedAssets.js";
+export * from "./removeDroppedAsset.js";
 export * from "./removeDroppedAssetsWithUniqueName.js";
 export * from "./updateAdminSettings.js";

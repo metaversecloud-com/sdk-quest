@@ -1,7 +1,7 @@
 import { Asset, DroppedAsset } from "../topiaInit.js";
 import { errorHandler } from "../errorHandler.js";
 
-export const dropAsset = async ({ assetId, credentials, position, uniqueName, urlSlug }) => {
+export const dropAsset = async ({ assetId, credentials, position, sceneId, uniqueName, urlSlug }) => {
   try {
     const asset = Asset.create(assetId, {
       credentials,
@@ -14,6 +14,7 @@ export const dropAsset = async ({ assetId, credentials, position, uniqueName, ur
         x: position.x || 0,
         y: position.y || 0,
       },
+      sceneId,
       uniqueName,
       urlSlug,
     });

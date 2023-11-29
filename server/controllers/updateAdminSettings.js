@@ -22,9 +22,10 @@ export const updateAdminSettings = async (req, res) => {
     droppedAsset.updateDataObject({ numberAllowedToCollect, questItemImage }, { lock: { lockId }, releaseLock: true });
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
+      assetId,
       credentials,
       isPartial: true,
-      uniqueName: assetId,
+      uniqueName: droppedAsset.uniqueName,
       urlSlug,
     });
 

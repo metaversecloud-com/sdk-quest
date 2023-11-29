@@ -30,12 +30,12 @@ export const handleQuestItemClicked = async (req, res) => {
     });
 
     if (!droppedAsset.uniqueName) throw "Key asset not found";
-    const keyAssetId = droppedAsset.uniqueName;
+    const keyAssetUniqueName = droppedAsset.uniqueName.slice(-20);
 
     const [keyAsset, world] = await Promise.all([
       getDroppedAssetDetails({
         credentials,
-        droppedAssetId: keyAssetId,
+        droppedAssetId: keyAssetUniqueName,
         isKeyAsset: true,
         urlSlug,
       }),
@@ -44,6 +44,7 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
       }),
     ]);
+    const keyAssetId = keyAsset.id;
 
     if (
       !keyAsset.dataObject?.numberAllowedToCollect ||

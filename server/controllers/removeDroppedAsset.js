@@ -5,6 +5,7 @@ export const removeDroppedAsset = async (req, res) => {
   try {
     const { droppedAssetId } = req.params;
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+
     const droppedAsset = DroppedAsset.create(droppedAssetId, urlSlug, {
       credentials: {
         assetId,
@@ -14,6 +15,7 @@ export const removeDroppedAsset = async (req, res) => {
       },
     });
     await droppedAsset.deleteDroppedAsset();
+
     return res.json({ success: true });
   } catch (error) {
     errorHandler({
