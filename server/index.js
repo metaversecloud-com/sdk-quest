@@ -59,6 +59,10 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
+app.get("/healthcheck", (req, res) => {
+  return res.send(`Server is running... ${version}`);
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
