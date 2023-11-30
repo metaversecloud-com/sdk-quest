@@ -16,8 +16,8 @@ export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, isKe
       );
     } else {
       droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
-      if (isKeyAsset) await initializeDroppedAssetDataObject({ droppedAsset, urlSlug });
     }
+    if (isKeyAsset) await initializeDroppedAssetDataObject({ droppedAsset, urlSlug });
 
     return droppedAsset;
   } catch (error) {

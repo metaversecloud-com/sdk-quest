@@ -40,7 +40,7 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
       }),
       getWorldDetails({
-        credentials,
+        credentials: { ...credentials, assetId: keyAssetId },
         urlSlug,
       }),
     ]);
