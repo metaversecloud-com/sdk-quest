@@ -17,9 +17,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(function (req, res, next) {
   const ogSend = res.send;
   res.send = function (data) {
-    if (data && res.statusCode < 300) {
+    if (data) {
       try {
-        const cleanData = JSON.parse(data);
+        const cleanData = typeof data === "string" ? JSON.parse(data) : data;
         const path = findObjectKeyPath(cleanData, "topia");
         if (cleanData && path && cleanData[path]) {
           delete cleanData[path]["topia"];
@@ -58,6 +58,10 @@ if (process.env.NODE_ENV === "development") {
     res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
   });
 }
+
+app.get("/healthcheck", (req, res) => {
+  return res.send(`Server is running... ${version}`);
+});
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

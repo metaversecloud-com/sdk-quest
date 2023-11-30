@@ -1,5 +1,5 @@
 {
-  "name": "@egg-hunter/client",
+  "name": "@quest/client",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -22,7 +22,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.10.17",
-    "@rtsdk/topia": "^0.3.4",
+    "@rtsdk/topia": "^0.7.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -42,6 +42,7 @@
     "react-error-overlay": "6.0.9",
     "yalc": "^1.0.0-pre.53"
   },
+  "allowedHosts": "all",
   "proxy": "http://localhost:3001/",
   "private": true,
   "resolutions": {

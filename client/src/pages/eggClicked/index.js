@@ -1,1 +1,0 @@
-export { EggClicked } from "./EggClicked";

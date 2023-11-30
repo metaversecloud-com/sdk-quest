@@ -1,84 +1,77 @@
 import React, { useEffect, useState } from "react";
-import { Admin, Leaderboard } from "../../components";
 
 // components
-import {
-  Grid,
-  // TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
+import { Admin, Leaderboard } from "@components";
+import { CircularProgress, Grid } from "@mui/material";
 
 // context
-import {
-  // fetchWorld, useGlobalDispatch,
-  useGlobalState,
-} from "@context";
+import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
 
+// utils
 import { backendAPI } from "@utils";
 
 export function Home() {
-  // const [droppedAsset, setDroppedAsset] = useState();
-  const [toggle, setToggle] = useState("leaderboard");
-  const [eggImage, setEggImage] = useState("");
+  const [activeTab, setActiveTab] = useState("leaderboard");
+  const [isLoading, setIsLoading] = useState(true);
 
   // context
-  // const globalDispatch = useGlobalDispatch();
-  const {
-    hasInteractiveParams,
-    visitor,
-    // selectedWorld
-  } = useGlobalState();
+  const { keyAssetImage, visitor } = useGlobalState();
+  const globalDispatch = useGlobalDispatch();
 
-  // Get dropped eggs info
   useEffect(() => {
-    if (hasInteractiveParams) {
-      getEggImage();
-    }
-  }, [hasInteractiveParams]);
+    getKeyAssetImage();
+    setIsLoading(false);
+  }, []);
 
-  const getEggImage = async () => {
+  const getKeyAssetImage = async () => {
     try {
-      const result = await backendAPI.get("/egg-image");
+      const result = await backendAPI.get("/key-asset-image");
       if (result.data.success) {
-        setEggImage(result.data.eggImage);
-      } else return console.log("ERROR getting egg image");
+        setKeyAssetImage({
+          dispatch: globalDispatch,
+          keyAssetImage: result.data.keyAssetImage,
+        });
+      } else {
+        return console.log("ERROR getting key asset image");
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
-  if (!hasInteractiveParams)
-    return <Typography>You can only access this application from within a Topia world embed.</Typography>;
+  if (isLoading) {
+    return (
+      <Grid container justifyContent="center" mt={4}>
+        <CircularProgress />
+      </Grid>
+    );
+  }
 
   return (
     <Grid alignItems="center" container direction="column" p={0}>
-      <Grid item p={3} paddingBottom={0} paddingTop={0} xs={12}>
-        {eggImage ? <img alt="Find me" src={eggImage} /> : <div />}
-      </Grid>
-      <Grid item p={3} xs={12}>
-        <Typography variant="h4">Quest</Typography>
-      </Grid>
       {visitor && visitor.isAdmin && (
-        <Grid item xs={12}>
-          <ToggleButtonGroup
-            aria-label="Admin vs Leaderboard"
-            color="primary"
-            exclusive
-            onChange={(e) => setToggle(e.target.value)}
-            value={toggle}
-          >
-            <ToggleButton style={{ padding: 20 }} value="leaderboard">
+        <Grid item pb={2} xs={12}>
+          <div className="tab-container">
+            <button className={activeTab !== "admin" ? "" : "btn-text"} onClick={() => setActiveTab("leaderboard")}>
               Leaderboard
-            </ToggleButton>
-            <ToggleButton style={{ padding: 20 }} value="admin">
+            </button>
+            <button className={activeTab === "admin" ? "" : "btn-text"} onClick={() => setActiveTab("admin")}>
               Admin
-            </ToggleButton>
-          </ToggleButtonGroup>
+            </button>
+          </div>
         </Grid>
       )}
-      {toggle === "admin" ? <Admin /> : <Leaderboard eggImage={eggImage} />}
+      <Grid item p={3} paddingBottom={0} paddingTop={0} xs={12}>
+        {keyAssetImage ? <img alt="Find me" src={keyAssetImage} /> : <div />}
+      </Grid>
+      <Grid item p={3} xs={12}>
+        <h1>Quest</h1>
+      </Grid>
+      {activeTab === "admin" ? (
+        <Admin keyAssetImage={keyAssetImage} />
+      ) : (
+        <Leaderboard isKeyAsset={true} keyAssetImage={keyAssetImage} />
+      )}
     </Grid>
   );
 }

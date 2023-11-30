@@ -1,2 +1,3 @@
-export { getWorldDetails, updateWorldDetails } from "./worldDetails.js";
-export { getWorldDataObject, updateWorldDataObject } from "./dataObject.js";
+export * from "./getWorldDetails.js";
+export * from "./getWorldDataObject.js";
+export * from "./initializeWorldDataObject.js";

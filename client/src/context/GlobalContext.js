@@ -1,17 +1,10 @@
 import React from "react";
-// import { Topia, WorldFactory } from "@rtsdk/topia";
 
 const GlobalStateContext = React.createContext();
 const GlobalDispatchContext = React.createContext();
 
 function globalReducer(state, action) {
   switch (action.type) {
-    case "SELECT_WORLD":
-      return {
-        ...state,
-        urlSlug: action.payload.urlSlug,
-        selectedWorld: action.payload.selectedWorld,
-      };
     case "SET_INTERACTIVE_PARAMS":
       return {
         ...state,
@@ -23,15 +16,10 @@ function globalReducer(state, action) {
         ...state,
         visitor: action.payload.visitor,
       };
-    case "SET_WORLD_INFO":
+    case "SET_KEY_ASSET_IMAGE":
       return {
         ...state,
-        world: action.payload.world,
-      };
-    case "SET_LEADERBOARD_DATA":
-      return {
-        ...state,
-        leaderboardData: action.payload.leaderboardData,
+        keyAssetImage: action.payload.keyAssetImage,
       };
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -43,7 +31,6 @@ function GlobalProvider({ children }) {
   const [state, dispatch] = React.useReducer(globalReducer, {
     hasInteractiveParams: false,
     retrievedVisitor: false,
-    selectedWorld: {},
     urlSlug: "",
   });
   return (
@@ -69,17 +56,34 @@ function useGlobalDispatch() {
   return context;
 }
 
-function setInteractiveParams({ assetId, dispatch, visitorId, interactiveNonce, interactivePublicKey, urlSlug }) {
+function setInteractiveParams({
+  assetId,
+  dispatch,
+  displayName,
+  interactiveNonce,
+  interactivePublicKey,
+  profileId,
+  sceneDropId,
+  uniqueName,
+  urlSlug,
+  username,
+  visitorId,
+}) {
   const isInteractiveIframe = visitorId && interactiveNonce && interactivePublicKey && assetId;
   dispatch({
     type: "SET_INTERACTIVE_PARAMS",
     payload: {
       assetId,
-      visitorId,
+      displayName,
       interactiveNonce,
       interactivePublicKey,
-      urlSlug,
       isInteractiveIframe,
+      profileId,
+      sceneDropId,
+      uniqueName,
+      urlSlug,
+      username,
+      visitorId,
     },
   });
 }
@@ -93,52 +97,13 @@ function setVisitorInfo({ dispatch, visitor }) {
   });
 }
 
-function setWorldInfo({ dispatch, world }) {
+function setKeyAssetImage({ dispatch, keyAssetImage }) {
   dispatch({
-    type: "SET_WORLD_INFO",
+    type: "SET_KEY_ASSET_IMAGE",
     payload: {
-      world,
+      keyAssetImage,
     },
   });
 }
 
-function setLeaderboardData({ dispatch, leaderboardData }) {
-  dispatch({
-    type: "SET_LEADERBOARD_DATA",
-    payload: {
-      leaderboardData,
-    },
-  });
-}
-
-// // eslint-disable-next-line no-unused-vars
-// async function fetchWorld({ apiKey, dispatch, urlSlug }) {
-//   if (!apiKey || !urlSlug) return;
-//   try {
-//     const topia = await new Topia({
-//       apiDomain: "api-stage.topia.io",
-//       apiKey,
-//     });
-//     const selectedWorld = await new WorldFactory(topia).create(urlSlug);
-//     await selectedWorld.fetchDetails();
-//     dispatch({
-//       type: "SELECT_WORLD",
-//       payload: {
-//         urlSlug,
-//         selectedWorld,
-//       },
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-export {
-  GlobalProvider,
-  setInteractiveParams,
-  setLeaderboardData,
-  setVisitorInfo,
-  setWorldInfo,
-  useGlobalState,
-  useGlobalDispatch,
-};
+export { GlobalProvider, setInteractiveParams, setKeyAssetImage, setVisitorInfo, useGlobalState, useGlobalDispatch };

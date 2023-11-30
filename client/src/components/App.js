@@ -1,32 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 
+// components
+import { CircularProgress, Grid } from "@mui/material";
+
 // pages
-import { Error, Home } from "@pages";
+import { Error, Home, QuestItemClicked } from "@pages";
 
 // utils
-import { backendAPI } from "@utils";
+import { backendAPI, setupBackendAPI } from "@utils";
 
 // context
-import { setInteractiveParams, setLeaderboardData, setVisitorInfo, setWorldInfo, useGlobalDispatch } from "@context";
-import { setupBackendAPI } from "../utils/backendAPI";
-import { getLeaderboardData } from "../utils/leaderboard";
-import { EggClicked } from "../pages";
+import { setInteractiveParams, setVisitorInfo, useGlobalDispatch, useGlobalState } from "@context";
 
 export function App() {
   const [searchParams] = useSearchParams();
   const [hasInitBackendAPI, setHasInitBackendAPI] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // context
   const globalDispatch = useGlobalDispatch();
+  const { hasInteractiveParams } = useGlobalState();
 
   useEffect(() => {
+    if (!hasInitBackendAPI) {
+      setupAPI();
+    } else {
+      getVisitor();
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line
+  }, [hasInitBackendAPI, searchParams]);
+
+  const setupAPI = async () => {
     const interactiveParams = {
       assetId: searchParams.get("assetId"),
+      displayName: searchParams.get("displayName"),
       interactiveNonce: searchParams.get("interactiveNonce"),
       interactivePublicKey: searchParams.get("interactivePublicKey"),
-      visitorId: searchParams.get("visitorId"),
+      profileId: searchParams.get("profileId"),
+      sceneDropId: searchParams.get("sceneDropId"),
+      uniqueName: searchParams.get("uniqueName"),
       urlSlug: searchParams.get("urlSlug"),
+      username: searchParams.get("username"),
+      visitorId: searchParams.get("visitorId"),
     };
 
     if (interactiveParams.assetId) {
@@ -36,59 +53,39 @@ export function App() {
       });
     }
 
-    const setupAPI = async () => {
-      await setupBackendAPI(interactiveParams);
-      setHasInitBackendAPI(true);
-    };
-    if (!hasInitBackendAPI) setupAPI();
-  }, [globalDispatch, hasInitBackendAPI, searchParams]);
+    await setupBackendAPI(interactiveParams);
+    setHasInitBackendAPI(true);
+  };
 
-  // Get Visitor info
-  useEffect(() => {
-    const getVisitor = async () => {
-      const result = await backendAPI.get("/visitor");
-      if (result.data.success) {
-        setVisitorInfo({
-          dispatch: globalDispatch,
-          visitor: result.data.visitor,
-        });
-      } else {
-        console.log("Error getting visitor");
-      }
-    };
-    getVisitor();
-  }, [globalDispatch]);
+  const getVisitor = async () => {
+    const result = await backendAPI.get("/visitor");
+    if (result.data.success) {
+      setVisitorInfo({
+        dispatch: globalDispatch,
+        visitor: result.data.visitor,
+      });
+    } else {
+      console.log("Error getting visitor");
+    }
+  };
 
-  // Get Visitor info
-  useEffect(() => {
-    const getWorld = async () => {
-      const result = await backendAPI.get("/world");
-      if (result.data.success) {
-        setWorldInfo({
-          dispatch: globalDispatch,
-          world: result.data.world,
-        });
-      } else {
-        console.log("Error getting world");
-      }
-    };
-    getWorld();
-  }, [globalDispatch]);
+  if (!hasInitBackendAPI || isLoading) {
+    return (
+      <Grid container justifyContent="center" mt={4}>
+        <CircularProgress />
+      </Grid>
+    );
+  }
 
-  useEffect(() => {
-    getLeaderboardData({ setLeaderboardData, globalDispatch });
-    setTimeout(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000); // Force leaderboard autosizing.  If remove this, doesn't properly size until next poll.
-    setInterval(() => getLeaderboardData({ setLeaderboardData, globalDispatch }), 1000 * 10);
-  }, [globalDispatch]);
+  if (!hasInteractiveParams) {
+    return <h5>You can only access this application from within a Topia world embed.</h5>;
+  }
 
   return (
     <Routes>
-      {/* {routes.map((route, index) => {
-        return <Route element={<route.component />} key={index} path={route.path} />
-      })} */}
       <Route element={<Home />} exact path="/" />
-      <Route element={<EggClicked />} exact path="/egg-clicked" />
-      <Route element={<Error />} exact path="*" />
+      <Route element={<QuestItemClicked />} path="/quest-item-clicked" />
+      <Route element={<Error />} path="*" />
     </Routes>
   );
 }

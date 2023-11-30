@@ -55,4 +55,4 @@ jobs:
 
       - name: Publish
         run: |
-          aws ecs update-service --service $IMAGE_TAG-topia-svc --force-new-deployment --cluster SDK-Example-CLS
+          aws ecs update-service --service sdk-quest-dev-topia0-svc --force-new-deployment --cluster SDK-Example-CLS

@@ -11,11 +11,11 @@ This boilerplate is meant to give you a simple starting point to build new featu
 ## Add your .env environmental variables
 
 ```json
-API_KEY=488ecv4e-fdf73-fgfq6v682ea-4r41-av3a
+API_KEY=xxxxxxxx
 API_URL=http://localhost:3001
 INSTANCE_DOMAIN=api.topia.io
-INTERACTIVE_KEY=2oij2asdf38v0j340j428
-INTERACTIVE_SECRET=enteryoursecret
+INTERACTIVE_KEY=xxxxxxxx
+INTERACTIVE_SECRET=xxxxxxxx
 ```
 
 ### Where to find API_KEY, INTERACTIVE_KEY and INTERACTIVE_SECRET

@@ -1,6 +1,6 @@
 {
   "author": "metaversecloud.com | topia.io",
-  "name": "@egg-hunter/server",
+  "name": "@quest/server",
   "private": true,
   "description": "",
   "engines": {
@@ -10,8 +10,6 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "link-sdk": "yalc link @rtsdk/topia",
-    "unlink-sdk": "yalc remove @rtsdk/topia",
     "start": "node index.js"
   },
   "type": "module",
