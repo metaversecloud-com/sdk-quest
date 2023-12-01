@@ -5,7 +5,7 @@ on:
 env:
   REGISTRY: '368076259134.dkr.ecr.us-east-1.amazonaws.com'
   REPOSITORY: 'sdk-prod'
-  IMAGE_TAG: ${{ github.event.repository.name }}
+  IMAGE_TAG: ${{ github.event.repository.name }}-new
   GCP_PROJECT_ID: "topia-gcp" #${{ secrets.GCP_PROJECT_ID }}
   GCP_ARTIFACTORY: 'us-west1-docker.pkg.dev'
   GCP_REPOSITORY: 'sdk-apps-prod'
