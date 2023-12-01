@@ -29,21 +29,22 @@ export const handleQuestItemClicked = async (req, res) => {
       urlSlug,
     });
 
-    if (!droppedAsset.dataObject?.keyAssetId) throw "Key asset not found";
-    const keyAssetId = droppedAsset.dataObject.keyAssetId;
+    if (!droppedAsset.dataObject?.keyAssetUniqueName) throw "Key asset not found";
+    const keyAssetUniqueName = droppedAsset.dataObject.keyAssetUniqueName;
 
-    const [keyAsset, world] = await Promise.all([
-      getDroppedAssetDetails({
-        credentials,
-        droppedAssetId: keyAssetId,
-        isKeyAsset: true,
-        urlSlug,
-      }),
-      getWorldDetails({
-        credentials: { ...credentials, assetId: keyAssetId },
-        urlSlug,
-      }),
-    ]);
+    const keyAsset = await getDroppedAssetDetails({
+      credentials,
+      uniqueName: keyAssetUniqueName,
+      isKeyAsset: true,
+      urlSlug,
+    });
+    if (!keyAsset) throw "Key asset not found";
+    const keyAssetId = keyAsset.id;
+
+    const world = await getWorldDetails({
+      credentials: { ...credentials, assetId: keyAssetId },
+      urlSlug,
+    });
 
     if (
       !keyAsset.dataObject?.numberAllowedToCollect ||
