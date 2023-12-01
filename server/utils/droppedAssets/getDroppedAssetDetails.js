@@ -7,8 +7,9 @@ export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, isKe
     let assetId = droppedAssetId,
       droppedAsset;
 
+    if (!assetId && !uniqueName) throw "An assetId or uniqueName must be provided";
     if (!assetId && uniqueName) {
-      droppedAsset = DroppedAsset.getWithUniqueName(
+      droppedAsset = await DroppedAsset.getWithUniqueName(
         uniqueName,
         urlSlug,
         credentials.interactivePublicKey,
@@ -17,6 +18,8 @@ export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, isKe
     } else {
       droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
     }
+    if (!droppedAsset) throw "Dropped asset not found";
+
     if (isKeyAsset) await initializeDroppedAssetDataObject({ droppedAsset, urlSlug });
 
     return droppedAsset;

@@ -39,7 +39,7 @@ export const dropQuestItem = async (req, res) => {
       credentials,
       position,
       sceneId: `${assetId}_${keyAsset.uniqueName}`,
-      uniqueName: `questItem_${keyAsset.uniqueName}_${keyAsset.id}`,
+      uniqueName: `questItem_${keyAsset.uniqueName}`,
       urlSlug,
     });
 
@@ -54,7 +54,7 @@ export const dropQuestItem = async (req, res) => {
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
       droppedAsset.updateWebImageLayers("", questItemImage),
-      droppedAsset.setDataObject({ keyAssetId: keyAsset.id }),
+      droppedAsset.setDataObject({ keyAssetUniqueName: keyAsset.uniqueName }),
       world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}.count`]: 0 }),
     ]);
 

@@ -3,30 +3,34 @@ import { errorHandler, getDroppedAssetDetails, getLongestStreak, getWorldDataObj
 export const getLeaderboard = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, isKeyAsset, urlSlug, visitorId } = req.query;
+    const credentials = {
+      assetId,
+      interactiveNonce,
+      interactivePublicKey,
+      visitorId,
+    };
 
     let keyAssetId = assetId;
     if (!JSON.parse(isKeyAsset)) {
       const droppedAsset = await getDroppedAssetDetails({
-        credentials: {
-          assetId,
-          interactiveNonce,
-          interactivePublicKey,
-          visitorId,
-        },
+        credentials,
         droppedAssetId: assetId,
         urlSlug,
       });
-      if (!droppedAsset.dataObject?.keyAssetId) throw "Key asset not found";
-      keyAssetId = droppedAsset.dataObject.keyAssetId;
+      if (!droppedAsset.dataObject?.keyAssetUniqueName) throw "Key asset not found";
+      const keyAssetUniqueName = droppedAsset.dataObject.keyAssetUniqueName;
+
+      const keyAsset = await getDroppedAssetDetails({
+        credentials,
+        uniqueName: keyAssetUniqueName,
+        isKeyAsset: true,
+        urlSlug,
+      });
+      keyAssetId = keyAsset.id;
     }
 
     const { dataObject } = await getWorldDataObject({
-      credentials: {
-        assetId: keyAssetId,
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
+      credentials: { ...credentials, assetId: keyAssetId },
       urlSlug,
     });
 
