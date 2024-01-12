@@ -11,7 +11,7 @@ export const initializeDroppedAssetDataObject = async ({ droppedAsset, urlSlug }
           numberAllowedToCollect: 5,
           questItemImage,
         },
-        { lock: { lockId }, releaseLock: true },
+        { lock: { lockId, releaseLock: true } },
       );
     }
 

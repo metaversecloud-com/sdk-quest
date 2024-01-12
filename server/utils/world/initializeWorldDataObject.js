@@ -16,7 +16,7 @@ export const initializeWorldDataObject = async ({ credentials, world, urlSlug })
             },
           },
         },
-        { lock: { lockId }, releaseLock: true },
+        { lock: { lockId, releaseLock: true } },
       );
     } else if (!world.dataObject?.keyAssets?.[assetId]) {
       await world.updateDataObject(
@@ -28,7 +28,7 @@ export const initializeWorldDataObject = async ({ credentials, world, urlSlug })
             questItems: {},
           },
         },
-        { lock: { lockId }, releaseLock: true },
+        { lock: { lockId, releaseLock: true } },
       );
     }
     return;

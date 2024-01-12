@@ -19,7 +19,7 @@ export const updateAdminSettings = async (req, res) => {
     });
 
     const lockId = `${assetId}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
-    droppedAsset.updateDataObject({ numberAllowedToCollect, questItemImage }, { lock: { lockId }, releaseLock: true });
+    droppedAsset.updateDataObject({ numberAllowedToCollect, questItemImage }, { lock: { lockId, releaseLock: true } });
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
       assetId,
