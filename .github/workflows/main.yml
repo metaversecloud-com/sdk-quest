@@ -70,4 +70,4 @@ jobs:
 
       - name: Publish
         run: |
-          aws ecs update-service --service topia-dev-quest0 --force-new-deployment --cluster Topia-dev-SDK-Apps
+          aws ecs update-service --service topia-dev-quest0 --force-new-deployment --cluster topia-dev-sdk-apps
