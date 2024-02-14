@@ -1,16 +1,7 @@
-FROM --platform=linux/arm64 node:18.16.1-alpine3.17
+FROM --platform=linux/arm64 node:20.10-alpine3.19
 WORKDIR /app
-
-ADD server ./server
-ADD client ./client
-COPY package.json .
-
-ENV NODE_ENV=production
-ENV DEFAULT_EGG_IMAGE_URL=https://topiaimages.s3.us-west-1.amazonaws.com/arva_egg.png
-ENV API_URL=http://localhost:3001
-
+ADD build ./build
+ADD package* ./
+ADD node_modules ./node_modules
 EXPOSE 3000
-RUN npm install
-RUN npm run build
-
 CMD ["npm", "start"]
