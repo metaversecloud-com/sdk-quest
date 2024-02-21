@@ -36,5 +36,5 @@
     "start-dev": "concurrently \"node server/index.js\" \"npm start --prefix client\""
   },
   "type": "module",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

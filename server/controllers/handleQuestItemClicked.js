@@ -55,7 +55,6 @@ export const handleQuestItemClicked = async (req, res) => {
       // Move the quest item to a new random location
       const promises = [];
       const position = getRandomCoordinates(world.width, world.height);
-      const currentTotal = itemsCollectedByUser[profileId].total;
 
       promises.push(droppedAsset.updatePosition(position.x, position.y));
       promises.push(
@@ -81,7 +80,8 @@ export const handleQuestItemClicked = async (req, res) => {
         promises.push(
           world.updateDataObject({
             [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 1 },
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`]: currentTotal + 1,
+            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`]:
+              itemsCollectedByUser[profileId].total + 1,
           }),
         );
         numberCollected = 1;

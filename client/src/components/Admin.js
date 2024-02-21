@@ -22,6 +22,7 @@ export function Admin({ keyAssetImage }) {
   const [droppedItems, setQuestItems] = useState([]);
   const [isDropping, setIsDropping] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -74,8 +75,10 @@ export function Admin({ keyAssetImage }) {
 
   const removeAllQuestItems = async () => {
     try {
+      setIsRemoving(true);
       await backendAPI.post("/dropped-asset/remove-all-with-unique-name");
       setQuestItems([]);
+      setIsRemoving(false);
       setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
@@ -182,7 +185,11 @@ export function Admin({ keyAssetImage }) {
           </button>
         </Grid>
         <Grid item mb={2}>
-          <button className="btn-outline" disabled={droppedItems.length === 0} onClick={removeAllQuestItems}>
+          <button
+            className="btn-outline"
+            disabled={isRemoving || droppedItems.length === 0}
+            onClick={removeAllQuestItems}
+          >
             Remove all
           </button>
         </Grid>

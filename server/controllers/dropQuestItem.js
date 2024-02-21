@@ -1,5 +1,6 @@
 import {
-  dropAsset,
+  Asset,
+  DroppedAsset,
   errorHandler,
   getBaseURL,
   getDroppedAssetDetails,
@@ -33,17 +34,23 @@ export const dropQuestItem = async (req, res) => {
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
 
-    const droppedAsset = await dropAsset({
-      assetId: keyAsset.assetId,
+    // Use questItemImage from key asset data object or fallback to default
+    const questItemImage = keyAsset.dataObject?.questItemImage || getDefaultKeyAssetImage({ urlSlug });
+
+    const asset = Asset.create(process.env.WEB_IMAGE_ASSET_ID || "webImageAsset", {
       credentials,
+    });
+
+    const droppedAsset = await DroppedAsset.drop(asset, {
+      interactivePublicKey,
+      isInteractive: true,
+      layer0: "",
+      layer1: questItemImage,
       position,
-      sceneId: `${assetId}_${keyAsset.uniqueName}`,
+      sceneDropId: `${assetId}_${keyAsset.uniqueName}`,
       uniqueName: `questItem_${keyAsset.uniqueName}`,
       urlSlug,
     });
-
-    // Use questItemImage from key asset data object or fallback to default
-    const questItemImage = keyAsset.dataObject?.questItemImage || getDefaultKeyAssetImage({ urlSlug });
 
     await Promise.all([
       droppedAsset.updateClickType({
@@ -52,7 +59,6 @@ export const dropQuestItem = async (req, res) => {
         isOpenLinkInDrawer: true,
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
-      droppedAsset.updateWebImageLayers("", questItemImage),
       droppedAsset.setDataObject({ keyAssetId: keyAsset.id, keyAssetUniqueName: keyAsset.uniqueName }),
       world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}.count`]: 0 }),
     ]);
