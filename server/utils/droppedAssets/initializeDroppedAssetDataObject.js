@@ -17,7 +17,7 @@ export const initializeDroppedAssetDataObject = async ({ droppedAsset, urlSlug }
 
     return;
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "initializeDroppedAssetDataObject",
       message: "Error initializing dropped asset data object",

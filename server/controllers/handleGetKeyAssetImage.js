@@ -7,14 +7,14 @@ export const handleGetKeyAssetImage = async (req, res) => {
       assetId,
       interactiveNonce,
       interactivePublicKey,
+      urlSlug,
       visitorId,
     };
 
     const droppedAsset = await getDroppedAssetDetails({
       credentials,
       droppedAssetId: assetId,
-      isKeyAsset: true,
-      urlSlug,
+      shouldInitDataObject: true,
     });
 
     let keyAssetImage;
@@ -29,7 +29,7 @@ export const handleGetKeyAssetImage = async (req, res) => {
 
     return res.json({ keyAssetImage, success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "handleGetKeyAssetImage",
       message: "Error getting key asset image",

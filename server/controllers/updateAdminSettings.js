@@ -8,14 +8,13 @@ export const updateAdminSettings = async (req, res) => {
       assetId,
       interactiveNonce,
       interactivePublicKey,
+      urlSlug,
       visitorId,
     };
 
     const droppedAsset = await getDroppedAssetDetails({
       credentials,
       droppedAssetId: assetId,
-      isKeyAsset: true,
-      urlSlug,
     });
 
     const lockId = `${assetId}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
@@ -26,7 +25,6 @@ export const updateAdminSettings = async (req, res) => {
       credentials,
       isPartial: true,
       uniqueName: droppedAsset.uniqueName,
-      urlSlug,
     });
 
     if (droppedAssets.length > 0) {
@@ -36,7 +34,7 @@ export const updateAdminSettings = async (req, res) => {
 
     return res.json({ success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "updateAdminSettings",
       message: "Error updating quest items",

@@ -5,7 +5,7 @@ import { CircularProgress, Grid } from "@mui/material";
 import { Leaderboard } from "@components/Leaderboard";
 
 // context
-import { useGlobalDispatch, useGlobalState } from "@context";
+import { useGlobalState } from "@context";
 
 // utils
 import { backendAPI } from "@utils";
@@ -16,7 +16,6 @@ export function QuestItemClicked() {
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const globalDispatch = useGlobalDispatch();
   const { keyAssetImage, hasInteractiveParams } = useGlobalState();
 
   useEffect(() => {
@@ -43,7 +42,7 @@ export function QuestItemClicked() {
       setIsLoading(false);
       console.log(error);
     }
-  }, [globalDispatch]);
+  }, []);
 
   if (isLoading) {
     return (

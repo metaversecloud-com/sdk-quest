@@ -9,6 +9,6 @@ export const getWorldDataObject = async ({ credentials, urlSlug }) => {
     await initializeWorldDataObject({ credentials, world, urlSlug });
     return world;
   } catch (error) {
-    errorHandler({ error, functionName: "getWorldDataObject", message: "Error getting world details" });
+    return errorHandler({ error, functionName: "getWorldDataObject", message: "Error getting world details" });
   }
 };

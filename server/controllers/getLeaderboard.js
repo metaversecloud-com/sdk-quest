@@ -1,4 +1,4 @@
-import { errorHandler, getDroppedAssetDetails, getLongestStreak, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getClickedAssetAndKeyAsset, getLongestStreak, getWorldDataObject } from "../utils/index.js";
 
 export const getLeaderboard = async (req, res) => {
   try {
@@ -7,25 +7,13 @@ export const getLeaderboard = async (req, res) => {
       assetId,
       interactiveNonce,
       interactivePublicKey,
+      urlSlug,
       visitorId,
     };
 
     let keyAssetId = assetId;
     if (!JSON.parse(isKeyAsset)) {
-      const droppedAsset = await getDroppedAssetDetails({
-        credentials,
-        droppedAssetId: assetId,
-        urlSlug,
-      });
-      if (!droppedAsset.dataObject?.keyAssetUniqueName) throw "Key asset not found";
-      const keyAssetUniqueName = droppedAsset.dataObject.keyAssetUniqueName;
-
-      const keyAsset = await getDroppedAssetDetails({
-        credentials,
-        uniqueName: keyAssetUniqueName,
-        isKeyAsset: true,
-        urlSlug,
-      });
+      const { keyAsset } = await getClickedAssetAndKeyAsset(credentials);
       keyAssetId = keyAsset.id;
     }
 
@@ -53,7 +41,7 @@ export const getLeaderboard = async (req, res) => {
     }
     return res.json({ leaderboard, success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "getLeaderboard",
       message: "Error getting leaderboard",

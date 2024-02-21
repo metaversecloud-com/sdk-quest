@@ -33,7 +33,7 @@ export const initializeWorldDataObject = async ({ credentials, world, urlSlug })
     }
     return;
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "initializeWorldDataObject",
       message: "Error initializing world data object",

@@ -14,6 +14,6 @@ export const handleGetVisitor = async (req, res) => {
     });
     return res.json({ visitor, success: true });
   } catch (error) {
-    errorHandler({ error, functionName: "handleGetVisitor", message: "Error getting visitor", req, res });
+    return errorHandler({ error, functionName: "handleGetVisitor", message: "Error getting visitor", req, res });
   }
 };

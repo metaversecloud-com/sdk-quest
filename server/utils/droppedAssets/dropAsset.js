@@ -21,6 +21,6 @@ export const dropAsset = async ({ assetId, credentials, position, sceneId, uniqu
 
     return droppedAsset;
   } catch (error) {
-    errorHandler({ error, functionName: "dropAsset", message: "Error dropping asset" });
+    return errorHandler({ error, functionName: "dropAsset", message: "Error dropping asset" });
   }
 };

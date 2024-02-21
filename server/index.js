@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import router from "./routes.js";
 import cors from "cors";
-import { findObjectKeyPath } from "./utils/findObjectKeyPath.js";
+import { cleanReturnPayload } from "./utils/cleanReturnPayload.js";
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
@@ -19,14 +19,7 @@ app.use(function (req, res, next) {
   res.send = function (data) {
     if (data) {
       try {
-        const cleanData = typeof data === "string" ? JSON.parse(data) : data;
-        const path = findObjectKeyPath(cleanData, "topia");
-        if (cleanData && path && cleanData[path]) {
-          delete cleanData[path]["topia"];
-          delete cleanData[path]["credentials"];
-          delete cleanData[path]["jwt"];
-          delete cleanData[path]["requestOptions"];
-        }
+        const cleanData = cleanReturnPayload(typeof data === "string" ? JSON.parse(data) : data, "topia");
         res.send = ogSend;
         return res.send(cleanData);
       } catch (error) {
@@ -38,7 +31,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use("/backend", router);
+app.use("/api", router);
 
 if (process.env.NODE_ENV === "development") {
   const corsOptions = {
@@ -58,10 +51,6 @@ if (process.env.NODE_ENV === "development") {
     res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
   });
 }
-
-app.get("/healthcheck", (req, res) => {
-  return res.send(`Server is running... ${version}`);
-});
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

@@ -19,6 +19,6 @@ export const moveVisitor = async (req, res) => {
 
     return res.json({ visitor, success: true });
   } catch (error) {
-    errorHandler({ error, functionName: "moveVisitor", message: "Error moving visitor", req, res });
+    return errorHandler({ error, functionName: "moveVisitor", message: "Error moving visitor", req, res });
   }
 };

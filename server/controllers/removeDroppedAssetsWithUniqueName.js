@@ -1,4 +1,4 @@
-import { errorHandler, getDroppedAssetsWithUniqueName } from "../utils/index.js";
+import { errorHandler, getDroppedAssetsWithUniqueName, World } from "../utils/index.js";
 
 export const removeDroppedAssetsWithUniqueName = async (req, res) => {
   try {
@@ -7,6 +7,7 @@ export const removeDroppedAssetsWithUniqueName = async (req, res) => {
       assetId,
       interactiveNonce,
       interactivePublicKey,
+      urlSlug,
       visitorId,
     };
 
@@ -14,23 +15,18 @@ export const removeDroppedAssetsWithUniqueName = async (req, res) => {
       assetId,
       credentials,
       isPartial: false,
-      urlSlug,
     });
 
     if (!droppedAssets || droppedAssets.length === 0) throw "No dropped assets found";
     if (droppedAssets.error) throw droppedAssets.error;
 
-    droppedAssets.forEach((droppedAsset) => {
-      try {
-        droppedAsset.deleteDroppedAsset();
-      } catch (error) {
-        console.log("Error on delete dropped asset", e);
-        return res.status(500).send({ error: error, success: false });
-      }
-    });
+    const droppedAssetIds = [];
+    for (const droppedAsset in droppedAssets) droppedAssetIds.push(droppedAssets[droppedAsset].id);
+    await World.deleteDroppedAssets(urlSlug, droppedAssetIds, interactivePublicKey, process.env.INTERACTIVE_SECRET);
+
     return res.json({ success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "removeDroppedAssetsWithUniqueName",
       message: "Error removing dropped asset by uniqueName",

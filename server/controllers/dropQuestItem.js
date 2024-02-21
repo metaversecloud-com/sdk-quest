@@ -15,6 +15,7 @@ export const dropQuestItem = async (req, res) => {
       assetId,
       interactiveNonce,
       interactivePublicKey,
+      urlSlug,
       visitorId,
     };
 
@@ -22,8 +23,6 @@ export const dropQuestItem = async (req, res) => {
       getDroppedAssetDetails({
         credentials,
         droppedAssetId: assetId,
-        isKeyAsset: true,
-        urlSlug,
       }),
       getWorldDetails({
         credentials,
@@ -54,13 +53,13 @@ export const dropQuestItem = async (req, res) => {
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
       droppedAsset.updateWebImageLayers("", questItemImage),
-      droppedAsset.setDataObject({ keyAssetUniqueName: keyAsset.uniqueName }),
+      droppedAsset.setDataObject({ keyAssetId: keyAsset.id, keyAssetUniqueName: keyAsset.uniqueName }),
       world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}.count`]: 0 }),
     ]);
 
     return res.json({ droppedAsset, success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "dropQuestItem",
       message: "Error dropping asset",

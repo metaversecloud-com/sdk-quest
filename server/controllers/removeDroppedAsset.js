@@ -18,7 +18,7 @@ export const removeDroppedAsset = async (req, res) => {
 
     return res.json({ success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "removeDroppedAsset",
       message: "Error removing dropped asset",

@@ -14,7 +14,7 @@ export const handleGetDroppedAssetDataObject = async (req, res) => {
     });
     return res.json({ droppedAsset });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "handleGetDroppedAssetDataObject",
       message: "Error updating dropped asset data object",

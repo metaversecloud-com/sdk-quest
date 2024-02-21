@@ -13,14 +13,13 @@ export const getDefaultKeyAssetImage = async ({ credentials, urlSlug }) => {
       const droppedAsset = await getDroppedAssetDetails({
         credentials,
         droppedAssetId: credentials.assetId,
-        urlSlug,
       });
       if (droppedAsset.dataObject?.questItemImage) keyAssetImage = droppedAsset.dataObject.questItemImage;
     }
 
     return keyAssetImage;
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "getDefaultKeyAssetImage",
       message: "Error getting default key asset image",
