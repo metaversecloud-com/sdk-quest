@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 
 // components
 import { Admin, Leaderboard } from "@components";
-import { CircularProgress, Grid } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // context
 import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";

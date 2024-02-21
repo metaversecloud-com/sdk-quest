@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 
 // components
-import { CircularProgress, Grid } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // pages
 import { Error, Home, QuestItemClicked } from "@pages";

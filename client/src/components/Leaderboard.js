@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 // components
-import { CircularProgress, Grid } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // context
 import { useGlobalState } from "@context";

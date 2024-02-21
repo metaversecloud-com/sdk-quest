@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 // components
-import { CircularProgress, Grid } from "@mui/material";
-import { RemoveCircleOutline } from "@mui/icons-material";
 import { WalkIcon } from "./SVGs.js";
+import { RemoveCircleOutline } from "@mui/icons-material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // context
 import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
