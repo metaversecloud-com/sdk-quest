@@ -3,7 +3,7 @@ import React from "react";
 // components
 import Grid from "@mui/material/Grid";
 
-export function Error() {
+export const Error = () => {
   return (
     <Grid
       container
@@ -23,4 +23,4 @@ export function Error() {
       <h5>Oops. Looks like the page you&apos;re looking for no longer exists.</h5>
     </Grid>
   );
-}
+};

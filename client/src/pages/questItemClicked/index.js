@@ -1,1 +1,1 @@
-export { QuestItemClicked } from "./QuestItemClicked";
+export * from "./QuestItemClicked";

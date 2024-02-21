@@ -14,7 +14,7 @@ import { backendAPI, setupBackendAPI } from "@utils";
 // context
 import { setInteractiveParams, setVisitorInfo, useGlobalDispatch, useGlobalState } from "@context";
 
-export function App() {
+export const App = () => {
   const [searchParams] = useSearchParams();
   const [hasInitBackendAPI, setHasInitBackendAPI] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -89,6 +89,6 @@ export function App() {
       <Route element={<Error />} path="*" />
     </Routes>
   );
-}
+};
 
 export default App;

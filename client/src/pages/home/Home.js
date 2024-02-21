@@ -11,7 +11,7 @@ import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
 // utils
 import { backendAPI } from "@utils";
 
-export function Home() {
+export const Home = () => {
   const [activeTab, setActiveTab] = useState("leaderboard");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -75,4 +75,4 @@ export function Home() {
       )}
     </Grid>
   );
-}
+};

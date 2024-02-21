@@ -11,7 +11,7 @@ import { useGlobalState } from "@context";
 // utils
 import { backendAPI } from "@utils";
 
-export function QuestItemClicked() {
+export const QuestItemClicked = () => {
   const [message, setMessage] = useState("");
   const [collectedText, setCollectedText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -76,4 +76,4 @@ export function QuestItemClicked() {
       <Leaderboard isKeyAsset={false} keyAssetImage={keyAssetImage} />
     </Grid>
   );
-}
+};
