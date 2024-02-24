@@ -104,18 +104,18 @@ export function Admin({ keyAssetImage }) {
   };
 
   const saveAdminUpdates = async () => {
-    setIsSaving(true);
+    setAreButtonsDisabled(true);
     try {
       await backendAPI.post("/admin-settings", { numberAllowedToCollect, questItemImage });
       setKeyAssetImage({
         dispatch: globalDispatch,
         keyAssetImage: questItemImage,
       });
-      setIsSaving(false);
+      setAreButtonsDisabled(false);
       setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
-      setIsSaving(false);
+      setAreButtonsDisabled(false);
     }
   };
 
