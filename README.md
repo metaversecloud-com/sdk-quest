@@ -52,6 +52,7 @@ INSTANCE_DOMAIN=api.topia.io
 INSTANCE_PROTOCOL=https
 INTERACTIVE_KEY=xxxxxxxxxxxxx
 INTERACTIVE_SECRET=xxxxxxxxxxxxxx
+WEB_IMAGE_ASSET_ID=webImageAsset
 ```
 
 ### Where to find API_KEY, INTERACTIVE_KEY and INTERACTIVE_SECRET

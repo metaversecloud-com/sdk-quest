@@ -1,6 +1,6 @@
 import { errorHandler, getDroppedAssetsWithUniqueName, World } from "../utils/index.js";
 
-export const removeDroppedAssetsWithUniqueName = async (req, res) => {
+export const handleRemoveDroppedAssetsWithUniqueName = async (req, res) => {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
     const credentials = {
@@ -29,7 +29,7 @@ export const removeDroppedAssetsWithUniqueName = async (req, res) => {
   } catch (error) {
     return errorHandler({
       error,
-      functionName: "removeDroppedAssetsWithUniqueName",
+      functionName: "handleRemoveDroppedAssetsWithUniqueName",
       message: "Error removing dropped asset by uniqueName",
       req,
       res,

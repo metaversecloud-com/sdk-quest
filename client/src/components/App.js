@@ -66,7 +66,7 @@ export const App = () => {
         visitor: result.data.visitor,
       });
     } else {
-      console.log("Error getting visitor");
+      console.error("Error getting visitor");
     }
   };
 

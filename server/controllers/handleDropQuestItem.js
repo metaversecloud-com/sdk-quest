@@ -9,7 +9,7 @@ import {
   getWorldDetails,
 } from "../utils/index.js";
 
-export const dropQuestItem = async (req, res) => {
+export const handleDropQuestItem = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const credentials = {
@@ -67,7 +67,7 @@ export const dropQuestItem = async (req, res) => {
   } catch (error) {
     return errorHandler({
       error,
-      functionName: "dropQuestItem",
+      functionName: "handleDropQuestItem",
       message: "Error dropping asset",
       req,
       res,

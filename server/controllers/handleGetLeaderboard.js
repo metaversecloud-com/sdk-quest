@@ -1,6 +1,6 @@
 import { errorHandler, getClickedAssetAndKeyAsset, getLongestStreak, getWorldDataObject } from "../utils/index.js";
 
-export const getLeaderboard = async (req, res) => {
+export const handleGetLeaderboard = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, isKeyAsset, urlSlug, visitorId } = req.query;
     const credentials = {
@@ -43,7 +43,7 @@ export const getLeaderboard = async (req, res) => {
   } catch (error) {
     return errorHandler({
       error,
-      functionName: "getLeaderboard",
+      functionName: "handleGetLeaderboard",
       message: "Error getting leaderboard",
       req,
       res,

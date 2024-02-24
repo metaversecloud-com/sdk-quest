@@ -36,12 +36,12 @@ export const QuestItemClicked = () => {
         setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
         setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected today`);
       } else {
-        console.log("ERROR getting data object");
+        console.error("ERROR getting data object");
       }
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.log(error);
+      console.error(error);
     }
   }, []);
 

@@ -22,7 +22,6 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.10.17",
-    "@rtsdk/topia": "^0.8.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -39,8 +38,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "react-error-overlay": "6.0.9",
-    "yalc": "^1.0.0-pre.53"
+    "react-error-overlay": "6.0.9"
   },
   "allowedHosts": "all",
   "proxy": "http://localhost:3001/",
@@ -54,9 +52,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
-    "lint": "eslint -c .eslintrc.js --ext .js,.jsx .",
-    "link-sdk": "yalc link @rtsdk/topia",
-    "unlink-sdk": "yalc remove @rtsdk/topia"
+    "lint": "eslint -c .eslintrc.js --ext .js,.jsx ."
   },
   "version": "0.1.0"
 }

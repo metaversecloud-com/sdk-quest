@@ -33,10 +33,10 @@ export const Home = () => {
           keyAssetImage: result.data.keyAssetImage,
         });
       } else {
-        return console.log("ERROR getting key asset image");
+        return console.error("ERROR getting key asset image");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

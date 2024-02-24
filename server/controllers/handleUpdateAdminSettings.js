@@ -1,6 +1,6 @@
 import { errorHandler, getDroppedAssetDetails, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
-export const updateAdminSettings = async (req, res) => {
+export const handleUpdateAdminSettings = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const { numberAllowedToCollect, questItemImage } = req.body;
@@ -36,7 +36,7 @@ export const updateAdminSettings = async (req, res) => {
   } catch (error) {
     return errorHandler({
       error,
-      functionName: "updateAdminSettings",
+      functionName: "handleUpdateAdminSettings",
       message: "Error updating quest items",
       req,
       res,
