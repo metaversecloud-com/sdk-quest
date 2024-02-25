@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 // components
-import { CircularProgress, Grid } from "@mui/material";
-import { RemoveCircleOutline } from "@mui/icons-material";
 import { WalkIcon } from "./SVGs.js";
+import { RemoveCircleOutline } from "@mui/icons-material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // context
 import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
@@ -19,8 +20,7 @@ export function Admin({ keyAssetImage }) {
   const [numberAllowedToCollect, setNumberAllowedToCollect] = useState();
   const [questItemImage, setQuestItemImage] = useState("");
   const [droppedItems, setQuestItems] = useState([]);
-  const [isDropping, setIsDropping] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -60,23 +60,26 @@ export function Admin({ keyAssetImage }) {
 
   const dropItem = async () => {
     try {
-      setIsDropping(true);
+      setAreButtonsDisabled(true);
       await backendAPI.post("/drop-quest-item");
       getQuestItems();
-      setIsDropping(false);
+      setAreButtonsDisabled(false);
       setErrorMessage("");
     } catch (error) {
-      setIsDropping(false);
+      setAreButtonsDisabled(false);
       setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
 
   const removeAllQuestItems = async () => {
     try {
+      setAreButtonsDisabled(true);
       await backendAPI.post("/dropped-asset/remove-all-with-unique-name");
       setQuestItems([]);
+      setAreButtonsDisabled(false);
       setErrorMessage("");
     } catch (error) {
+      setAreButtonsDisabled(false);
       setErrorMessage(error?.response?.data?.message || error.message);
     }
   };
@@ -101,18 +104,18 @@ export function Admin({ keyAssetImage }) {
   };
 
   const saveAdminUpdates = async () => {
-    setIsSaving(true);
+    setAreButtonsDisabled(true);
     try {
       await backendAPI.post("/admin-settings", { numberAllowedToCollect, questItemImage });
       setKeyAssetImage({
         dispatch: globalDispatch,
         keyAssetImage: questItemImage,
       });
-      setIsSaving(false);
+      setAreButtonsDisabled(false);
       setErrorMessage("");
     } catch (error) {
       setErrorMessage(error?.response?.data?.message || error.message);
-      setIsSaving(false);
+      setAreButtonsDisabled(false);
     }
   };
 
@@ -143,7 +146,7 @@ export function Admin({ keyAssetImage }) {
           <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
         </div>
 
-        <button disabled={isSaving} onClick={saveAdminUpdates}>
+        <button disabled={areButtonsDisabled} onClick={saveAdminUpdates}>
           Save
         </button>
         <hr style={{ margin: 1 }} />
@@ -154,34 +157,26 @@ export function Admin({ keyAssetImage }) {
           <h5 style={{ textAlign: "center" }}>
             {droppedItems.length}{" "}
             {keyAssetImage && (
-              <img
-                alt="Drop in world"
-                className={isDropping ? "isDropping" : ""}
-                height={20}
-                src={keyAssetImage}
-                style={{ paddingLeft: 4, paddingRight: 4 }}
-              />
+              <img alt="Drop in world" height={20} src={keyAssetImage} style={{ paddingLeft: 4, paddingRight: 4 }} />
             )}{" "}
             hidden in this world
           </h5>
         </Grid>
         <Grid item>
-          <button disabled={isDropping} onClick={dropItem}>
+          <button disabled={areButtonsDisabled} onClick={dropItem}>
             Hide
             {keyAssetImage && (
-              <img
-                alt="Drop in world"
-                className={isDropping ? "isDropping" : ""}
-                height={20}
-                src={keyAssetImage}
-                style={{ paddingLeft: 4, paddingRight: 4 }}
-              />
+              <img alt="Drop in world" height={20} src={keyAssetImage} style={{ paddingLeft: 4, paddingRight: 4 }} />
             )}{" "}
             in world
           </button>
         </Grid>
         <Grid item mb={2}>
-          <button className="btn-outline" disabled={droppedItems.length === 0} onClick={removeAllQuestItems}>
+          <button
+            className="btn-outline"
+            disabled={areButtonsDisabled || droppedItems.length === 0}
+            onClick={removeAllQuestItems}
+          >
             Remove all
           </button>
         </Grid>

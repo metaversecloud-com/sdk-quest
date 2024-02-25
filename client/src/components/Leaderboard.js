@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 // components
-import { CircularProgress, Grid } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // context
 import { useGlobalState } from "@context";
@@ -31,7 +32,7 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
-        console.log("There was a problem while retrieving leaderboard data. Please try again later.");
+        console.error("There was a problem while retrieving leaderboard data. Please try again later.");
       }
     };
     if (visitor) getLeaderboardData();

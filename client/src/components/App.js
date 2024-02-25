@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Route, Routes, useSearchParams } from "react-router-dom";
 
 // components
-import { CircularProgress, Grid } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // pages
 import { Error, Home, QuestItemClicked } from "@pages";
@@ -13,7 +14,7 @@ import { backendAPI, setupBackendAPI } from "@utils";
 // context
 import { setInteractiveParams, setVisitorInfo, useGlobalDispatch, useGlobalState } from "@context";
 
-export function App() {
+export const App = () => {
   const [searchParams] = useSearchParams();
   const [hasInitBackendAPI, setHasInitBackendAPI] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +66,7 @@ export function App() {
         visitor: result.data.visitor,
       });
     } else {
-      console.log("Error getting visitor");
+      console.error("Error getting visitor");
     }
   };
 
@@ -88,6 +89,6 @@ export function App() {
       <Route element={<Error />} path="*" />
     </Routes>
   );
-}
+};
 
 export default App;

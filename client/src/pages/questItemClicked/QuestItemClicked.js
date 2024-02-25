@@ -1,22 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 // components
-import { CircularProgress, Grid } from "@mui/material";
 import { Leaderboard } from "@components/Leaderboard";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // context
-import { useGlobalDispatch, useGlobalState } from "@context";
+import { useGlobalState } from "@context";
 
 // utils
 import { backendAPI } from "@utils";
 
-export function QuestItemClicked() {
+export const QuestItemClicked = () => {
   const [message, setMessage] = useState("");
   const [collectedText, setCollectedText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const globalDispatch = useGlobalDispatch();
   const { keyAssetImage, hasInteractiveParams } = useGlobalState();
 
   useEffect(() => {
@@ -36,14 +36,14 @@ export function QuestItemClicked() {
         setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
         setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected today`);
       } else {
-        console.log("ERROR getting data object");
+        console.error("ERROR getting data object");
       }
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.log(error);
+      console.error(error);
     }
-  }, [globalDispatch]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -76,4 +76,4 @@ export function QuestItemClicked() {
       <Leaderboard isKeyAsset={false} keyAssetImage={keyAssetImage} />
     </Grid>
   );
-}
+};

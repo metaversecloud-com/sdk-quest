@@ -1,36 +1,44 @@
 import {
-  dropQuestItem,
-  getLeaderboard,
-  moveVisitor,
+  handleDropQuestItem,
+  handleGetLeaderboard,
+  handleMoveVisitor,
   handleGetDroppedAssetDataObject,
-  handleGetDroppedAssetsWithUniqueName,
+  handleGetQuestItems,
   handleGetKeyAssetImage,
   handleQuestItemClicked,
   handleGetVisitor,
-  removeDroppedAsset,
-  removeDroppedAssetsWithUniqueName,
-  updateAdminSettings,
+  handleRemoveDroppedAsset,
+  handleRemoveDroppedAssetsWithUniqueName,
+  handleUpdateAdminSettings,
 } from "./controllers/index.js";
 
+import { getVersion } from "./utils/getVersion.js";
 import express from "express";
 const router = express.Router();
 
+router.get("/system/health", (req, res) => {
+  return res.json({
+    appVersion: getVersion(),
+    status: "OK",
+  });
+});
+
 // Admin
-router.get("/leaderboard", getLeaderboard);
+router.get("/leaderboard", handleGetLeaderboard);
 router.get("/key-asset-image", handleGetKeyAssetImage);
-router.post("/admin-settings", updateAdminSettings);
+router.post("/admin-settings", handleUpdateAdminSettings);
 
 // Dropped Asset
 router.get("/dropped-asset/data-object", handleGetDroppedAssetDataObject);
-router.get("/quest-items", handleGetDroppedAssetsWithUniqueName); // { isPartial: boolean, uniqueName: string }
-router.post("/dropped-asset/remove-all-with-unique-name", removeDroppedAssetsWithUniqueName); // { isPartial: boolean, uniqueName: string }
-router.delete("/dropped-asset/:droppedAssetId", removeDroppedAsset);
-router.post("/drop-quest-item", dropQuestItem);
+router.get("/quest-items", handleGetQuestItems);
+router.post("/dropped-asset/remove-all-with-unique-name", handleRemoveDroppedAssetsWithUniqueName);
+router.delete("/dropped-asset/:droppedAssetId", handleRemoveDroppedAsset);
+router.post("/drop-quest-item", handleDropQuestItem);
 router.post("/quest-item-clicked", handleQuestItemClicked);
 
 // Visitor
 // visitorId comes from interactive nonce
 router.get("/visitor", handleGetVisitor);
-router.put("/visitor/move", moveVisitor);
+router.put("/visitor/move", handleMoveVisitor);
 
 export default router;

@@ -5,7 +5,7 @@
   "dependencies": {
     "@babel/core": "^7.22.8",
     "@babel/eslint-parser": "^7.22.7",
-    "@rtsdk/topia": "^0.8.1",
+    "@rtsdk/topia": "^0.8.5",
     "axios": "^1.2.1",
     "body-parser": "^1.20.1",
     "cheerio": "^1.0.0-rc.12",
@@ -29,12 +29,12 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build -w client",
-    "build:dev": "npm run build",
+    "build-dev": "npm run build",
     "link-sdk": "yalc link @rtsdk/topia",
     "unlink-sdk": "yalc remove @rtsdk/topia",
     "start": "npm start -ws",
-    "start:dev": "concurrently \"node server/index.js\" \"npm start --prefix client\""
+    "start-dev": "concurrently \"node server/index.js\" \"npm start --prefix client\""
   },
   "type": "module",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

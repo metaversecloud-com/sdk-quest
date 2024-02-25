@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 
 // components
 import { Admin, Leaderboard } from "@components";
-import { CircularProgress, Grid } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
 
 // context
 import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
@@ -10,7 +11,7 @@ import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
 // utils
 import { backendAPI } from "@utils";
 
-export function Home() {
+export const Home = () => {
   const [activeTab, setActiveTab] = useState("leaderboard");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,10 +33,10 @@ export function Home() {
           keyAssetImage: result.data.keyAssetImage,
         });
       } else {
-        return console.log("ERROR getting key asset image");
+        return console.error("ERROR getting key asset image");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -74,4 +75,4 @@ export function Home() {
       )}
     </Grid>
   );
-}
+};

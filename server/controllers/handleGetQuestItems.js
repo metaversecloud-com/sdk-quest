@@ -1,6 +1,6 @@
 import { errorHandler, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
-export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
+export const handleGetQuestItems = async (req, res) => {
   try {
     const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
 
@@ -10,25 +10,16 @@ export const handleGetDroppedAssetsWithUniqueName = async (req, res) => {
         interactiveNonce,
         interactivePublicKey,
         visitorId,
+        urlSlug,
       },
       isPartial: true,
-      urlSlug,
     });
 
-    const normalized = droppedAssets.map((asset) => {
-      let normalizedAsset = { ...asset };
-      delete normalizedAsset["topia"];
-      delete normalizedAsset["credentials"];
-      delete normalizedAsset["jwt"];
-      delete normalizedAsset["requestOptions"];
-      return normalizedAsset;
-    });
-
-    return res.json({ droppedAssets: normalized, success: true });
+    return res.json({ droppedAssets, success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
-      functionName: "handleGetDroppedAssetsWithUniqueName",
+      functionName: "handleGetQuestItems",
       message: "Error fetching dropped assets with unique name",
       req,
       res,

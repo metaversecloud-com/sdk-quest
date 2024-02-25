@@ -1,7 +1,7 @@
 import {
   errorHandler,
   getBaseURL,
-  getDroppedAssetDetails,
+  getClickedAssetAndKeyAsset,
   getRandomCoordinates,
   getVisitor,
   getWorldDetails,
@@ -20,25 +20,11 @@ export const handleQuestItemClicked = async (req, res) => {
       assetId,
       interactiveNonce,
       interactivePublicKey,
+      urlSlug,
       visitorId,
     };
 
-    const droppedAsset = await getDroppedAssetDetails({
-      credentials,
-      droppedAssetId: assetId,
-      urlSlug,
-    });
-
-    if (!droppedAsset.dataObject?.keyAssetUniqueName) throw "Key asset not found";
-    const keyAssetUniqueName = droppedAsset.dataObject.keyAssetUniqueName;
-
-    const keyAsset = await getDroppedAssetDetails({
-      credentials,
-      uniqueName: keyAssetUniqueName,
-      isKeyAsset: true,
-      urlSlug,
-    });
-    if (!keyAsset) throw "Key asset not found";
+    const { droppedAsset, keyAsset } = await getClickedAssetAndKeyAsset(credentials);
     const keyAssetId = keyAsset.id;
 
     const world = await getWorldDetails({
@@ -67,32 +53,47 @@ export const handleQuestItemClicked = async (req, res) => {
       return res.json({ addedClick: false, numberAllowedToCollect, success: true });
     } else {
       // Move the quest item to a new random location
+      const promises = [];
       const position = getRandomCoordinates(world.width, world.height);
 
-      await Promise.all([
-        droppedAsset.updatePosition(position.x, position.y),
+      promises.push(droppedAsset.updatePosition(position.x, position.y));
+      promises.push(
         droppedAsset.updateClickType({
           clickType: "link",
           clickableLinkTitle: "Quest",
           isOpenLinkInDrawer: true,
           clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
         }),
-      ]);
+      );
 
       if (!itemsCollectedByUser?.[profileId]) {
-        await world.updateDataObject({
-          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 1 } },
-        });
+        // first time user has interacted with Quest ever
+        promises.push(
+          world.updateDataObject({
+            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 1 }, total: 1 },
+            [`profileMapper.${profileId}`]: username,
+          }),
+        );
         numberCollected = 1;
       } else if (!itemsCollectedByUser?.[profileId]?.[dateKey]) {
-        await world.updateDataObject({
-          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 1 },
-        });
+        // first time user has interacted with Quest on this day
+        promises.push(
+          world.updateDataObject({
+            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 1 },
+            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`]:
+              itemsCollectedByUser[profileId].total + 1,
+          }),
+        );
         numberCollected = 1;
       } else {
-        await world.incrementDataObjectValue(
-          [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}.count`],
-          1,
+        promises.push(
+          world.incrementDataObjectValue(
+            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}.count`],
+            1,
+          ),
+        );
+        promises.push(
+          world.incrementDataObjectValue([`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`], 1),
         );
         numberCollected = itemsCollectedByUser[profileId][dateKey].count + 1;
       }
@@ -102,14 +103,12 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
         visitorId,
       });
+      promises.push(visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1));
 
-      await Promise.all([
-        visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1),
-        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1),
-        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`], 1),
-        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.questItems.${assetId}.count`], 1),
-        world.updateDataObject({ [`profileMapper.${profileId}`]: username }),
-      ]);
+      promises.push(world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1));
+      promises.push(world.incrementDataObjectValue([`keyAssets.${keyAssetId}.questItems.${assetId}.count`], 1));
+
+      await Promise.all(promises);
 
       return res.json({
         addedClick: true,
@@ -119,8 +118,7 @@ export const handleQuestItemClicked = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "handleQuestItemClicked",
       message: "Error updating dropped asset update position, click type, and world/visitor data object",

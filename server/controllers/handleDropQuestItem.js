@@ -1,5 +1,6 @@
 import {
-  dropAsset,
+  Asset,
+  DroppedAsset,
   errorHandler,
   getBaseURL,
   getDroppedAssetDetails,
@@ -8,13 +9,14 @@ import {
   getWorldDetails,
 } from "../utils/index.js";
 
-export const dropQuestItem = async (req, res) => {
+export const handleDropQuestItem = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
     const credentials = {
       assetId,
       interactiveNonce,
       interactivePublicKey,
+      urlSlug,
       visitorId,
     };
 
@@ -22,8 +24,6 @@ export const dropQuestItem = async (req, res) => {
       getDroppedAssetDetails({
         credentials,
         droppedAssetId: assetId,
-        isKeyAsset: true,
-        urlSlug,
       }),
       getWorldDetails({
         credentials,
@@ -34,17 +34,23 @@ export const dropQuestItem = async (req, res) => {
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
 
-    const droppedAsset = await dropAsset({
-      assetId: keyAsset.assetId,
+    // Use questItemImage from key asset data object or fallback to default
+    const questItemImage = keyAsset.dataObject?.questItemImage || getDefaultKeyAssetImage({ urlSlug });
+
+    const asset = Asset.create(process.env.WEB_IMAGE_ASSET_ID || "webImageAsset", {
       credentials,
+    });
+
+    const droppedAsset = await DroppedAsset.drop(asset, {
+      interactivePublicKey,
+      isInteractive: true,
+      layer0: "",
+      layer1: questItemImage,
       position,
-      sceneId: `${assetId}_${keyAsset.uniqueName}`,
+      sceneDropId: `${assetId}_${keyAsset.uniqueName}`,
       uniqueName: `questItem_${keyAsset.uniqueName}`,
       urlSlug,
     });
-
-    // Use questItemImage from key asset data object or fallback to default
-    const questItemImage = keyAsset.dataObject?.questItemImage || getDefaultKeyAssetImage({ urlSlug });
 
     await Promise.all([
       droppedAsset.updateClickType({
@@ -53,16 +59,15 @@ export const dropQuestItem = async (req, res) => {
         isOpenLinkInDrawer: true,
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
-      droppedAsset.updateWebImageLayers("", questItemImage),
-      droppedAsset.setDataObject({ keyAssetUniqueName: keyAsset.uniqueName }),
+      droppedAsset.setDataObject({ keyAssetId: keyAsset.id, keyAssetUniqueName: keyAsset.uniqueName }),
       world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}.count`]: 0 }),
     ]);
 
     return res.json({ droppedAsset, success: true });
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
-      functionName: "dropQuestItem",
+      functionName: "handleDropQuestItem",
       message: "Error dropping asset",
       req,
       res,

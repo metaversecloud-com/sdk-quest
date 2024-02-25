@@ -1,10 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 // components
-import { Button, Grid, Paper } from "@mui/material";
+import Grid from "@mui/material/Grid";
 
-export function Error() {
+export const Error = () => {
   return (
     <Grid
       container
@@ -20,32 +19,8 @@ export function Error() {
         left: 0,
       }}
     >
-      <Paper
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: 16,
-          maxWidth: 500,
-        }}
-      >
-        <h1>404</h1>
-        <h5>Oops. Looks like the page you&apos;re looking for no longer exists.</h5>
-        <h6>But we&apos;re here to bring you back to safety</h6>
-        <Button
-          color="primary"
-          component={Link}
-          size="large"
-          sx={{
-            textTransform: "none",
-            fontSize: 22,
-          }}
-          to="/"
-          variant="contained"
-        >
-          Back to Home
-        </Button>
-      </Paper>
+      <h1>404</h1>
+      <h5>Oops. Looks like the page you&apos;re looking for no longer exists.</h5>
     </Grid>
   );
-}
+};

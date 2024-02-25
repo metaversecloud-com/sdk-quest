@@ -10,13 +10,13 @@ const initBackendAPI = function () {
 
 const setupBackendAPI = (interactiveParams) => {
   backendAPI = axios.create({
-    baseURL: `${BASE_URL}/backend`,
+    baseURL: `${BASE_URL}/api`,
     headers: {
       "Content-Type": "application/json",
     },
   });
   // Only do this if have interactive nonce.
-  if (interactiveParams.assetId) {
+  if (interactiveParams.interactiveNonce) {
     backendAPI.interceptors.request.use((config) => {
       if (!config?.params) config.params = {};
       config.params = { ...config.params };

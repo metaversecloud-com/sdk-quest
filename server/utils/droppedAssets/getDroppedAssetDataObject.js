@@ -8,7 +8,7 @@ export const getDroppedAssetDataObject = async ({ credentials, urlSlug }) => {
     await initializeDroppedAssetDataObject({ droppedAsset, urlSlug });
     return droppedAsset;
   } catch (error) {
-    errorHandler({
+    return errorHandler({
       error,
       functionName: "getDroppedAssetDataObject",
       message: "Error getting dropped asset data object",

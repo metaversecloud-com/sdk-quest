@@ -2,7 +2,6 @@ export * from "./droppedAssets/index.js";
 export * from "./visitors/index.js";
 export * from "./world/index.js";
 export * from "./errorHandler.js";
-export * from "./findObjectKeyPath.js";
 export * from "./getBaseURL.js";
 export * from "./getDefaultKeyAssetImage.js";
 export * from "./getLongestStreak.js";
