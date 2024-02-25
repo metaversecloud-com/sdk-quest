@@ -15,7 +15,7 @@ export const handleMoveVisitor = async (req, res) => {
         visitorId,
       },
     });
-    await visitor.handleMoveVisitor({ x: moveTo.x, y: moveTo.y, shouldTeleportVisitor });
+    await visitor.moveVisitor({ x: moveTo.x, y: moveTo.y, shouldTeleportVisitor });
 
     return res.json({ visitor, success: true });
   } catch (error) {
