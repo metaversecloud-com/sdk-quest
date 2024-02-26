@@ -22,7 +22,10 @@ export const handleRemoveDroppedAssetsWithUniqueName = async (req, res) => {
     if (droppedAssets.length > 0) {
       const droppedAssetIds = [];
       for (const droppedAsset in droppedAssets) droppedAssetIds.push(droppedAssets[droppedAsset].id);
-      await World.deleteDroppedAssets(urlSlug, droppedAssetIds, interactivePublicKey, process.env.INTERACTIVE_SECRET);
+      await World.deleteDroppedAssets(urlSlug, droppedAssetIds, {
+        interactivePublicKey,
+        interactiveSecret: process.env.INTERACTIVE_SECRET,
+      });
     }
 
     return res.json({ success: true });
