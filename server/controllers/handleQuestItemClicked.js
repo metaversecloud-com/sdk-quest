@@ -103,7 +103,11 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
         visitorId,
       });
-      if (itemsCollectedByUser[profileId].total === 5) {
+      console.log(
+        "🚀 ~ file: handleQuestItemClicked.js:107 ~ itemsCollectedByUser[profileId].total:",
+        itemsCollectedByUser[profileId].total,
+      );
+      if (itemsCollectedByUser[profileId].total === 4) {
         const test = await visitor.grantExpression({ name: "quest_1" });
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";

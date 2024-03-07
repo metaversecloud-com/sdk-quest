@@ -1,6 +1,8 @@
 import { errorHandler, getDefaultKeyAssetImage } from "../index.js";
 
 export const initializeDroppedAssetDataObject = async ({ droppedAsset, urlSlug }) => {
+  console.log("🚀 ~ file: initializeDroppedAssetDataObject.js:28 ~ initializeDroppedAssetDataObject:");
+
   try {
     await droppedAsset.fetchDataObject();
     if (!droppedAsset?.dataObject?.questItemImage) {
