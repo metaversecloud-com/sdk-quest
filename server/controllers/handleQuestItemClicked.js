@@ -103,16 +103,12 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
         visitorId,
       });
-      console.log(
-        "🚀 ~ file: handleQuestItemClicked.js:107 ~ itemsCollectedByUser[profileId].total:",
-        itemsCollectedByUser[profileId].total,
-      );
-      if (itemsCollectedByUser[profileId].total === 4) {
+      if (itemsCollectedByUser[profileId].total + 1 === 5) {
         const test = await visitor.grantExpression({ name: "quest_1" });
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";
         if (test.data?.statusCode === 409) {
-          title = `Congrats! You collected ${itemsCollectedByUser[profileId].total} quest items`;
+          title = `Congrats! You collected ${itemsCollectedByUser[profileId].total + 1} quest items`;
           text = "Keep up the solid detective work 🔎";
         }
         promises.push(
