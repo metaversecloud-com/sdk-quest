@@ -103,6 +103,22 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
         visitorId,
       });
+      if (itemsCollectedByUser[profileId].total === 5) {
+        const test = await visitor.grantExpression({ name: "quest_1" });
+        let title = "🔎 New Emote Unlocked",
+          text = "Congrats! Your detective skills paid off.";
+        if (test.data?.statusCode === 409) {
+          title = `Congrats! You collected ${itemsCollectedByUser[profileId].total} quest items`;
+          text = "Keep up the solid detective work 🔎";
+        }
+        promises.push(
+          visitor.fireToast({
+            groupId: "QuestExpression",
+            title,
+            text,
+          }),
+        );
+      }
       promises.push(visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1));
 
       promises.push(world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1));
