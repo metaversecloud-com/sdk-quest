@@ -60,7 +60,7 @@ export const handleDropQuestItem = async (req, res) => {
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
       droppedAsset.setDataObject({ keyAssetId: keyAsset.id, keyAssetUniqueName: keyAsset.uniqueName }),
-      world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}.count`]: 0 }),
+      world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}`]: { count: 0 } }),
     ]);
 
     return res.json({ droppedAsset, success: true });
