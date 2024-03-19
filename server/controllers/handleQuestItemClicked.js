@@ -92,7 +92,7 @@ export const handleQuestItemClicked = async (req, res) => {
           const differenceInDays = getDifferenceInDays(lastCollectedDate, currentDate);
           if (differenceInDays === 0) {
             totalCollectedToday = totalCollectedToday + 1;
-            numberCollectedToday = totalCollectedToday + 1;
+            numberCollectedToday = totalCollectedToday;
           } else if (differenceInDays === 1) {
             currentStreak = currentStreak + 1;
           }
