@@ -2,6 +2,8 @@ import {
   errorHandler,
   getBaseURL,
   getClickedAssetAndKeyAsset,
+  getDifferenceInDays,
+  getLongestStreak,
   getRandomCoordinates,
   getVisitor,
   getWorldDetails,
@@ -10,11 +12,9 @@ import {
 export const handleQuestItemClicked = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, profileId, urlSlug, username, visitorId } = req.query;
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed, so we add 1
-    const day = String(currentDate.getDate()).padStart(2, "0");
-    const dateKey = `${year}_${month}_${day}`;
+    const currentDate = new Date().setHours(0, 0, 0, 0);
+
+    const analytics = [];
 
     const credentials = {
       assetId,
@@ -41,21 +41,20 @@ export const handleQuestItemClicked = async (req, res) => {
 
     const itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
     const numberAllowedToCollect = keyAsset.dataObject?.numberAllowedToCollect;
-    let numberCollected = 0;
+    let numberCollectedToday = 1;
 
     if (
       itemsCollectedByUser &&
       itemsCollectedByUser[profileId] &&
-      itemsCollectedByUser[profileId][dateKey] &&
-      itemsCollectedByUser[profileId][dateKey].count >= numberAllowedToCollect
+      itemsCollectedByUser[profileId].totalCollectedToday >= numberAllowedToCollect
     ) {
       console.log(`Visitor has already collected ${numberAllowedToCollect} quest items today.`);
       return res.json({ addedClick: false, numberAllowedToCollect, success: true });
     } else {
-      // Move the quest item to a new random location
       const promises = [];
-      const position = getRandomCoordinates(world.width, world.height);
 
+      // Move the quest item to a new random location
+      const position = getRandomCoordinates(world.width, world.height);
       promises.push(droppedAsset.updatePosition(position.x, position.y));
       promises.push(
         droppedAsset.updateClickType({
@@ -70,32 +69,50 @@ export const handleQuestItemClicked = async (req, res) => {
         // first time user has interacted with Quest ever
         promises.push(
           world.updateDataObject({
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: { [dateKey]: { count: 1 }, total: 1 },
+            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: {
+              currentStreak: 1,
+              lastCollectedDate: currentDate,
+              longestStreak: 1,
+              total: 1,
+              totalCollectedToday: 1,
+            },
             [`profileMapper.${profileId}`]: username,
           }),
         );
-        numberCollected = 1;
-      } else if (!itemsCollectedByUser?.[profileId]?.[dateKey]) {
-        // first time user has interacted with Quest on this day
+      } else {
+        let currentStreak = itemsCollectedByUser[profileId].currentStreak || 1;
+        let total = itemsCollectedByUser[profileId].total ? itemsCollectedByUser[profileId].total + 1 : 1;
+        let totalCollectedToday = itemsCollectedByUser[profileId].totalCollectedToday || 1;
+        const lastCollectedDate = itemsCollectedByUser[profileId].lastCollectedDate;
+
+        let longestStreak = itemsCollectedByUser[profileId].longestStreak;
+        if (!longestStreak) longestStreak = getLongestStreak(itemsCollectedByUser[profileId]);
+
+        if (lastCollectedDate) {
+          const differenceInDays = getDifferenceInDays(lastCollectedDate, currentDate);
+          if (differenceInDays === 0) {
+            totalCollectedToday = totalCollectedToday + 1;
+            numberCollectedToday = totalCollectedToday + 1;
+          } else if (differenceInDays === 1) {
+            currentStreak = currentStreak + 1;
+          }
+        }
+
+        if (currentStreak + 1 > longestStreak) longestStreak = currentStreak;
+
+        if (totalCollectedToday + 1 === numberAllowedToCollect) analytics.push("dayCompletedCount");
+
         promises.push(
           world.updateDataObject({
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}`]: { count: 1 },
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`]:
-              itemsCollectedByUser[profileId].total + 1,
+            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: {
+              currentStreak,
+              lastCollectedDate: currentDate,
+              longestStreak,
+              total,
+              totalCollectedToday,
+            },
           }),
         );
-        numberCollected = 1;
-      } else {
-        promises.push(
-          world.incrementDataObjectValue(
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.${dateKey}.count`],
-            1,
-          ),
-        );
-        promises.push(
-          world.incrementDataObjectValue([`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.total`], 1),
-        );
-        numberCollected = itemsCollectedByUser[profileId][dateKey].count + 1;
       }
 
       const visitor = await getVisitor({
@@ -103,14 +120,19 @@ export const handleQuestItemClicked = async (req, res) => {
         urlSlug,
         visitorId,
       });
-      if (itemsCollectedByUser[profileId].total + 1 === 5) {
-        const test = await visitor.grantExpression({ name: "quest_1" });
+
+      if ([30, 50, 75].includes(itemsCollectedByUser[profileId].total + 1)) {
+        const grantExpressionResult = await visitor.grantExpression({ name: "quest_1" });
+
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";
-        if (test.data?.statusCode === 409) {
+        if (grantExpressionResult.data?.statusCode === 409) {
           title = `Congrats! You collected ${itemsCollectedByUser[profileId].total + 1} quest items`;
           text = "Keep up the solid detective work 🔎";
+        } else {
+          analytics.push("emoteUnlockedCount");
         }
+
         promises.push(
           visitor.fireToast({
             groupId: "QuestExpression",
@@ -119,17 +141,20 @@ export const handleQuestItemClicked = async (req, res) => {
           }),
         );
       }
+
       promises.push(visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1));
 
-      promises.push(world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1));
       promises.push(world.incrementDataObjectValue([`keyAssets.${keyAssetId}.questItems.${assetId}.count`], 1));
+      promises.push(
+        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1, { analytics }),
+      );
 
       await Promise.all(promises);
 
       return res.json({
         addedClick: true,
         numberAllowedToCollect,
-        numberCollected,
+        numberCollectedToday,
         success: true,
       });
     }

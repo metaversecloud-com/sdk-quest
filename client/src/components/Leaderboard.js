@@ -28,7 +28,7 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
         setMyData(leaderboard[index]);
         setCurrentPosition(index + 1);
         setTotal(leaderboard.length);
-        setVisibleData(leaderboard.slice(0, 20));
+        setVisibleData(leaderboard.slice(0, 100));
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -74,7 +74,7 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
         </Grid>
       )}
       <Grid item mt={2}>
-        <h4>Top 20</h4>
+        <h4>Leaderboard</h4>
         <table>
           <thead>
             <tr>

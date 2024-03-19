@@ -1,4 +1,4 @@
-import { errorHandler, getClickedAssetAndKeyAsset, getLongestStreak, getWorldDataObject } from "../utils/index.js";
+import { errorHandler, getClickedAssetAndKeyAsset, getLongestStreak, getWorldDetails } from "../utils/index.js";
 
 export const handleGetLeaderboard = async (req, res) => {
   try {
@@ -17,28 +17,47 @@ export const handleGetLeaderboard = async (req, res) => {
       keyAssetId = keyAsset.id;
     }
 
-    const { dataObject } = await getWorldDataObject({
+    const world = await getWorldDetails({
       credentials: { ...credentials, assetId: keyAssetId },
       urlSlug,
     });
 
-    let leaderboard = [];
-    if (dataObject && dataObject.keyAssets && dataObject?.keyAssets?.[keyAssetId]) {
-      const itemsCollectedByUser = dataObject.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
-      if (itemsCollectedByUser) {
-        for (const profileId in itemsCollectedByUser) {
-          const longestStreak = getLongestStreak(itemsCollectedByUser[profileId]);
+    let leaderboard = [],
+      shouldUpdateDataObject = false;
 
-          leaderboard.push({
-            name: dataObject.profileMapper[profileId],
-            collected: itemsCollectedByUser[profileId].total,
-            profileId,
-            streak: longestStreak,
-          });
-        }
-        leaderboard.sort((a, b) => b.collected - a.collected);
+    let itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
+
+    for (const profileId in itemsCollectedByUser) {
+      let streak = itemsCollectedByUser[profileId].longestStreak;
+      if (!streak) {
+        const { currentStreak, longestStreak, lastCollectedDate } = getLongestStreak(itemsCollectedByUser[profileId]);
+        streak = longestStreak;
+        itemsCollectedByUser[profileId] = {
+          currentStreak,
+          lastCollectedDate,
+          longestStreak,
+          total: itemsCollectedByUser[profileId].total,
+          totalCollectedToday: 0,
+        };
+        shouldUpdateDataObject = true;
       }
+
+      leaderboard.push({
+        name: world.dataObject.profileMapper[profileId],
+        collected: itemsCollectedByUser[profileId].total,
+        profileId,
+        streak,
+      });
     }
+
+    if (shouldUpdateDataObject) {
+      world.updateDataObject({
+        [`keyAssets.${keyAssetId}.itemsCollectedByUser`]: itemsCollectedByUser,
+      });
+    }
+
+    leaderboard.sort((a, b) => b.collected - a.collected);
+
     return res.json({ leaderboard, success: true });
   } catch (error) {
     return errorHandler({
