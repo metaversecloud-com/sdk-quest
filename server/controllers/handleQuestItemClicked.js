@@ -121,7 +121,7 @@ export const handleQuestItemClicked = async (req, res) => {
         visitorId,
       });
 
-      if ([30, 50, 75].includes(itemsCollectedByUser[profileId].total + 1)) {
+      if ([50, 100].includes(itemsCollectedByUser[profileId].total + 1)) {
         const grantExpressionResult = await visitor.grantExpression({ name: "quest_1" });
 
         let title = "🔎 New Emote Unlocked",
