@@ -1,3 +1,5 @@
+import { getDifferenceInDays } from "./getDifferenceInDays.js";
+
 // Retrieve streak from legacy data (count stored by day)
 export const getLongestStreak = (data) => {
   let currentStreak = 1;

@@ -23,27 +23,23 @@ export const handleGetLeaderboard = async (req, res) => {
     });
 
     let leaderboard = [],
-      promises = [];
+      shouldUpdateDataObject = false;
 
-    const itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
+    let itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
 
     for (const profileId in itemsCollectedByUser) {
       let streak = itemsCollectedByUser[profileId].longestStreak;
       if (!streak) {
         const { currentStreak, longestStreak, lastCollectedDate } = getLongestStreak(itemsCollectedByUser[profileId]);
         streak = longestStreak;
-
-        promises.push(
-          world.updateDataObject({
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: {
-              currentStreak,
-              lastCollectedDate,
-              longestStreak,
-              total: itemsCollectedByUser[profileId].total,
-              totalCollectedToday: 0,
-            },
-          }),
-        );
+        itemsCollectedByUser[profileId] = {
+          currentStreak,
+          lastCollectedDate,
+          longestStreak,
+          total: itemsCollectedByUser[profileId].total,
+          totalCollectedToday: 0,
+        };
+        shouldUpdateDataObject = true;
       }
 
       leaderboard.push({
@@ -54,7 +50,11 @@ export const handleGetLeaderboard = async (req, res) => {
       });
     }
 
-    if (promises.length > 0) Promise.all(promises);
+    if (shouldUpdateDataObject) {
+      world.updateDataObject({
+        [`keyAssets.${keyAssetId}.itemsCollectedByUser`]: itemsCollectedByUser,
+      });
+    }
 
     leaderboard.sort((a, b) => b.collected - a.collected);
 
