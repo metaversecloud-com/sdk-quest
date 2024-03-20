@@ -27,10 +27,10 @@ export const QuestItemClicked = () => {
   const handleItemAssetClicked = useCallback(async () => {
     try {
       const result = await backendAPI.post("/quest-item-clicked");
-      const { addedClick, numberAllowedToCollect, numberCollected, success } = result.data;
+      const { addedClick, numberAllowedToCollect, numberCollectedToday, success } = result.data;
 
       if (addedClick) {
-        setCollectedText(`${numberCollected}/${numberAllowedToCollect} collected today`);
+        setCollectedText(`${numberCollectedToday}/${numberAllowedToCollect} collected today`);
         setMessage(`🎉 Congratulations! You are one step closer to completing your daily quest!`);
       } else if (success) {
         setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);

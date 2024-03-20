@@ -1,6 +1,10 @@
+import { getDifferenceInDays } from "./getDifferenceInDays.js";
+
+// Retrieve streak from legacy data (count stored by day)
 export const getLongestStreak = (data) => {
-  let longestStreak = 0;
   let currentStreak = 1;
+  let lastCollectedDate;
+  let longestStreak = 0;
 
   const dates = Object.keys(data)
     .filter((key) => !key.includes("total"))
@@ -12,7 +16,9 @@ export const getLongestStreak = (data) => {
 
   // Iterate over sorted dates
   for (let i = 1; i < dates.length; i++) {
-    const diffInDays = (dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24);
+    if (!lastCollectedDate) lastCollectedDate = dates[i].setHours(0, 0, 0, 0);
+
+    const diffInDays = getDifferenceInDays(dates[i], dates[i - 1]);
     const dayOfWeek = dates[i].getDay();
     if (
       diffInDays === 1 ||
@@ -29,5 +35,5 @@ export const getLongestStreak = (data) => {
   // Check once more at the end to cover the case where the longest streak ends on the last date
   longestStreak = Math.max(longestStreak, currentStreak);
 
-  return longestStreak;
+  return { currentStreak, lastCollectedDate, longestStreak };
 };

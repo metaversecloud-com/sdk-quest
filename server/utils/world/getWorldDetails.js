@@ -4,9 +4,7 @@ import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
 
 export const getWorldDetails = async ({ credentials, urlSlug }) => {
   try {
-    const world = World.create(urlSlug, {
-      credentials,
-    });
+    const world = World.create(urlSlug, { credentials });
     await world.fetchDetails();
     await world.fetchDataObject();
     await initializeWorldDataObject({ credentials, world, urlSlug });
