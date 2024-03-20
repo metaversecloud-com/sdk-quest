@@ -48,7 +48,6 @@ export const handleQuestItemClicked = async (req, res) => {
       itemsCollectedByUser[profileId] &&
       itemsCollectedByUser[profileId].totalCollectedToday >= numberAllowedToCollect
     ) {
-      console.log(`Visitor has already collected ${numberAllowedToCollect} quest items today.`);
       return res.json({ addedClick: false, numberAllowedToCollect, success: true });
     } else {
       const promises = [];
