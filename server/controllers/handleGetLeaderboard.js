@@ -51,7 +51,7 @@ export const handleGetLeaderboard = async (req, res) => {
     }
 
     if (shouldUpdateDataObject) {
-      world.updateDataObject({
+      await world.updateDataObject({
         [`keyAssets.${keyAssetId}.itemsCollectedByUser`]: itemsCollectedByUser,
       });
     }
