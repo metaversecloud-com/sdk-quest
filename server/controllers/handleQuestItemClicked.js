@@ -12,7 +12,11 @@ import {
 export const handleQuestItemClicked = async (req, res) => {
   try {
     const { assetId, interactiveNonce, interactivePublicKey, profileId, urlSlug, username, visitorId } = req.query;
-    const currentDate = new Date().setHours(0, 0, 0, 0);
+
+    const now = new Date();
+    const localDateString = now.toLocaleDateString();
+    const currentDate = new Date(localDateString);
+    currentDate.setHours(0, 0, 0, 0);
 
     const analytics = [];
 
@@ -41,7 +45,8 @@ export const handleQuestItemClicked = async (req, res) => {
 
     const itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
     const numberAllowedToCollect = keyAsset.dataObject?.numberAllowedToCollect;
-    let numberCollectedToday = 1;
+    let totalCollectedToday = 1,
+      total = 1;
 
     if (
       itemsCollectedByUser &&
@@ -80,8 +85,7 @@ export const handleQuestItemClicked = async (req, res) => {
         );
       } else {
         let currentStreak = itemsCollectedByUser[profileId].currentStreak || 1;
-        let total = itemsCollectedByUser[profileId].total ? itemsCollectedByUser[profileId].total + 1 : 1;
-        let totalCollectedToday = itemsCollectedByUser[profileId].totalCollectedToday || 1;
+        total = itemsCollectedByUser[profileId].total ? itemsCollectedByUser[profileId].total + 1 : 1;
         const lastCollectedDate = itemsCollectedByUser[profileId].lastCollectedDate;
 
         let longestStreak = itemsCollectedByUser[profileId].longestStreak;
@@ -90,16 +94,14 @@ export const handleQuestItemClicked = async (req, res) => {
         if (lastCollectedDate) {
           const differenceInDays = getDifferenceInDays(lastCollectedDate, currentDate);
           if (differenceInDays === 0) {
-            totalCollectedToday = totalCollectedToday + 1;
-            numberCollectedToday = totalCollectedToday;
+            totalCollectedToday = itemsCollectedByUser[profileId].totalCollectedToday + 1;
           } else if (differenceInDays === 1) {
             currentStreak = currentStreak + 1;
           }
         }
 
-        if (currentStreak + 1 > longestStreak) longestStreak = currentStreak;
-
-        if (totalCollectedToday + 1 === numberAllowedToCollect) analytics.push("dayCompletedCount");
+        if (currentStreak > longestStreak) longestStreak = currentStreak;
+        if (totalCollectedToday === numberAllowedToCollect) analytics.push("dayCompletedCount");
 
         promises.push(
           world.updateDataObject({
@@ -120,13 +122,13 @@ export const handleQuestItemClicked = async (req, res) => {
         visitorId,
       });
 
-      if ([50, 100].includes(itemsCollectedByUser[profileId].total + 1)) {
+      if ([50, 100].includes(total)) {
         const grantExpressionResult = await visitor.grantExpression({ name: "quest_1" });
 
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";
         if (grantExpressionResult.data?.statusCode === 409) {
-          title = `Congrats! You collected ${itemsCollectedByUser[profileId].total + 1} quest items`;
+          title = `Congrats! You collected ${total} quest items`;
           text = "Keep up the solid detective work 🔎";
         } else {
           analytics.push("emoteUnlockedCount");
@@ -153,7 +155,7 @@ export const handleQuestItemClicked = async (req, res) => {
       return res.json({
         addedClick: true,
         numberAllowedToCollect,
-        numberCollectedToday,
+        totalCollectedToday,
         success: true,
       });
     }

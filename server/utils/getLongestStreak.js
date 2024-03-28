@@ -1,3 +1,4 @@
+import { getDateFromString } from "./getDateFromString.js";
 import { getDifferenceInDays } from "./getDifferenceInDays.js";
 
 // Retrieve streak from legacy data (count stored by day)
@@ -9,8 +10,7 @@ export const getLongestStreak = (data) => {
   const dates = Object.keys(data)
     .filter((key) => !key.includes("total"))
     .map((key) => {
-      const [year, month, day] = key.split("_");
-      return new Date(year, month - 1, day); // month is 0-indexed
+      return getDateFromString(key);
     })
     .sort((a, b) => a - b);
 
