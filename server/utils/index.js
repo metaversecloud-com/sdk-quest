@@ -3,6 +3,7 @@ export * from "./visitors/index.js";
 export * from "./world/index.js";
 export * from "./errorHandler.js";
 export * from "./getBaseURL.js";
+export * from "./getDateFromString.js";
 export * from "./getDefaultKeyAssetImage.js";
 export * from "./getDifferenceInDays.js";
 export * from "./getLongestStreak.js";
