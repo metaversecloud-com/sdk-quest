@@ -1,20 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // components
-import { WalkIcon } from "./SVGs.js";
-import { RemoveCircleOutline } from "@mui/icons-material";
-import CircularProgress from "@mui/material/CircularProgress";
-import Grid from "@mui/material/Grid";
-
-// context
-import { setKeyAssetImage, useGlobalDispatch, useGlobalState } from "@context";
+import { Loading } from "@components/Loading";
 
 // utils
-import { backendAPI } from "@utils";
+import { backendAPI } from "@utils/backendAPI";
 
-// Formatting
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+// context
+import { GlobalStateContext } from "@context/GlobalContext";
 
 export function Admin({ keyAssetImage }) {
   const [numberAllowedToCollect, setNumberAllowedToCollect] = useState();
@@ -25,8 +18,7 @@ export function Admin({ keyAssetImage }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   // context
-  const { hasInteractiveParams } = useGlobalState();
-  const globalDispatch = useGlobalDispatch();
+  const { hasInteractiveParams } = useContext(GlobalStateContext);
 
   useEffect(() => {
     if (hasInteractiveParams) {
@@ -107,9 +99,9 @@ export function Admin({ keyAssetImage }) {
     setAreButtonsDisabled(true);
     try {
       await backendAPI.post("/admin-settings", { numberAllowedToCollect, questItemImage });
-      setKeyAssetImage({
-        dispatch: globalDispatch,
-        keyAssetImage: questItemImage,
+      dispatch({
+        type: "SET_KEY_ASSET_IMAGE",
+        payload: { keyAssetImage: questItemImage },
       });
       setAreButtonsDisabled(false);
       setErrorMessage("");
@@ -119,15 +111,16 @@ export function Admin({ keyAssetImage }) {
     }
   };
 
-  if (isLoading) return <CircularProgress />;
+  if (isLoading) return <Loading />;
 
   return (
     <>
-      <Grid container direction="column" gap={2}>
-        <hr style={{ margin: 1 }} />
-        <div>
+      <div className="container grid gap-4">
+        <hr />
+        <div className="mt-4">
           <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
           <input
+            className="input"
             id="numberAllowedToCollect"
             onChange={(e) => setNumberAllowedToCollect(e.target.value)}
             type="text"
@@ -138,6 +131,7 @@ export function Admin({ keyAssetImage }) {
         <div>
           <label htmlFor="questItemImage">Quest Item Image URL:</label>
           <input
+            className="input"
             id="questItemImage"
             onChange={(e) => setQuestItemImage(e.target.value)}
             type="text"
@@ -146,46 +140,43 @@ export function Admin({ keyAssetImage }) {
           <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
         </div>
 
-        <button disabled={areButtonsDisabled} onClick={saveAdminUpdates}>
+        <button className="btn mt-2" disabled={areButtonsDisabled} onClick={saveAdminUpdates}>
           Save
         </button>
         <hr style={{ margin: 1 }} />
-      </Grid>
-
-      <Grid container direction="row" gap={2} justifyContent="center" mt={2}>
-        <Grid item xs={12}>
-          <h5 style={{ textAlign: "center" }}>
-            {droppedItems.length}{" "}
-            {keyAssetImage && (
-              <img alt="Drop in world" height={20} src={keyAssetImage} style={{ paddingLeft: 4, paddingRight: 4 }} />
-            )}{" "}
+      </div>
+      <div className="container py-6 items-center justify-center">
+        <h5 className="h5 flex items-center justify-center pb-4">
+          {droppedItems.length}{" "}
+          {keyAssetImage && (
+            <img alt="Drop in world" src={keyAssetImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
+          )}{" "}
             hidden in this world
           </h5>
-        </Grid>
-        <Grid item>
-          <button disabled={areButtonsDisabled} onClick={dropItem}>
+        <div className="my-2">
+          <button className="btn" disabled={areButtonsDisabled} onClick={dropItem}>
             Hide
             {keyAssetImage && (
-              <img alt="Drop in world" height={20} src={keyAssetImage} style={{ paddingLeft: 4, paddingRight: 4 }} />
+              <img alt="Drop in world" src={keyAssetImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
             )}{" "}
             in world
           </button>
-        </Grid>
-        <Grid item mb={2}>
+        </div>
+        <div className="flex flex-col">
           <button
-            className="btn-outline"
+            className="btn btn-outline"
             disabled={areButtonsDisabled || droppedItems.length === 0}
             onClick={removeAllQuestItems}
           >
             Remove all
           </button>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
 
       {droppedItems.length > 0 && (
-        <Grid container direction="column" mt={1}>
+        <div className="container mt-4">
           <h4>Placed Items</h4>
-          <table>
+          <table className="table">
             <tbody>
               {droppedItems.map((item, index) => {
                 if (!item) return <div />;
@@ -194,8 +185,8 @@ export function Admin({ keyAssetImage }) {
                   const clickableLink = new URL(item.clickableLink);
                   let params = new URLSearchParams(clickableLink.search);
                   const lastMoved = new Date(parseInt(params.get("lastMoved")));
-                  dayjs.extend(relativeTime);
-                  lastMovedFormatted = dayjs(lastMoved).fromNow(); // Adding true to fromNow gets rid of 'ago' to save space
+                  const now = new Date()
+                  lastMovedFormatted = Math.round((now - lastMoved) / (1000 * 60 * 60 * 24));
                 }
                 return (
                   <tr key={index}>
@@ -203,20 +194,22 @@ export function Admin({ keyAssetImage }) {
                     <td>
                       <div className="tooltip">
                         <span className="tooltip-content">Last Moved</span>
-                        {lastMovedFormatted}
+                        <p className="p3">
+                          {lastMovedFormatted === 0 ? "Today" : `${lastMovedFormatted} day${lastMovedFormatted > 1 ? 's' : ''} ago`}
+                        </p>
                       </div>
                     </td>
                     <td style={{ textAlign: "right" }}>
                       <div className="tooltip">
                         <span className="tooltip-content">Walk to Item</span>
-                        <button className="btn-icon" onClick={() => moveVisitor(item.position)}>
-                          <WalkIcon />
+                        <button className="btn btn-icon" onClick={() => moveVisitor(item.position)}>
+                          <img alt="Walk to" src="https://sdk-style.s3.amazonaws.com/icons/walk.svg" />
                         </button>
                       </div>
                       <div className="tooltip">
                         <span className="tooltip-content">Remove Item</span>
-                        <button className="btn-icon" onClick={() => removeQuestItem(item.id)}>
-                          <RemoveCircleOutline />
+                        <button className="btn btn-icon" onClick={() => removeQuestItem(item.id)}>
+                          <img alt="Remove" src="https://sdk-style.s3.amazonaws.com/icons/delete.svg" />
                         </button>
                       </div>
                     </td>
@@ -225,7 +218,7 @@ export function Admin({ keyAssetImage }) {
               })}
             </tbody>
           </table>
-        </Grid>
+        </div>
       )}
       {errorMessage && <p className="p3 text-error">{errorMessage}</p>}
     </>

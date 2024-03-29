@@ -1,4 +1,5 @@
 import {
+  handleCheckInteractiveCredentials,
   handleDropQuestItem,
   handleGetLeaderboard,
   handleMoveVisitor,
@@ -29,6 +30,8 @@ router.get("/system/health", (req, res) => {
   });
 });
 
+router.get("/system/interactive-credentials", handleCheckInteractiveCredentials);
+
 // Admin
 router.get("/leaderboard", handleGetLeaderboard);
 router.get("/key-asset-image", handleGetKeyAssetImage);
@@ -43,7 +46,6 @@ router.post("/drop-quest-item", handleDropQuestItem);
 router.post("/quest-item-clicked", handleQuestItemClicked);
 
 // Visitor
-// visitorId comes from interactive nonce
 router.get("/visitor", handleGetVisitor);
 router.put("/visitor/move", handleMoveVisitor);
 

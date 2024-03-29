@@ -1,21 +1,16 @@
-import axios from "axios";
+import axios from 'axios';
 
-const BASE_URL = process.env.API_URL || "";
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 let backendAPI = axios;
 
-const initBackendAPI = function () {
-  backendAPI = null;
-  backendAPI = axios;
-};
-
-const setupBackendAPI = (interactiveParams) => {
+const setupBackendAPI = async (interactiveParams) => {
   backendAPI = axios.create({
     baseURL: `${BASE_URL}/api`,
     headers: {
       "Content-Type": "application/json",
     },
   });
-  // Only do this if have interactive nonce.
+
   if (interactiveParams.interactiveNonce) {
     backendAPI.interceptors.request.use((config) => {
       if (!config?.params) config.params = {};
@@ -33,10 +28,13 @@ const setupBackendAPI = (interactiveParams) => {
       return config;
     });
   }
+
+  try {
+    await backendAPI.get("/system/interactive-credentials");
+    return { success: true }
+  } catch (error) {
+    return { success: false }
+  }
 };
 
-export { backendAPI, initBackendAPI, setupBackendAPI };
-
-export default () => {
-  return backendAPI;
-};
+export { backendAPI, setupBackendAPI };

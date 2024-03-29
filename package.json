@@ -1,40 +1,31 @@
 {
+  "name": "sdk-quest",
   "author": "metaversecloud.com | topia.io",
-  "name": "quest",
-  "private": true,
+  "description": "",
   "dependencies": {
-    "@babel/core": "^7.22.8",
-    "@babel/eslint-parser": "^7.22.7",
-    "@rtsdk/topia": "^0.9.0",
-    "axios": "^1.2.1",
-    "body-parser": "^1.20.1",
-    "cheerio": "^1.0.0-rc.12",
-    "concurrently": "^7.6.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "ejs": "^3.1.6",
-    "express": "^4.18.2",
-    "yalc": "^1.0.0-pre.53"
+    "@rtsdk/topia": "^0.9.1",
+    "axios": "^1.6.7",
+    "concurrently": "^8.2.2",
+    "dotenv": "^16.4.5"
   },
+  "keywords": [],
+  "license": "BSD-3-Clause",
+  "main": "./server/index.js",
+  "devDependencies": {
+    "prettier": "3.2.5"
+  },
+  "private": true,
+  "scripts": {
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
+    "dev-server": "npm run dev --prefix server",
+    "dev-client": "npm run start --prefix client"
+  },
+  "type": "module",
+  "version": "1.0.0",
   "workspaces": [
     "client",
     "server"
-  ],
-  "description": "",
-  "engines": {
-    "node": "18.16"
-  },
-  "keywords": [],
-  "license": "ISC",
-  "main": "index.js",
-  "scripts": {
-    "build": "npm run build -w client",
-    "build-dev": "npm run build",
-    "link-sdk": "yalc link @rtsdk/topia",
-    "unlink-sdk": "yalc remove @rtsdk/topia",
-    "dev": "concurrently \"node server/index.js\" \"npm start --prefix client\"",
-    "start": "npm start -ws"
-  },
-  "type": "module",
-  "version": "1.1.0"
+  ]
 }

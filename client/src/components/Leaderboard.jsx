@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // components
-import CircularProgress from "@mui/material/CircularProgress";
-import Grid from "@mui/material/Grid";
-
-// context
-import { useGlobalState } from "@context";
+import { Loading } from "@components";
 
 // utils
-import { backendAPI } from "@utils";
+import { backendAPI } from "@utils/backendAPI";
+
+// context
+import { GlobalStateContext } from "@context/GlobalContext";
 
 export function Leaderboard({ isKeyAsset, keyAssetImage }) {
   const [visibleData, setVisibleData] = useState([]);
@@ -17,12 +16,12 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
   const [myData, setMyData] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { visitor } = useGlobalState();
+  // context
+  const { visitor } = useContext(GlobalStateContext);
 
   useEffect(() => {
-    const getLeaderboardData = async () => {
-      try {
-        const result = await backendAPI.get(`/leaderboard?isKeyAsset=${isKeyAsset}`);
+    backendAPI.get(`/leaderboard?isKeyAsset=${isKeyAsset}`)
+      .then((result) => {
         const { leaderboard } = result.data;
         const index = leaderboard.findIndex((item) => item.profileId === visitor.profileId);
         setMyData(leaderboard[index]);
@@ -30,24 +29,21 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
         setTotal(leaderboard.length);
         setVisibleData(leaderboard.slice(0, 100));
         setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        console.error("There was a problem while retrieving leaderboard data. Please try again later.");
-      }
-    };
-    if (visitor) getLeaderboardData();
+      })
+      .catch((error) => console.error("There was a problem while retrieving leaderboard data. Please try again later."))
+      .finally(() => setIsLoading(false))
   }, [visitor]);
 
-  if (isLoading) return <CircularProgress />;
+  if (isLoading) return <Loading />;
 
   if (visibleData.length === 0) return <p>No quest items have been found yet. Search the world and be the first!</p>;
 
   return (
-    <Grid container direction="column">
+    <div className="container flex">
       {currentPosition && currentPosition > 0 ? (
         <>
           <h4>My Stats</h4>
-          <table>
+          <table className="table">
             <thead>
               <tr>
                 <th>Current Position</th>
@@ -67,15 +63,15 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
           </table>
         </>
       ) : (
-        <Grid item>
+        <div className="flex flex-col">
           <p>
             Explore and find <img alt="Find me" height={20} src={keyAssetImage} /> to complete your daily quest.
           </p>
-        </Grid>
+        </div>
       )}
-      <Grid item mt={2}>
+      <div className="flex flex-col mt-2">
         <h4>Leaderboard</h4>
-        <table>
+        <table className="table">
           <thead>
             <tr>
               <th></th>
@@ -97,7 +93,7 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
             })}
           </tbody>
         </table>
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 }

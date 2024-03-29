@@ -1,3 +1,4 @@
+export * from "./handleCheckInteractiveCredentials.js";
 export * from "./handleDropQuestItem.js";
 export * from "./handleGetLeaderboard.js";
 export * from "./handleGetDroppedAssetDataObject.js";

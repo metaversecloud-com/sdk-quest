@@ -1,15 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 
 // components
-import { Leaderboard } from "@components/Leaderboard";
-import CircularProgress from "@mui/material/CircularProgress";
-import Grid from "@mui/material/Grid";
-
-// context
-import { useGlobalState } from "@context";
+import { Leaderboard, Loading } from "@components";
 
 // utils
-import { backendAPI } from "@utils";
+import { backendAPI } from "@utils/backendAPI";
 
 export const QuestItemClicked = () => {
   const [message, setMessage] = useState("");
@@ -17,7 +12,7 @@ export const QuestItemClicked = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const { keyAssetImage, hasInteractiveParams } = useGlobalState();
+  const { keyAssetImage, hasInteractiveParams } = useContext();
 
   useEffect(() => {
     if (hasInteractiveParams) handleItemAssetClicked();
@@ -45,35 +40,29 @@ export const QuestItemClicked = () => {
     }
   }, []);
 
-  if (isLoading) {
-    return (
-      <Grid container justifyContent="center" mt={4}>
-        <CircularProgress />
-      </Grid>
-    );
-  }
+  if (isLoading) return <Loading />;
 
   return (
-    <Grid alignItems="center" container direction="column" p={0}>
-      <Grid item p={3} paddingBottom={0} paddingTop={0} xs={12}>
-        {keyAssetImage ? <img alt="Find me" src={keyAssetImage} /> : <div />}
-      </Grid>
-      <Grid item p={3} xs={12}>
-        <h1>Quest</h1>
-      </Grid>
-      <Grid container direction="column">
+    <div className="container p-6 items-center justify-start">
+      <div className="flex flex-col px-3">{keyAssetImage ? <img alt="Find me" src={keyAssetImage} /> : <div />}</div>
+      <div className="flex flex-col px-3">
+        <h1 className="h2">Quest</h1>
+      </div>
+      <div className="container p-6 items-center justify-start">
         {message && (
-          <Grid item p={1} paddingTop={0}>
+          <div className="flex flex-col p-1">
             <p>{message}</p>
-          </Grid>
+          </div>
         )}
         {collectedText && (
-          <Grid item p={1} paddingBottom={2} paddingTop={0}>
+          <div className="flex flex-col p-1">
             <p>{collectedText}</p>
-          </Grid>
+          </div>
         )}
-      </Grid>
+      </div>
       <Leaderboard isKeyAsset={false} keyAssetImage={keyAssetImage} />
-    </Grid>
+    </div>
   );
 };
+
+export default QuestItemClicked
