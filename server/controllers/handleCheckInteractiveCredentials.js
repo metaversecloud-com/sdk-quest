@@ -1,19 +1,12 @@
-import { errorHandler, User } from "../utils/index.js";
+import { errorHandler, getCredentials, User } from "../utils/index.js";
 
 export const handleCheckInteractiveCredentials = async (req, res) => {
   try {
-    const { interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
-    const credentials = {
-      interactiveNonce,
-      interactivePublicKey,
-      urlSlug,
-      visitorId,
-    };
+    const credentials = getCredentials(req.query);
 
     if (process.env.INTERACTIVE_KEY !== credentials.interactivePublicKey) throw "Provided public key does not match";
 
-    // if key matches proceed with check using jwt created by topiaInit
-    const user = User.create({ credentials: { interactiveNonce, interactivePublicKey, urlSlug, visitorId } });
+    const user = User.create({ credentials });
     await user.checkInteractiveCredentials();
 
     return res.json({ success: true });

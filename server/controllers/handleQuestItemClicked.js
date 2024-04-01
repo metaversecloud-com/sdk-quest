@@ -2,6 +2,7 @@ import {
   errorHandler,
   getBaseURL,
   getClickedAssetAndKeyAsset,
+  getCredentials,
   getDifferenceInDays,
   getLongestStreak,
   getRandomCoordinates,
@@ -11,7 +12,8 @@ import {
 
 export const handleQuestItemClicked = async (req, res) => {
   try {
-    const { assetId, interactiveNonce, interactivePublicKey, profileId, urlSlug, username, visitorId } = req.query;
+    const credentials = getCredentials(req.query);
+    const { profileId, urlSlug, username, visitorId } = credentials;
 
     const now = new Date();
     const localDateString = now.toLocaleDateString();
@@ -20,21 +22,10 @@ export const handleQuestItemClicked = async (req, res) => {
 
     const analytics = [];
 
-    const credentials = {
-      assetId,
-      interactiveNonce,
-      interactivePublicKey,
-      urlSlug,
-      visitorId,
-    };
-
     const { droppedAsset, keyAsset } = await getClickedAssetAndKeyAsset(credentials);
     const keyAssetId = keyAsset.id;
 
-    const world = await getWorldDetails({
-      credentials: { ...credentials, assetId: keyAssetId },
-      urlSlug,
-    });
+    const world = await getWorldDetails({ ...credentials, assetId: keyAssetId });
 
     if (
       !keyAsset.dataObject?.numberAllowedToCollect ||
@@ -79,8 +70,8 @@ export const handleQuestItemClicked = async (req, res) => {
               longestStreak: 1,
               total: 1,
               totalCollectedToday: 1,
-            },
-            [`profileMapper.${profileId}`]: username,
+              username
+            }
           }),
         );
       } else {
@@ -111,6 +102,7 @@ export const handleQuestItemClicked = async (req, res) => {
               longestStreak,
               total,
               totalCollectedToday,
+              username
             },
           }),
         );
@@ -144,8 +136,6 @@ export const handleQuestItemClicked = async (req, res) => {
       }
 
       promises.push(visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1));
-
-      promises.push(world.incrementDataObjectValue([`keyAssets.${keyAssetId}.questItems.${assetId}.count`], 1));
       promises.push(
         world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1, { analytics }),
       );

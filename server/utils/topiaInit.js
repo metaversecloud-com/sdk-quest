@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import { Topia, AssetFactory, DroppedAssetFactory, UserFactory, VisitorFactory, WorldFactory } from "@rtsdk/topia";
+
+import dotenv from "dotenv";
+dotenv.config({ path: "../.env" });
 
 const config = {
   apiDomain: process.env.INSTANCE_DOMAIN || "api.topia.io",

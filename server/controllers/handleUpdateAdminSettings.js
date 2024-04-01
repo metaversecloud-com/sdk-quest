@@ -1,16 +1,10 @@
-import { errorHandler, getDroppedAssetDetails, getDroppedAssetsWithUniqueName } from "../utils/index.js";
+import { errorHandler, getCredentials, getDroppedAssetDetails, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
 export const handleUpdateAdminSettings = async (req, res) => {
   try {
-    const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
+    const credentials = getCredentials(req.query);
+    const { assetId } = credentials;
     const { numberAllowedToCollect, questItemImage } = req.body;
-    const credentials = {
-      assetId,
-      interactiveNonce,
-      interactivePublicKey,
-      urlSlug,
-      visitorId,
-    };
 
     const droppedAsset = await getDroppedAssetDetails({
       credentials,

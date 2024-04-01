@@ -2,8 +2,9 @@ import { World } from "../topiaInit.js";
 import { errorHandler } from "../errorHandler.js";
 import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
 
-export const getWorldDetails = async ({ credentials, urlSlug }) => {
+export const getWorldDetails = async (credentials) => {
   try {
+    const { urlSlug } = credentials
     const world = World.create(urlSlug, { credentials });
     await world.fetchDetails();
     await world.fetchDataObject();

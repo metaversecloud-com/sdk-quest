@@ -10,6 +10,7 @@ import {
   handleGetVisitor,
   handleRemoveDroppedAsset,
   handleRemoveDroppedAssetsWithUniqueName,
+  handleRemoveQuestFromWorld,
   handleUpdateAdminSettings,
 } from "./controllers/index.js";
 
@@ -36,6 +37,7 @@ router.get("/system/interactive-credentials", handleCheckInteractiveCredentials)
 router.get("/leaderboard", handleGetLeaderboard);
 router.get("/key-asset-image", handleGetKeyAssetImage);
 router.post("/admin-settings", handleUpdateAdminSettings);
+router.delete("/quest", handleRemoveQuestFromWorld);
 
 // Dropped Asset
 router.get("/dropped-asset/data-object", handleGetDroppedAssetDataObject);

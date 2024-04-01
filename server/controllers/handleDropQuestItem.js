@@ -7,28 +7,20 @@ import {
   getDefaultKeyAssetImage,
   getRandomCoordinates,
   getWorldDetails,
+  getCredentials,
 } from "../utils/index.js";
 
 export const handleDropQuestItem = async (req, res) => {
   try {
-    const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
-    const credentials = {
-      assetId,
-      interactiveNonce,
-      interactivePublicKey,
-      urlSlug,
-      visitorId,
-    };
+    const credentials = getCredentials(req.query);
+    const { assetId, interactivePublicKey, urlSlug } = credentials;
 
     const [keyAsset, world] = await Promise.all([
       getDroppedAssetDetails({
         credentials,
         droppedAssetId: assetId,
       }),
-      getWorldDetails({
-        credentials,
-        urlSlug,
-      }),
+      getWorldDetails(credentials),
     ]);
 
     // Randomly place the quest item asset
@@ -60,7 +52,6 @@ export const handleDropQuestItem = async (req, res) => {
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
       droppedAsset.setDataObject({ keyAssetId: keyAsset.id, keyAssetUniqueName: keyAsset.uniqueName }),
-      world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}`]: { count: 0 } }),
     ]);
 
     return res.json({ droppedAsset, success: true });

@@ -1,17 +1,13 @@
-import { errorHandler, getDroppedAssetsWithUniqueName } from "../utils/index.js";
+import { errorHandler, getCredentials, getDroppedAssetsWithUniqueName } from "../utils/index.js";
 
 export const handleGetQuestItems = async (req, res) => {
   try {
-    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const credentials = getCredentials(req.query);
+    const { assetId } = credentials;
 
     const droppedAssets = await getDroppedAssetsWithUniqueName({
       assetId,
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-        urlSlug,
-      },
+      credentials,
       isPartial: true,
     });
 

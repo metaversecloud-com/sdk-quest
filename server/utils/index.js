@@ -4,6 +4,7 @@ export * from "./world/index.js";
 export * from "./cleanReturnPayload.js";
 export * from "./errorHandler.js";
 export * from "./getBaseURL.js";
+export * from "./getCredentials.js";
 export * from "./getDateFromString.js";
 export * from "./getDefaultKeyAssetImage.js";
 export * from "./getDifferenceInDays.js";

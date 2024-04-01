@@ -30,7 +30,7 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
         setVisibleData(leaderboard.slice(0, 100));
         setIsLoading(false);
       })
-      .catch((error) => console.error("There was a problem while retrieving leaderboard data. Please try again later."))
+      .catch(() => console.error("There was a problem while retrieving leaderboard data. Please try again later."))
       .finally(() => setIsLoading(false))
   }, [visitor]);
 
@@ -39,7 +39,7 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
   if (visibleData.length === 0) return <p>No quest items have been found yet. Search the world and be the first!</p>;
 
   return (
-    <div className="container flex">
+    <div className="container">
       {currentPosition && currentPosition > 0 ? (
         <>
           <h4>My Stats</h4>
@@ -53,11 +53,11 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td className="p2">
                   {currentPosition} of {total}
                 </td>
-                <td>{myData.streak || 0}</td>
-                <td>{myData.collected}</td>
+                <td className="p2">{myData.streak || 0}</td>
+                <td className="p2">{myData.collected}</td>
               </tr>
             </tbody>
           </table>
@@ -69,7 +69,7 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
           </p>
         </div>
       )}
-      <div className="flex flex-col mt-2">
+      <div className="mt-6">
         <h4>Leaderboard</h4>
         <table className="table">
           <thead>
@@ -84,10 +84,10 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
             {visibleData.map((item, index) => {
               return (
                 <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{item.name}</td>
-                  <td>{item.streak || 0}</td>
-                  <td>{item.collected}</td>
+                  <td className="p2">{index + 1}</td>
+                  <td className="p2">{item.name}</td>
+                  <td className="p2">{item.streak || 0}</td>
+                  <td className="p2">{item.collected}</td>
                 </tr>
               );
             })}
