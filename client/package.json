@@ -1,58 +1,31 @@
 {
-  "name": "@quest/client",
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "engines": {
-    "node": "18.16"
+  "name": "@sdk-quest/client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/eslint-parser": "^7.22.7",
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.10.17",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.2.1",
-    "babel-plugin-import": "^1.13.5",
-    "customize-cra": "^1.0.0",
-    "dayjs": "^1.11.7",
+    "axios": "^1.6.8",
     "react": "^18.2.0",
-    "react-app-rewired": "^2.2.1",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.5",
-    "react-scripts": "^5.0.1",
-    "react-virtualized": "^9.22.5",
-    "web-vitals": "^2.1.4"
+    "react-router-dom": "^6.22.1"
   },
   "devDependencies": {
-    "react-error-overlay": "6.0.9"
-  },
-  "allowedHosts": "all",
-  "proxy": "http://localhost:3001/",
-  "private": true,
-  "resolutions": {
-    "//": "See https://github.com/facebook/create-react-app/issues/11773",
-    "react-error-overlay": "6.0.9"
-  },
-  "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject",
-    "lint": "eslint -c .eslintrc.js --ext .js,.jsx ."
-  },
-  "version": "0.1.0"
+    "@types/react": "^18.2.56",
+    "@types/react-dom": "^18.2.19",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.1.4"
+  }
 }

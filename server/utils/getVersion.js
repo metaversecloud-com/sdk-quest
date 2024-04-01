@@ -12,5 +12,6 @@ export const getVersion = () => {
     return version;
   } catch (error) {
     console.error("Error reading or parsing package.json:", error);
+    return error;
   }
 };
