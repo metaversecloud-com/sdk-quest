@@ -1,19 +1,13 @@
 import { DroppedAsset } from "../utils/topiaInit.js";
-import { errorHandler } from "../utils/index.js";
+import { errorHandler, getCredentials } from "../utils/index.js";
 
 export const handleRemoveDroppedAsset = async (req, res) => {
   try {
+    const credentials = getCredentials(req.query);
+    const { urlSlug} = credentials;
     const { droppedAssetId } = req.params;
-    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
 
-    const droppedAsset = DroppedAsset.create(droppedAssetId, urlSlug, {
-      credentials: {
-        assetId,
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
-    });
+    const droppedAsset = DroppedAsset.create(droppedAssetId, urlSlug, { credentials });
     await droppedAsset.deleteDroppedAsset();
 
     return res.json({ success: true });

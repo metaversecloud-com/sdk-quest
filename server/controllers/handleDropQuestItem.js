@@ -7,29 +7,23 @@ import {
   getDefaultKeyAssetImage,
   getRandomCoordinates,
   getWorldDetails,
+  getCredentials,
 } from "../utils/index.js";
 
 export const handleDropQuestItem = async (req, res) => {
   try {
-    const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
-    const credentials = {
-      assetId,
-      interactiveNonce,
-      interactivePublicKey,
-      urlSlug,
-      visitorId,
-    };
+    const credentials = getCredentials(req.query);
+    const { assetId, interactivePublicKey, urlSlug } = credentials;
 
     const [keyAsset, world] = await Promise.all([
       getDroppedAssetDetails({
         credentials,
         droppedAssetId: assetId,
+        shouldInitDataObject: true,
       }),
-      getWorldDetails({
-        credentials,
-        urlSlug,
-      }),
+      getWorldDetails(credentials),
     ]);
+    const uniqueName = keyAsset.uniqueName || "Quest"
 
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
@@ -47,8 +41,8 @@ export const handleDropQuestItem = async (req, res) => {
       layer0: "",
       layer1: questItemImage,
       position,
-      sceneDropId: `${assetId}_${keyAsset.uniqueName}`,
-      uniqueName: `questItem_${keyAsset.uniqueName}`,
+      sceneDropId: `${assetId}_${uniqueName}`,
+      uniqueName: `questItem_${uniqueName}`,
       urlSlug,
     });
 
@@ -59,8 +53,11 @@ export const handleDropQuestItem = async (req, res) => {
         isOpenLinkInDrawer: true,
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
-      droppedAsset.setDataObject({ keyAssetId: keyAsset.id, keyAssetUniqueName: keyAsset.uniqueName }),
-      world.updateDataObject({ [`keyAssets.${assetId}.questItems.${droppedAsset.id}`]: { count: 0 } }),
+      droppedAsset.setDataObject({
+        keyAssetId: keyAsset.id,
+        keyAssetUniqueName: uniqueName,
+        questItemImage: keyAsset.dataObject?.questItemImage,
+      }),
     ]);
 
     return res.json({ droppedAsset, success: true });

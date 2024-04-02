@@ -1,14 +1,11 @@
-import { errorHandler, getVisitor } from "../utils/index.js";
+import { errorHandler, getCredentials, getVisitor } from "../utils/index.js";
 
 export const handleGetVisitor = async (req, res) => {
   try {
-    const { interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const credentials = getCredentials(req.query);
+    const { urlSlug, visitorId } = credentials;
     const visitor = await getVisitor({
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
+      credentials,
       urlSlug,
       visitorId,
     });

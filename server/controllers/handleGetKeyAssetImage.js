@@ -1,15 +1,9 @@
-import { errorHandler, getDroppedAssetDetails, getDefaultKeyAssetImage } from "../utils/index.js";
+import { errorHandler, getDroppedAssetDetails, getDefaultKeyAssetImage, getCredentials } from "../utils/index.js";
 
 export const handleGetKeyAssetImage = async (req, res) => {
   try {
-    const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
-    const credentials = {
-      assetId,
-      interactiveNonce,
-      interactivePublicKey,
-      urlSlug,
-      visitorId,
-    };
+    const credentials = getCredentials(req.query);
+    const { assetId, urlSlug } = credentials;
 
     const droppedAsset = await getDroppedAssetDetails({
       credentials,
@@ -17,17 +11,7 @@ export const handleGetKeyAssetImage = async (req, res) => {
       shouldInitDataObject: true,
     });
 
-    let keyAssetImage;
-    if (droppedAsset.dataObject && droppedAsset.dataObject?.questItemImage) {
-      keyAssetImage = droppedAsset.dataObject?.questItemImage;
-    } else {
-      await getDefaultKeyAssetImage({
-        credentials,
-        urlSlug,
-      });
-    }
-
-    return res.json({ keyAssetImage, success: true });
+    return res.json({ keyAssetImage: droppedAsset.dataObject?.questItemImage, success: true });
   } catch (error) {
     return errorHandler({
       error,

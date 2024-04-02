@@ -1,15 +1,11 @@
-import { errorHandler, getDroppedAssetDataObject } from "../utils/index.js";
+import { errorHandler, getCredentials, getDroppedAssetDataObject } from "../utils/index.js";
 
 export const handleGetDroppedAssetDataObject = async (req, res) => {
   try {
-    const { assetId, interactiveNonce, interactivePublicKey, urlSlug, visitorId } = req.query;
+    const credentials = getCredentials(req.query);
+    const { urlSlug } = credentials;
     const droppedAsset = await getDroppedAssetDataObject({
-      credentials: {
-        assetId,
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-      },
+      credentials,
       urlSlug,
     });
     return res.json({ droppedAsset });

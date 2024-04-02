@@ -1,4 +1,5 @@
 import {
+  handleCheckInteractiveCredentials,
   handleDropQuestItem,
   handleGetLeaderboard,
   handleMoveVisitor,
@@ -8,7 +9,8 @@ import {
   handleQuestItemClicked,
   handleGetVisitor,
   handleRemoveDroppedAsset,
-  handleRemoveDroppedAssetsWithUniqueName,
+  handleRemoveQuestItems,
+  handleRemoveQuestFromWorld,
   handleUpdateAdminSettings,
 } from "./controllers/index.js";
 
@@ -29,21 +31,23 @@ router.get("/system/health", (req, res) => {
   });
 });
 
+router.get("/system/interactive-credentials", handleCheckInteractiveCredentials);
+
 // Admin
 router.get("/leaderboard", handleGetLeaderboard);
 router.get("/key-asset-image", handleGetKeyAssetImage);
 router.post("/admin-settings", handleUpdateAdminSettings);
+router.delete("/quest", handleRemoveQuestFromWorld);
 
 // Dropped Asset
 router.get("/dropped-asset/data-object", handleGetDroppedAssetDataObject);
 router.get("/quest-items", handleGetQuestItems);
-router.post("/dropped-asset/remove-all-with-unique-name", handleRemoveDroppedAssetsWithUniqueName);
+router.post("/dropped-asset/remove-all-with-unique-name", handleRemoveQuestItems);
 router.delete("/dropped-asset/:droppedAssetId", handleRemoveDroppedAsset);
 router.post("/drop-quest-item", handleDropQuestItem);
 router.post("/quest-item-clicked", handleQuestItemClicked);
 
 // Visitor
-// visitorId comes from interactive nonce
 router.get("/visitor", handleGetVisitor);
 router.put("/visitor/move", handleMoveVisitor);
 

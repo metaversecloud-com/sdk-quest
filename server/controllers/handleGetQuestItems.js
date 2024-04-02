@@ -1,26 +1,17 @@
-import { errorHandler, getDroppedAssetsWithUniqueName } from "../utils/index.js";
+import { errorHandler, getCredentials, getQuestItems } from "../utils/index.js";
 
 export const handleGetQuestItems = async (req, res) => {
   try {
-    const { assetId, interactivePublicKey, interactiveNonce, urlSlug, visitorId } = req.query;
+    const credentials = getCredentials(req.query);
 
-    const droppedAssets = await getDroppedAssetsWithUniqueName({
-      assetId,
-      credentials: {
-        interactiveNonce,
-        interactivePublicKey,
-        visitorId,
-        urlSlug,
-      },
-      isPartial: true,
-    });
+    const droppedAssets = await getQuestItems(credentials);
 
     return res.json({ droppedAssets, success: true });
   } catch (error) {
     return errorHandler({
       error,
       functionName: "handleGetQuestItems",
-      message: "Error fetching dropped assets with unique name",
+      message: "Error fetching Quest items",
       req,
       res,
     });

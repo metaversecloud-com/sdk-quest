@@ -18,7 +18,7 @@ export const getVisitor = async ({ credentials, urlSlug, visitorId }) => {
     }
     return visitor;
   } catch (error) {
-    return errorHandler({ error, functionName: "getVisitor", message: "Error getting visitor" });
+    errorHandler({ error, functionName: "getVisitor", message: "Error getting visitor" });
     return await visitor.fetchDataObject();
   }
 };

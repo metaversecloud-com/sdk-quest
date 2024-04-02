@@ -1,35 +1,31 @@
-import path from "path";
-import { fileURLToPath } from "url";
 import express from "express";
-import bodyParser from "body-parser";
+import cors from "cors";
 import dotenv from "dotenv";
 import router from "./routes.js";
-import cors from "cors";
-import { cleanReturnPayload } from "./utils/cleanReturnPayload.js";
-dotenv.config();
+import path from "path";
 
-const PORT = process.env.PORT || 3001;
+import { cleanReturnPayload } from "./utils/cleanReturnPayload.js";
+import { fileURLToPath } from "url";
+dotenv.config({ path: "../.env" });
+
+function checkEnvVariables() {
+  const requiredEnvVariables = ["INTERACTIVE_KEY", "INTERACTIVE_SECRET"];
+  const missingVariables = requiredEnvVariables.filter((variable) => !process.env[variable]);
+
+  if (missingVariables.length > 0) {
+    throw new Error(`Missing required environment variables in the .env file: ${missingVariables.join(", ")}`);
+  } else {
+    console.log("All required environment variables provided.");
+  }
+}
+checkEnvVariables();
+
+const PORT = process.env.PORT || 3000;
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(function (req, res, next) {
-  const ogSend = res.send;
-  res.send = function (data) {
-    if (data) {
-      try {
-        const cleanData = cleanReturnPayload(typeof data === "string" ? JSON.parse(data) : data, "topia");
-        res.send = ogSend;
-        return res.send(cleanData);
-      } catch (error) {
-        console.error(error);
-        next();
-      }
-    }
-  };
-  next();
-});
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/api", router);
 
@@ -52,6 +48,25 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
+// TODO: Figure out why this isn't working after converting to Vite
+app.use(function (req, res, next) {
+  const ogSend = res.send;
+  res.send = function (data) {
+    if (data) {
+      try {
+        const cleanData = cleanReturnPayload(typeof data === "string" ? JSON.parse(data) : data);
+        res.send = ogSend;
+        return res.send(cleanData);
+      } catch (error) {
+        console.log(error);
+        next();
+      }
+    }
+  };
+  next();
+});
+
+
 app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
+  console.log(`Server is running on port: ${PORT}`);
 });

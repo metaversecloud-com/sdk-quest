@@ -3,7 +3,9 @@ import { errorHandler, getDefaultKeyAssetImage } from "../index.js";
 export const initializeDroppedAssetDataObject = async ({ droppedAsset, urlSlug }) => {
   try {
     await droppedAsset.fetchDataObject();
-    if (!droppedAsset?.dataObject?.questItemImage) {
+    if (droppedAsset.dataObject?.keyAssetId) return;
+
+    if (!droppedAsset.dataObject?.questItemImage) {
       const lockId = `${droppedAsset.id}-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
       const questItemImage = await getDefaultKeyAssetImage({ urlSlug });
       await droppedAsset.setDataObject(

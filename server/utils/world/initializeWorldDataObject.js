@@ -3,31 +3,23 @@ import { errorHandler } from "../errorHandler.js";
 export const initializeWorldDataObject = async ({ credentials, world, urlSlug }) => {
   try {
     const { assetId } = credentials;
+
+    const payload = {
+      itemsCollectedByUser: {},
+      keyAssetId: assetId,
+      totalItemsCollected: 0,
+      lastInteractionDate: new Date(),
+    }
+
     const lockId = `${urlSlug}-${assetId}-keyAssetId-${new Date(Math.round(new Date().getTime() / 60000) * 60000)}`;
     if (!world.dataObject || !world.dataObject?.keyAssets) {
       await world.setDataObject(
-        {
-          keyAssets: {
-            [assetId]: {
-              itemsCollectedByUser: {},
-              keyAssetId: assetId,
-              totalItemsCollected: 0,
-              questItems: {},
-            },
-          },
-        },
+        { keyAssets: { [assetId]: { ...payload } } },
         { lock: { lockId, releaseLock: true } },
       );
     } else if (!world.dataObject?.keyAssets?.[assetId]) {
       await world.updateDataObject(
-        {
-          [`keyAssets.${assetId}`]: {
-            itemsCollectedByUser: {},
-            keyAssetId: assetId,
-            totalItemsCollected: 0,
-            questItems: {},
-          },
-        },
+        { [`keyAssets.${assetId}`]: { ...payload } },
         { lock: { lockId, releaseLock: true } },
       );
     }
