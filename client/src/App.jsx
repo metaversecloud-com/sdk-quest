@@ -11,7 +11,7 @@ import { Loading } from "@components/Loading";
 
 // context
 import { GlobalDispatchContext } from "@context/GlobalContext";
-import { SET_INTERACTIVE_PARAMS, SET_VISITOR_INFO } from "@context/types";
+import { SET_INTERACTIVE_PARAMS, SET_KEY_ASSET_IMAGE, SET_VISITOR_INFO } from "@context/types";
 
 // utils
 import { backendAPI, setupBackendAPI } from "@utils/backendAPI";
@@ -74,22 +74,42 @@ const App = () => {
   );
 
   const setupBackend = async () => {
-    const setupResult = await setupBackendAPI(interactiveParams);
-    if (!setupResult.success) navigate("*");
-    else setHasInitBackendAPI(true);
+    setupBackendAPI(interactiveParams)
+      .then((result) => {
+        if (!result.success) navigate("*")
+      })
+      .finally(() => setHasInitBackendAPI(true))
   };
 
   const getVisitor = async () => {
-    const result = await backendAPI.get("/visitor");
-    if (result.data.success) {
-      dispatch({
-        type: SET_VISITOR_INFO,
-        payload: result.data.visitor,
-      });
-      setIsLoading(false)
-    } else {
-      console.error("Error getting visitor");
-    }
+    backendAPI.get("/visitor")
+      .then((result) => {
+        if (result.data.success) {
+          dispatch({
+            type: SET_VISITOR_INFO,
+            payload: result.data.visitor,
+          });
+        }
+      })
+      .catch(() => console.error("Error getting visitor"))
+      .finally(() => setIsLoading(false))
+  };
+
+  const getKeyAssetImage = async () => {
+    backendAPI.get("/key-asset-image")
+      .then((result) => {
+        if (result.data.success) {
+          dispatch({
+            type: SET_KEY_ASSET_IMAGE,
+            payload: result.data.keyAssetImage,
+          });
+        } else {
+          return console.error("ERROR getting key asset image");
+        }
+      }
+      )
+      .catch((error) => console.error(error))
+      .finally(() => setIsLoading(false))
   };
 
   useEffect(() => {
@@ -102,7 +122,10 @@ const App = () => {
 
   useEffect(() => {
     if (!hasInitBackendAPI) setupBackend();
-    else getVisitor();
+    else {
+      getVisitor();
+      getKeyAssetImage();
+    }
   }, [hasInitBackendAPI, interactiveParams]);
 
   if (isLoading || !setHasInitBackendAPI) return <Loading />;

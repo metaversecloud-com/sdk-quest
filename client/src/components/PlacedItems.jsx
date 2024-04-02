@@ -1,17 +1,13 @@
 import { backendAPI } from "@utils/backendAPI";
 
-export function PlacedItems({ droppedItems, setErrorMessage }) {
+export function PlacedItems({ droppedItems, getQuestItems, setErrorMessage }) {
+
   const removeQuestItem = async (id) => {
     setErrorMessage("");
-    setAreButtonsDisabled(true);
     backendAPI.delete(`/dropped-asset/${id}`)
-      .then((result) => {
-        getQuestItems();
-      })
+      .then(() => getQuestItems())
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
-      .finally(() => setAreButtonsDisabled(false))
   };
-
 
   const moveVisitor = async (position) => {
     setErrorMessage("");

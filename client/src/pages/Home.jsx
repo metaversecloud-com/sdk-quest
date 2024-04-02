@@ -1,41 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 
 // components
-import { Admin, Leaderboard, Loading } from "@components";
-
-// utils
-import { backendAPI } from "@utils/backendAPI";
+import { Admin, Leaderboard } from "@components";
 
 // context
-import { GlobalDispatchContext, GlobalStateContext } from "@context/GlobalContext";
-import { SET_KEY_ASSET_IMAGE } from "@context/types";
+import { GlobalStateContext } from "@context/GlobalContext";
 
 export const Home = () => {
   const [activeTab, setActiveTab] = useState("leaderboard");
-  const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const dispatch = useContext(GlobalDispatchContext);
   const { keyAssetImage, visitor } = useContext(GlobalStateContext);
-
-  useEffect(() => {
-    backendAPI.get("/key-asset-image")
-      .then((result) => {
-        if (result.data.success) {
-          dispatch({
-            type: SET_KEY_ASSET_IMAGE,
-            payload: result.data.keyAssetImage,
-          });
-        } else {
-          return console.error("ERROR getting key asset image");
-        }
-      }
-      )
-      .catch((error) => console.error(error))
-      .finally(() => setIsLoading(false))
-  }, []);
-
-  if (isLoading) return <Loading />;
 
   return (
     <div className="container p-6 items-center justify-center">
@@ -55,8 +30,8 @@ export const Home = () => {
         </div>
       )}
       {keyAssetImage ? <img alt="Find me" className="mx-auto" src={keyAssetImage} /> : <div />}
-      <div className="flex flex-col pb-4">
-        <h1 className="h1 text-center pb-4">Quest</h1>
+      <div className="flex flex-col mb-6 mt-4">
+        <h1 className="h2 text-center">Quest</h1>
       </div>
       {activeTab === "admin" ? (
         <Admin keyAssetImage={keyAssetImage} />

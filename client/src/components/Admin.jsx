@@ -26,7 +26,6 @@ export function Admin({ keyAssetImage }) {
     if (hasInteractiveParams) {
       getDataObject();
       getQuestItems();
-      setIsLoading(false);
     }
   }, [hasInteractiveParams]);
 
@@ -39,6 +38,7 @@ export function Admin({ keyAssetImage }) {
         if (dataObject.questItemImage) setQuestItemImage(dataObject.questItemImage);
       })
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
+      .finally(() => setIsLoading(false))
   };
 
   const getQuestItems = async () => {
@@ -94,12 +94,12 @@ export function Admin({ keyAssetImage }) {
             disabled={areButtonsDisabled || droppedItems.length === 0}
             onClick={removeAllQuestItems}
           >
-            Remove all
+            Remove all items
           </button>
         </div>
       </div>
 
-      {droppedItems.length > 0 && <PlacedItems droppedItems={droppedItems} setErrorMessage={setErrorMessage} />}
+      {droppedItems.length > 0 && <PlacedItems droppedItems={droppedItems} getQuestItems={getQuestItems} setErrorMessage={setErrorMessage} />}
 
       {errorMessage && <p className="p3 text-error">{errorMessage}</p>}
     </>

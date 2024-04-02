@@ -19,6 +19,7 @@ export const handleDropQuestItem = async (req, res) => {
       getDroppedAssetDetails({
         credentials,
         droppedAssetId: assetId,
+        shouldInitDataObject: true,
       }),
       getWorldDetails(credentials),
     ]);
@@ -51,7 +52,11 @@ export const handleDropQuestItem = async (req, res) => {
         isOpenLinkInDrawer: true,
         clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
       }),
-      droppedAsset.setDataObject({ keyAssetId: keyAsset.id, keyAssetUniqueName: keyAsset.uniqueName }),
+      droppedAsset.setDataObject({
+        keyAssetId: keyAsset.id,
+        keyAssetUniqueName: keyAsset.uniqueName,
+        questItemImage: keyAsset.dataObject?.questItemImage,
+      }),
     ]);
 
     return res.json({ droppedAsset, success: true });

@@ -59,7 +59,7 @@ export function AdminForm({ numberAllowedToCollect, questItemImage, setErrorMess
         Save
       </button>
       <button className="btn btn-danger" disabled={areButtonsDisabled} onClick={() => setShowModal(true)}>
-        Remove Quest from World
+        Remove Quest from world
       </button>
       <hr className="mt-4 mb-2" />
 

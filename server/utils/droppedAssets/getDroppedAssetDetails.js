@@ -2,7 +2,7 @@ import { DroppedAsset } from "../topiaInit.js";
 import { errorHandler } from "../index.js";
 import { initializeDroppedAssetDataObject } from "./initializeDroppedAssetDataObject.js";
 
-export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, shouldInitDataObject, uniqueName }) => {
+export const getDroppedAssetDetails = async ({ credentials, droppedAssetId, shouldInitDataObject = false, uniqueName }) => {
   try {
     const { interactivePublicKey, urlSlug } = credentials;
     let assetId = droppedAssetId,

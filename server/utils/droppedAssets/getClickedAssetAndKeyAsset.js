@@ -22,7 +22,6 @@ export const getClickedAssetAndKeyAsset = async (credentials) => {
       keyAsset = await getDroppedAssetDetails({
         credentials,
         uniqueName: droppedAsset.dataObject.keyAssetUniqueName,
-        shouldInitDataObject: true,
       });
     }
 
