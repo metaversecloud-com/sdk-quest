@@ -9,7 +9,7 @@ import {
   handleQuestItemClicked,
   handleGetVisitor,
   handleRemoveDroppedAsset,
-  handleRemoveDroppedAssetsWithUniqueName,
+  handleRemoveQuestItems,
   handleRemoveQuestFromWorld,
   handleUpdateAdminSettings,
 } from "./controllers/index.js";
@@ -42,7 +42,7 @@ router.delete("/quest", handleRemoveQuestFromWorld);
 // Dropped Asset
 router.get("/dropped-asset/data-object", handleGetDroppedAssetDataObject);
 router.get("/quest-items", handleGetQuestItems);
-router.post("/dropped-asset/remove-all-with-unique-name", handleRemoveDroppedAssetsWithUniqueName);
+router.post("/dropped-asset/remove-all-with-unique-name", handleRemoveQuestItems);
 router.delete("/dropped-asset/:droppedAssetId", handleRemoveDroppedAsset);
 router.post("/drop-quest-item", handleDropQuestItem);
 router.post("/quest-item-clicked", handleQuestItemClicked);

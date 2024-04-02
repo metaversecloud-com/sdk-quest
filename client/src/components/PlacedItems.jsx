@@ -1,7 +1,6 @@
 import { backendAPI } from "@utils/backendAPI";
 
-export function PlacedItems({ droppedItems, getQuestItems, setErrorMessage }) {
-
+export function PlacedItems({ getQuestItems, setErrorMessage, questItems }) {
   const removeQuestItem = async (id) => {
     setErrorMessage("");
     backendAPI.delete(`/dropped-asset/${id}`)
@@ -20,7 +19,7 @@ export function PlacedItems({ droppedItems, getQuestItems, setErrorMessage }) {
       <h4>Placed Items</h4>
       <table className="table">
         <tbody>
-          {droppedItems.map((item, index) => {
+          {Object.values(questItems).map((item, index) => {
             if (!item) return <div />;
             let lastMovedFormatted = "-";
             if (item.clickableLink) {
@@ -32,7 +31,7 @@ export function PlacedItems({ droppedItems, getQuestItems, setErrorMessage }) {
             }
             return (
               <tr key={index}>
-                <td>{index + 1}</td>
+                <td className="p3">{index + 1}</td>
                 <td>
                   <div className="tooltip">
                     <span className="tooltip-content">Last Moved</span>

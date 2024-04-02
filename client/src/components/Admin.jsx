@@ -1,20 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 
 // components
-import { Loading } from "@components/Loading";
+import { AdminForm, Loading, PlacedItems } from "@components";
 
 // utils
 import { backendAPI } from "@utils/backendAPI";
 
 // context
 import { GlobalStateContext } from "@context/GlobalContext";
-import { PlacedItems } from './PlacedItems';
-import { AdminForm } from './AdminForm';
 
 export function Admin({ keyAssetImage }) {
   const [numberAllowedToCollect, setNumberAllowedToCollect] = useState();
   const [questItemImage, setQuestItemImage] = useState("");
-  const [droppedItems, setQuestItems] = useState([]);
+  const [questItems, setQuestItems] = useState({});
+  const [questItemCount, setQuestItemCount] = useState(0);
   const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -44,7 +43,10 @@ export function Admin({ keyAssetImage }) {
   const getQuestItems = async () => {
     setErrorMessage("");
     backendAPI.get("/quest-items")
-      .then((result) => setQuestItems(result.data.droppedAssets))
+      .then((result) => {
+        setQuestItems(result.data.droppedAssets)
+        setQuestItemCount(Object.keys(result.data.droppedAssets).length)
+      })
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
   };
 
@@ -61,7 +63,10 @@ export function Admin({ keyAssetImage }) {
     setErrorMessage("");
     setAreButtonsDisabled(true);
     backendAPI.post("/dropped-asset/remove-all-with-unique-name")
-      .then(() => setQuestItems([]))
+      .then(() => {
+        setQuestItems({})
+        setQuestItemCount(0)
+      })
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
       .finally(() => setAreButtonsDisabled(false))
   };
@@ -71,9 +76,10 @@ export function Admin({ keyAssetImage }) {
   return (
     <>
       <AdminForm numberAllowedToCollect={numberAllowedToCollect} questItemImage={questItemImage} setErrorMessage={setErrorMessage} setNumberAllowedToCollect={setNumberAllowedToCollect} setQuestItemImage={setQuestItemImage} />
+
       <div className="container py-6 items-center justify-center">
         <h5 className="h5 flex items-center justify-center pb-4">
-          {droppedItems.length}{" "}
+          {questItemCount}{" "}
           {keyAssetImage && (
             <img alt="Drop in world" src={keyAssetImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
           )}{" "}
@@ -91,7 +97,7 @@ export function Admin({ keyAssetImage }) {
         <div className="flex flex-col">
           <button
             className="btn btn-outline"
-            disabled={areButtonsDisabled || droppedItems.length === 0}
+            disabled={areButtonsDisabled || questItemCount === 0}
             onClick={removeAllQuestItems}
           >
             Remove all items
@@ -99,7 +105,7 @@ export function Admin({ keyAssetImage }) {
         </div>
       </div>
 
-      {droppedItems.length > 0 && <PlacedItems droppedItems={droppedItems} getQuestItems={getQuestItems} setErrorMessage={setErrorMessage} />}
+      {questItemCount > 0 && <PlacedItems questItems={questItems} getQuestItems={getQuestItems} setErrorMessage={setErrorMessage} />}
 
       {errorMessage && <p className="p3 text-error">{errorMessage}</p>}
     </>

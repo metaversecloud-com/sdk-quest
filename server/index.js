@@ -48,6 +48,7 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
+// TODO: Figure out why this isn't working after converting to Vite
 app.use(function (req, res, next) {
   const ogSend = res.send;
   res.send = function (data) {

@@ -1,4 +1,4 @@
-import { DroppedAsset, errorHandler, getCredentials, getVisitor, getWorldDetails, removeDroppedAssetsWithUniqueName } from "../utils/index.js";
+import { DroppedAsset, errorHandler, getCredentials, getVisitor, getWorldDetails, removeQuestItems } from "../utils/index.js";
 
 export const handleRemoveQuestFromWorld = async (req, res) => {
   try {
@@ -8,7 +8,7 @@ export const handleRemoveQuestFromWorld = async (req, res) => {
     const promises = []
 
     // remove all quest items
-    const { success } = await removeDroppedAssetsWithUniqueName(credentials);
+    const { success } = await removeQuestItems(credentials);
     if (!success) throw "Error removing quest items."
 
     // remove key asset

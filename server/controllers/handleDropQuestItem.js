@@ -23,6 +23,7 @@ export const handleDropQuestItem = async (req, res) => {
       }),
       getWorldDetails(credentials),
     ]);
+    const uniqueName = keyAsset.uniqueName || "Quest"
 
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
@@ -40,8 +41,8 @@ export const handleDropQuestItem = async (req, res) => {
       layer0: "",
       layer1: questItemImage,
       position,
-      sceneDropId: `${assetId}_${keyAsset.uniqueName}`,
-      uniqueName: `questItem_${keyAsset.uniqueName}`,
+      sceneDropId: `${assetId}_${uniqueName}`,
+      uniqueName: `questItem_${uniqueName}`,
       urlSlug,
     });
 
@@ -54,7 +55,7 @@ export const handleDropQuestItem = async (req, res) => {
       }),
       droppedAsset.setDataObject({
         keyAssetId: keyAsset.id,
-        keyAssetUniqueName: keyAsset.uniqueName,
+        keyAssetUniqueName: uniqueName,
         questItemImage: keyAsset.dataObject?.questItemImage,
       }),
     ]);

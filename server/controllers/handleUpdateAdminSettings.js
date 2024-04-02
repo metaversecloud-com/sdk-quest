@@ -1,9 +1,9 @@
-import { errorHandler, getCredentials, getDroppedAssetDetails, getDroppedAssetsWithUniqueName } from "../utils/index.js";
+import { errorHandler, getCredentials, getDroppedAssetDetails, World } from "../utils/index.js";
 
 export const handleUpdateAdminSettings = async (req, res) => {
   try {
     const credentials = getCredentials(req.query);
-    const { assetId } = credentials;
+    const { assetId, urlSlug } = credentials;
     const { numberAllowedToCollect, questItemImage } = req.body;
 
     const droppedAsset = await getDroppedAssetDetails({
@@ -17,15 +17,19 @@ export const handleUpdateAdminSettings = async (req, res) => {
       { lock: { lockId, releaseLock: true } },
     );
 
-    const droppedAssets = await getDroppedAssetsWithUniqueName({
-      assetId,
-      credentials,
-      isPartial: true,
-      uniqueName: droppedAsset.uniqueName,
-    });
-
+    const uniqueName = droppedAsset.uniqueName || "Quest"
+    const world = await World.create(urlSlug, { credentials });
+    const droppedAssets = await world.fetchDroppedAssetsBySceneDropId({
+      sceneDropId: `${assetId}_${uniqueName}`,
+    })
     if (droppedAssets.length > 0) {
-      const promises = droppedAssets.map((droppedAsset) => droppedAsset.updateWebImageLayers("", questItemImage));
+      const promises = []
+      droppedAssets.map((droppedAsset) => {
+        if (droppedAsset.uniqueName === `questItem_${uniqueName}`) {
+          promises.push(droppedAsset.updateWebImageLayers("", questItemImage));
+          promises.push(droppedAsset.updateDataObject({ questItemImage }));
+        }
+      });
       await Promise.all(promises);
     }
 

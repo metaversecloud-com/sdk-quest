@@ -8,6 +8,6 @@ export * from "./handleGetVisitor.js";
 export * from "./handleMoveVisitor.js";
 export * from "./handleQuestItemClicked.js";
 export * from "./handleRemoveDroppedAsset.js";
-export * from "./handleRemoveDroppedAssetsWithUniqueName.js";
+export * from "./handleRemoveQuestItems.js";
 export * from "./handleUpdateAdminSettings.js";
 export * from "./handleRemoveQuestFromWorld.js";

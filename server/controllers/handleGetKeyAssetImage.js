@@ -11,17 +11,7 @@ export const handleGetKeyAssetImage = async (req, res) => {
       shouldInitDataObject: true,
     });
 
-    let keyAssetImage;
-    if (droppedAsset.dataObject && droppedAsset.dataObject?.questItemImage) {
-      keyAssetImage = droppedAsset.dataObject?.questItemImage;
-    } else {
-      await getDefaultKeyAssetImage({
-        credentials,
-        urlSlug,
-      });
-    }
-
-    return res.json({ keyAssetImage, success: true });
+    return res.json({ keyAssetImage: droppedAsset.dataObject?.questItemImage, success: true });
   } catch (error) {
     return errorHandler({
       error,

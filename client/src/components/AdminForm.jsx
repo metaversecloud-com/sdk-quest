@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 // utils
 import { backendAPI } from "@utils/backendAPI";
 
+// context
+import { GlobalDispatchContext } from "@context/GlobalContext";
+
 export function AdminForm({ numberAllowedToCollect, questItemImage, setErrorMessage, setNumberAllowedToCollect, setQuestItemImage }) {
   const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const dispatch = useContext(GlobalDispatchContext);
 
   const saveAdminUpdates = async () => {
     setAreButtonsDisabled(true);
@@ -14,7 +19,7 @@ export function AdminForm({ numberAllowedToCollect, questItemImage, setErrorMess
       .then(() => {
         dispatch({
           type: "SET_KEY_ASSET_IMAGE",
-          payload: { keyAssetImage: questItemImage },
+          payload: questItemImage,
         });
       })
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))

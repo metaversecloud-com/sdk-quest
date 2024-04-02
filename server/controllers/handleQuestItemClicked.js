@@ -36,13 +36,15 @@ export const handleQuestItemClicked = async (req, res) => {
 
     const itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
     const numberAllowedToCollect = keyAsset.dataObject?.numberAllowedToCollect;
+    const lastCollectedDate = itemsCollectedByUser?.[profileId]?.lastCollectedDate;
+    const differenceInDays = getDifferenceInDays(currentDate, lastCollectedDate);
+    const hasCollectedToday = differenceInDays === 0
     let totalCollectedToday = 1,
       total = 1;
 
     if (
-      itemsCollectedByUser &&
-      itemsCollectedByUser[profileId] &&
-      itemsCollectedByUser[profileId].totalCollectedToday >= numberAllowedToCollect
+      hasCollectedToday &&
+      itemsCollectedByUser?.[profileId]?.totalCollectedToday >= numberAllowedToCollect
     ) {
       return res.json({ addedClick: false, numberAllowedToCollect, success: true });
     } else {
@@ -77,14 +79,12 @@ export const handleQuestItemClicked = async (req, res) => {
       } else {
         let currentStreak = itemsCollectedByUser[profileId].currentStreak || 1;
         total = itemsCollectedByUser[profileId].total ? itemsCollectedByUser[profileId].total + 1 : 1;
-        const lastCollectedDate = itemsCollectedByUser[profileId].lastCollectedDate;
 
         let longestStreak = itemsCollectedByUser[profileId].longestStreak;
         if (!longestStreak) longestStreak = getLongestStreak(itemsCollectedByUser[profileId]);
 
         if (lastCollectedDate) {
-          const differenceInDays = getDifferenceInDays(lastCollectedDate, currentDate);
-          if (differenceInDays === 0) {
+          if (hasCollectedToday) {
             totalCollectedToday = itemsCollectedByUser[profileId].totalCollectedToday + 1;
           } else if (differenceInDays === 1) {
             currentStreak = currentStreak + 1;

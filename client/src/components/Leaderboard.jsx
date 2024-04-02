@@ -63,11 +63,9 @@ export function Leaderboard({ isKeyAsset, keyAssetImage }) {
           </table>
         </>
       ) : (
-        <div className="flex flex-col">
-          <p>
-            Explore and find <img alt="Find me" height={20} src={keyAssetImage} /> to complete your daily quest.
-          </p>
-        </div>
+        <p className="p1">
+          Explore and find <img alt="Find me" className="inline" style={{ height: 20 }} src={keyAssetImage} /> to complete your daily quest.
+        </p>
       )}
       <div className="mt-6">
         <h4>Leaderboard</h4>
