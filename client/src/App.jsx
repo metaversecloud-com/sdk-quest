@@ -74,11 +74,8 @@ const App = () => {
   );
 
   const setupBackend = async () => {
-    setupBackendAPI(interactiveParams)
-      .then((result) => {
-        if (!result.success) navigate("*")
-      })
-      .finally(() => setHasInitBackendAPI(true))
+    await setupBackendAPI(interactiveParams)
+    setHasInitBackendAPI(true);
   };
 
   const getVisitor = async () => {
@@ -91,7 +88,10 @@ const App = () => {
           });
         }
       })
-      .catch(() => console.error("Error getting visitor"))
+      .catch((error) => {
+        console.error(error?.response?.data?.message);
+        navigate("*");
+      })
       .finally(() => setIsLoading(false))
   };
 
@@ -106,9 +106,11 @@ const App = () => {
         } else {
           return console.error("ERROR getting key asset image");
         }
-      }
-      )
-      .catch((error) => console.error(error))
+      })
+      .catch((error) => {
+        console.error(error?.response?.data?.message);
+        navigate("*");
+      })
       .finally(() => setIsLoading(false))
   };
 

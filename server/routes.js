@@ -1,5 +1,4 @@
 import {
-  handleCheckInteractiveCredentials,
   handleDropQuestItem,
   handleGetLeaderboard,
   handleMoveVisitor,
@@ -16,6 +15,7 @@ import {
 
 import { getVersion } from "./utils/getVersion.js";
 import express from "express";
+import { checkInteractiveCredentials } from './middleware/checkInteractiveCredentials.js';
 const router = express.Router();
 
 router.get("/system/health", (req, res) => {
@@ -31,21 +31,19 @@ router.get("/system/health", (req, res) => {
   });
 });
 
-router.get("/system/interactive-credentials", handleCheckInteractiveCredentials);
-
 // Admin
-router.get("/leaderboard", handleGetLeaderboard);
-router.get("/key-asset-image", handleGetKeyAssetImage);
-router.post("/admin-settings", handleUpdateAdminSettings);
-router.delete("/quest", handleRemoveQuestFromWorld);
+router.get("/leaderboard", checkInteractiveCredentials, handleGetLeaderboard);
+router.get("/key-asset-image", checkInteractiveCredentials, handleGetKeyAssetImage);
+router.post("/admin-settings", checkInteractiveCredentials, handleUpdateAdminSettings);
+router.delete("/quest", checkInteractiveCredentials, handleRemoveQuestFromWorld);
 
 // Dropped Asset
-router.get("/dropped-asset/data-object", handleGetDroppedAssetDataObject);
-router.get("/quest-items", handleGetQuestItems);
-router.post("/dropped-asset/remove-all-with-unique-name", handleRemoveQuestItems);
-router.delete("/dropped-asset/:droppedAssetId", handleRemoveDroppedAsset);
-router.post("/drop-quest-item", handleDropQuestItem);
-router.post("/quest-item-clicked", handleQuestItemClicked);
+router.get("/dropped-asset/data-object", checkInteractiveCredentials, handleGetDroppedAssetDataObject);
+router.get("/quest-items", checkInteractiveCredentials, handleGetQuestItems);
+router.post("/dropped-asset/remove-all-with-unique-name", checkInteractiveCredentials, handleRemoveQuestItems);
+router.delete("/dropped-asset/:droppedAssetId", checkInteractiveCredentials, handleRemoveDroppedAsset);
+router.post("/drop-quest-item", checkInteractiveCredentials, handleDropQuestItem);
+router.post("/quest-item-clicked", checkInteractiveCredentials, handleQuestItemClicked);
 
 // Visitor
 router.get("/visitor", handleGetVisitor);

@@ -27,13 +27,6 @@ const setupBackendAPI = async (interactiveParams) => {
       return config;
     });
   }
-
-  try {
-    await backendAPI.get("/system/interactive-credentials");
-    return { success: true }
-  } catch (error) {
-    return { success: false }
-  }
 };
 
 export { backendAPI, setupBackendAPI };

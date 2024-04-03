@@ -1,4 +1,3 @@
-export * from "./handleCheckInteractiveCredentials.js";
 export * from "./handleDropQuestItem.js";
 export * from "./handleGetDroppedAssetDataObject.js";
 export * from "./handleGetKeyAssetImage.js";
