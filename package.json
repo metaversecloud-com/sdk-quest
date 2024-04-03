@@ -1,29 +1,25 @@
 {
   "name": "sdk-quest",
   "author": "metaversecloud.com | topia.io",
+  "version": "1.0.0",
   "description": "",
-  "dependencies": {
-    "@rtsdk/topia": "^0.9.1",
-    "axios": "^1.6.7",
-    "concurrently": "^8.2.2",
-    "dotenv": "^16.4.5"
-  },
-  "keywords": [],
-  "license": "BSD-3-Clause",
-  "main": "./server/index.js",
-  "devDependencies": {
-    "prettier": "3.2.5"
-  },
-  "private": true,
+  "type": "module",
   "scripts": {
-    "build": "npm run build -w client",
+    "build": "npm run build -ws",
     "start": "npm run start -w server",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "dev-server": "npm run dev --prefix server",
-    "dev-client": "npm run start --prefix client"
+    "dev-client": "npm run dev --prefix client"
   },
-  "type": "module",
-  "version": "1.0.0",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/cors": "^2.8.17",
+    "prettier": "3.2.5"
+  },
   "workspaces": [
     "client",
     "server"
