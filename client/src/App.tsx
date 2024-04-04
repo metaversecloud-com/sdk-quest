@@ -3,8 +3,8 @@ import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 
 // pages
 import Home from "@pages/Home";
-import QuestItemClicked from "./pages/QuestItemClicked";
 import Error from "@pages/Error";
+import QuestItemClicked from "@pages/QuestItemClicked";
 
 // components
 import { Loading } from "./components";
