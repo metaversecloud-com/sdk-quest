@@ -15,10 +15,11 @@ export const getWorldDetails = async (credentials: Credentials) => {
     const sceneDropId = credentials.sceneDropId || assetId
 
     const world = World.create(urlSlug, { credentials });
-    await world.fetchDetails();
-    await world.fetchDataObject();
 
-    await initializeWorldDataObject({ credentials, world });
+    await Promise.all([
+      world.fetchDetails(),
+      initializeWorldDataObject({ credentials, world }),
+    ])
 
     let dataObject = world.dataObject as WorldDataObject;
 

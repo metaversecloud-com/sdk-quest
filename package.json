@@ -13,12 +13,15 @@
   },
   "dependencies": {
     "@rtsdk/topia": "^0.9.1",
-    "concurrently": "^8.2.2"
+    "axios": "^1.6.8",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.3"
   },
   "license": "BSD-3-Clause",
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/cors": "^2.8.17",
+    "@types/node": "^20.12.4",
     "prettier": "3.2.5"
   },
   "workspaces": [

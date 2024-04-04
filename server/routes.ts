@@ -13,7 +13,6 @@ import {
   handleUpdateAdminSettings,
 } from "./controllers/index.js";
 import { getVersion } from "./utils/getVersion.js";
-import { checkInteractiveCredentials } from './middleware/checkInteractiveCredentials.js';
 
 const router = express.Router();
 
@@ -30,18 +29,18 @@ router.get("/system/health", (req, res) => {
   });
 });
 
-router.get("/quest", checkInteractiveCredentials, handleGetQuestDetails);
-router.delete("/quest", checkInteractiveCredentials, handleRemoveQuestFromWorld);
+router.get("/quest", handleGetQuestDetails);
+router.delete("/quest", handleRemoveQuestFromWorld);
 
-router.get("/leaderboard", checkInteractiveCredentials, handleGetLeaderboard);
-router.post("/admin-settings", checkInteractiveCredentials, handleUpdateAdminSettings);
+router.get("/leaderboard", handleGetLeaderboard);
+router.post("/admin-settings", handleUpdateAdminSettings);
 
 // Dropped Asset
-router.get("/quest-items", checkInteractiveCredentials, handleGetQuestItems);
-router.post("/dropped-asset/remove-all-with-unique-name", checkInteractiveCredentials, handleRemoveQuestItems);
-router.delete("/dropped-asset/:droppedAssetId", checkInteractiveCredentials, handleRemoveDroppedAsset);
-router.post("/drop-quest-item", checkInteractiveCredentials, handleDropQuestItem);
-router.post("/quest-item-clicked", checkInteractiveCredentials, handleQuestItemClicked);
+router.get("/quest-items", handleGetQuestItems);
+router.post("/dropped-asset/remove-all-with-unique-name", handleRemoveQuestItems);
+router.delete("/dropped-asset/:droppedAssetId", handleRemoveDroppedAsset);
+router.post("/drop-quest-item", handleDropQuestItem);
+router.post("/quest-item-clicked", handleQuestItemClicked);
 
 // Visitor
 router.get("/visitor", handleGetVisitor);

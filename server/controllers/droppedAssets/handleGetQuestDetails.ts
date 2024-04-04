@@ -11,8 +11,8 @@ export const handleGetQuestDetails = async (req: Request, res: Response) => {
   } catch (error) {
     return errorHandler({
       error,
-      functionName: "handleGetKeyAssetImage",
-      message: "Error getting key asset image",
+      functionName: "handleGetQuestDetails",
+      message: "Error getting quest details image",
       req,
       res,
     });

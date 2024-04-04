@@ -8,15 +8,21 @@ export const initializeWorldDataObject = async ({ credentials, world }: { creden
     let { assetId, urlSlug } = credentials
     const sceneDropId = credentials.sceneDropId || assetId
 
-    const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
+    await world.fetchDataObject();
+
+    let questItemImage;
+    if (!world.dataObject?.scenes && !world.dataObject?.scenes?.[sceneDropId]) {
+      const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
+      // @ts-ignore
+      questItemImage = droppedAsset.dataObject?.questItemImage || await getDefaultKeyAssetImage(urlSlug);
+    }
 
     const payload = {
       itemsCollectedByUser: {},
       keyAssetId: assetId,
       lastInteractionDate: new Date(),
       numberAllowedToCollect: 5,
-      // @ts-ignore
-      questItemImage: droppedAsset.dataObject?.questItemImage || await getDefaultKeyAssetImage(urlSlug),
+      questItemImage,
       sceneDropId,
       totalItemsCollected: 0,
     }
