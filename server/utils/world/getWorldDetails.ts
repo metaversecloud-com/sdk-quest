@@ -18,8 +18,10 @@ export const getWorldDetails = async (credentials: Credentials) => {
 
     await Promise.all([
       world.fetchDetails(),
-      initializeWorldDataObject({ credentials, world }),
+      world.fetchDataObject(),
     ])
+
+    await initializeWorldDataObject({ credentials, world });
 
     let dataObject = world.dataObject as WorldDataObject;
 
