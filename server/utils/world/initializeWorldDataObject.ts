@@ -8,8 +8,6 @@ export const initializeWorldDataObject = async ({ credentials, world }: { creden
     let { assetId, urlSlug } = credentials
     const sceneDropId = credentials.sceneDropId || assetId
 
-    await world.fetchDataObject();
-
     let questItemImage;
     if (!world.dataObject?.scenes && !world.dataObject?.scenes?.[sceneDropId]) {
       const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
