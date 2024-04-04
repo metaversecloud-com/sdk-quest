@@ -1,7 +1,7 @@
-import { Credentials } from "../../types";
-import { errorHandler } from "../errorHandler";
-import { getDefaultKeyAssetImage } from "../getDefaultKeyAssetImage";
-import { DroppedAsset } from "../topiaInit";
+import { Credentials } from "../../types/Credentials.js";
+import { errorHandler } from "../errorHandler.js";
+import { getDefaultKeyAssetImage } from "../getDefaultKeyAssetImage.js";
+import { DroppedAsset } from "../topiaInit.js";
 
 export const initializeWorldDataObject = async ({ credentials, world }: { credentials: Credentials, world: any }) => {
   try {

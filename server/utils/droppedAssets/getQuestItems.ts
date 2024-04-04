@@ -1,6 +1,6 @@
 import { World } from '../topiaInit.js';
 import { errorHandler } from '../errorHandler.js';
-import { Credentials } from '../../types/Credentials';
+import { Credentials } from '../../types/Credentials.js';
 
 export const getQuestItems = async (credentials: Credentials) => {
   try {
