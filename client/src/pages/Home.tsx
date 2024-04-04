@@ -10,7 +10,8 @@ export const Home = () => {
   const [activeTab, setActiveTab] = useState("leaderboard");
 
   // context
-  const { keyAssetImage, visitor } = useContext(GlobalStateContext);
+  const { questDetails, visitor } = useContext(GlobalStateContext);
+  const { questItemImage } = questDetails
 
   return (
     <div className="container p-6 items-center justify-center">
@@ -29,14 +30,14 @@ export const Home = () => {
           </div>
         </div>
       )}
-      {keyAssetImage ? <img alt="Find me" className="mx-auto" src={keyAssetImage} /> : <div />}
+      {questItemImage ? <img alt="Find me" className="mx-auto" src={questItemImage} /> : <div />}
       <div className="flex flex-col mb-6 mt-4">
         <h1 className="h2 text-center">Quest</h1>
       </div>
       {activeTab === "admin" ? (
-        <Admin keyAssetImage={keyAssetImage} />
+        <Admin />
       ) : (
-        <Leaderboard isKeyAsset={true} keyAssetImage={keyAssetImage} />
+        <Leaderboard />
       )}
     </div>
   );

@@ -9,9 +9,7 @@ import { backendAPI } from "@utils/backendAPI";
 // context
 import { GlobalStateContext } from "@context/GlobalContext";
 
-export const Admin = ({ keyAssetImage }: { keyAssetImage: string }) => {
-  const [numberAllowedToCollect, setNumberAllowedToCollect] = useState();
-  const [questItemImage, setQuestItemImage] = useState("");
+export const Admin = () => {
   const [questItems, setQuestItems] = useState({});
   const [questItemCount, setQuestItemCount] = useState(0);
   const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
@@ -19,28 +17,16 @@ export const Admin = ({ keyAssetImage }: { keyAssetImage: string }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   // context
-  const { hasInteractiveParams } = useContext(GlobalStateContext);
+  const { hasInteractiveParams, questDetails } = useContext(GlobalStateContext);
+  const { questItemImage } = questDetails
 
   useEffect(() => {
     if (hasInteractiveParams) {
-      getDataObject();
       getQuestItems();
     }
   }, [hasInteractiveParams]);
 
-  const getDataObject = async () => {
-    setErrorMessage("");
-    backendAPI.get("/dropped-asset/data-object")
-      .then((result) => {
-        const dataObject = result.data.droppedAsset.dataObject;
-        if (dataObject.numberAllowedToCollect) setNumberAllowedToCollect(dataObject.numberAllowedToCollect);
-        if (dataObject.questItemImage) setQuestItemImage(dataObject.questItemImage);
-      })
-      .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
-      .finally(() => setIsLoading(false))
-  };
-
-  const getQuestItems = async () => {
+  const getQuestItems = () => {
     setErrorMessage("");
     backendAPI.get("/quest-items")
       .then((result) => {
@@ -48,9 +34,10 @@ export const Admin = ({ keyAssetImage }: { keyAssetImage: string }) => {
         setQuestItemCount(Object.keys(result.data.droppedAssets).length)
       })
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
+      .finally(() => setIsLoading(false))
   };
 
-  const dropItem = async () => {
+  const dropItem = () => {
     setErrorMessage("");
     setAreButtonsDisabled(true);
     backendAPI.post("/drop-quest-item")
@@ -59,7 +46,7 @@ export const Admin = ({ keyAssetImage }: { keyAssetImage: string }) => {
       .finally(() => setAreButtonsDisabled(false))
   };
 
-  const removeAllQuestItems = async () => {
+  const removeAllQuestItems = () => {
     setErrorMessage("");
     setAreButtonsDisabled(true);
     backendAPI.post("/dropped-asset/remove-all-with-unique-name")
@@ -75,21 +62,21 @@ export const Admin = ({ keyAssetImage }: { keyAssetImage: string }) => {
 
   return (
     <>
-      <AdminForm numberAllowedToCollect={numberAllowedToCollect} questItemImage={questItemImage} setErrorMessage={setErrorMessage} setNumberAllowedToCollect={setNumberAllowedToCollect} setQuestItemImage={setQuestItemImage} />
+      <AdminForm setErrorMessage={setErrorMessage} />
 
       <div className="container py-6 items-center justify-center">
         <h5 className="h5 flex items-center justify-center pb-4">
           {questItemCount}{" "}
-          {keyAssetImage && (
-            <img alt="Drop in world" src={keyAssetImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
+          {questItemImage && (
+            <img alt="Drop in world" src={questItemImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
           )}{" "}
             hidden in this world
           </h5>
         <div className="my-2">
           <button className="btn" disabled={areButtonsDisabled} onClick={dropItem}>
             Hide
-            {keyAssetImage && (
-              <img alt="Drop in world" src={keyAssetImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
+            {questItemImage && (
+              <img alt="Drop in world" src={questItemImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
             )}{" "}
             in world
           </button>
@@ -107,7 +94,7 @@ export const Admin = ({ keyAssetImage }: { keyAssetImage: string }) => {
 
       {questItemCount > 0 && <PlacedItems questItems={questItems} getQuestItems={getQuestItems} setErrorMessage={setErrorMessage} />}
 
-      {errorMessage && <p className="p3 text-error">{errorMessage}</p>}
+      {errorMessage && <p className="p3 text-error">{`${errorMessage}`}</p>}
     </>
   );
 }

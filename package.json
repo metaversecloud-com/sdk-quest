@@ -1,7 +1,7 @@
 {
   "name": "sdk-quest",
   "author": "metaversecloud.com | topia.io",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "type": "module",
   "scripts": {
@@ -12,6 +12,7 @@
     "dev-client": "npm run dev --prefix client"
   },
   "dependencies": {
+    "@rtsdk/topia": "^0.9.1",
     "concurrently": "^8.2.2"
   },
   "license": "BSD-3-Clause",

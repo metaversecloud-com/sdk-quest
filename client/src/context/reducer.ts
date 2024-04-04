@@ -1,4 +1,4 @@
-import { ActionType, InitialState, SET_HAS_SETUP_BACKEND, SET_INTERACTIVE_PARAMS, SET_KEY_ASSET_IMAGE, SET_VISITOR_INFO } from "./types";
+import { ActionType, InitialState, SET_INTERACTIVE_PARAMS, SET_QUEST_DETAILS, SET_VISITOR_INFO } from "./types";
 
 const globalReducer = (state: InitialState, action: ActionType) => {
   const { type, payload } = action;
@@ -9,16 +9,10 @@ const globalReducer = (state: InitialState, action: ActionType) => {
         ...payload,
         hasInteractiveParams: true,
       };
-    case SET_HAS_SETUP_BACKEND:
+    case SET_QUEST_DETAILS:
       return {
         ...state,
-        ...payload,
-        hasSetupBackend: true,
-      };
-    case SET_KEY_ASSET_IMAGE:
-      return {
-        ...state,
-        keyAssetImage: payload,
+        questDetails: payload,
       };
     case SET_VISITOR_INFO:
       return {

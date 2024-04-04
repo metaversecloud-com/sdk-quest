@@ -15,14 +15,14 @@ export const QuestItemClicked = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const { keyAssetImage, hasInteractiveParams } = useContext(GlobalStateContext);
+  const { questDetails, hasInteractiveParams } = useContext(GlobalStateContext);
+  const { questItemImage } = questDetails
 
   useEffect(() => {
     if (hasInteractiveParams) {
       backendAPI.post("/quest-item-clicked")
         .then((result) => {
           const { addedClick, numberAllowedToCollect, totalCollectedToday, success } = result.data;
-
           if (addedClick) {
             setCollectedText(`${totalCollectedToday}/${numberAllowedToCollect} collected today`);
             setMessage(`🎉 Congratulations! You are one step closer to completing your daily quest!`);
@@ -40,7 +40,7 @@ export const QuestItemClicked = () => {
 
   return (
     <div className="container p-6 items-center justify-start">
-      {keyAssetImage ? <img alt="Find me" className="mx-auto" src={keyAssetImage} /> : <div />}
+      {questItemImage ? <img alt="Find me" className="mx-auto" src={questItemImage} /> : <div />}
       <div className="flex flex-col mb-6 mt-4">
         <h1 className="h2 text-center">Quest</h1>
       </div>
@@ -56,7 +56,7 @@ export const QuestItemClicked = () => {
           </div>
         )}
       </div>
-      <Leaderboard isKeyAsset={false} keyAssetImage={keyAssetImage} />
+      <Leaderboard />
     </div>
   );
 };

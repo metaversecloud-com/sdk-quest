@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
+import { DataObjectType } from "../../types/DataObjectType.js";
 import {
+  DroppedAsset,
   errorHandler,
   getBaseURL,
-  getClickedAssetAndKeyAsset,
   getCredentials,
   getDifferenceInDays,
-  getLongestStreak,
   getRandomCoordinates,
   getVisitor,
   getWorldDetails,
@@ -14,7 +14,8 @@ import {
 export const handleQuestItemClicked = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
-    const { profileId, urlSlug, username, visitorId } = credentials;
+    const { assetId, profileId, urlSlug, username } = credentials;
+    const sceneDropId = credentials.sceneDropId || assetId
 
     const now = new Date();
     const localDateString = now.toLocaleDateString();
@@ -23,22 +24,13 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     const analytics = [];
 
-    const { droppedAsset, keyAsset } = await getClickedAssetAndKeyAsset(credentials);
-    const keyAssetId = keyAsset.id;
+    const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
-    const world = await getWorldDetails({ ...credentials, assetId: keyAssetId });
+    const { dataObject, world } = await getWorldDetails(credentials);
+    const { itemsCollectedByUser, numberAllowedToCollect } = dataObject as DataObjectType;
 
-    if (
-      !keyAsset.dataObject?.numberAllowedToCollect ||
-      !world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser
-    ) {
-      throw "Data objects not found";
-    }
-
-    const itemsCollectedByUser = world.dataObject?.keyAssets?.[keyAssetId]?.itemsCollectedByUser;
-    const numberAllowedToCollect = keyAsset.dataObject?.numberAllowedToCollect;
     const lastCollectedDate = itemsCollectedByUser?.[profileId]?.lastCollectedDate;
-    const differenceInDays = getDifferenceInDays(currentDate, lastCollectedDate);
+    const differenceInDays = getDifferenceInDays(currentDate, new Date(lastCollectedDate));
     const hasCollectedToday = differenceInDays === 0
     let totalCollectedToday = 1,
       total = 1;
@@ -56,6 +48,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
       promises.push(droppedAsset.updatePosition(position.x, position.y));
       promises.push(
         droppedAsset.updateClickType({
+          // @ts-ignore
           clickType: "link",
           clickableLinkTitle: "Quest",
           isOpenLinkInDrawer: true,
@@ -67,22 +60,22 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         // first time user has interacted with Quest ever
         promises.push(
           world.updateDataObject({
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: {
+            [`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}`]: {
               currentStreak: 1,
               lastCollectedDate: currentDate,
               longestStreak: 1,
               total: 1,
               totalCollectedToday: 1,
               username
-            }
+            },
+            [`scenes.${sceneDropId}.lastInteractionDate`]: new Date(),
           }),
         );
       } else {
         let currentStreak = itemsCollectedByUser[profileId].currentStreak || 1;
         total = itemsCollectedByUser[profileId].total ? itemsCollectedByUser[profileId].total + 1 : 1;
 
-        let longestStreak = itemsCollectedByUser[profileId].longestStreak;
-        if (!longestStreak) longestStreak = getLongestStreak(itemsCollectedByUser[profileId]);
+        let longestStreak = itemsCollectedByUser[profileId].longestStreak || 0;
 
         if (lastCollectedDate) {
           if (hasCollectedToday) {
@@ -97,7 +90,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
         promises.push(
           world.updateDataObject({
-            [`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}`]: {
+            [`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}`]: {
               currentStreak,
               lastCollectedDate: currentDate,
               longestStreak,
@@ -132,9 +125,8 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         );
       }
 
-      promises.push(visitor.incrementDataObjectValue([`itemsCollectedByWorld.${world.urlSlug}.count`], 1));
       promises.push(
-        world.incrementDataObjectValue([`keyAssets.${keyAssetId}.totalItemsCollected.count`], 1, { analytics }),
+        world.incrementDataObjectValue([`scenes.${sceneDropId}.totalItemsCollected.count`], 1, { analytics }),
       );
 
       await Promise.all(promises);

@@ -1,26 +1,18 @@
 import { World } from '../topiaInit.js';
-import { getDroppedAssetDetails } from './getDroppedAssetDetails.js';
 import { errorHandler } from '../errorHandler.js';
 import { Credentials } from '../../types/Credentials';
 
 export const getQuestItems = async (credentials: Credentials) => {
   try {
     const { assetId, urlSlug } = credentials;
-
-    const droppedAsset = await getDroppedAssetDetails({
-      credentials,
-      droppedAssetId: assetId,
-    });
-    const uniqueName = droppedAsset.uniqueName || "Quest"
+    const sceneDropId = credentials.sceneDropId || assetId
 
     const world = await World.create(urlSlug, { credentials });
-    const droppedAssets = await world.fetchDroppedAssetsBySceneDropId({
-      sceneDropId: `${assetId}_${uniqueName}`,
-    })
+    const droppedAssets = await world.fetchDroppedAssetsBySceneDropId({ sceneDropId })
 
     const questItems = await Object.entries(droppedAssets).reduce((questItems, [key, questItem]) => {
       // @ts-ignore
-      if (questItem.uniqueName.includes("questItem")) questItems[key] = questItem;
+      if (questItem.uniqueName?.includes("questItem")) questItems[key] = questItem;
       return questItems;
     }, {})
 

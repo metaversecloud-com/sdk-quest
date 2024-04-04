@@ -3,12 +3,12 @@ import {
   handleDropQuestItem,
   handleGetLeaderboard,
   handleMoveVisitor,
-  handleGetDroppedAssetDataObject,
+  handleGetQuestDetails,
   handleGetQuestItems,
-  handleGetKeyAssetImage,
   handleQuestItemClicked,
   handleGetVisitor,
   handleRemoveDroppedAsset,
+  handleRemoveQuestFromWorld,
   handleRemoveQuestItems,
   handleUpdateAdminSettings,
 } from "./controllers/index.js";
@@ -30,13 +30,13 @@ router.get("/system/health", (req, res) => {
   });
 });
 
-// Admin
+router.get("/quest", checkInteractiveCredentials, handleGetQuestDetails);
+router.delete("/quest", checkInteractiveCredentials, handleRemoveQuestFromWorld);
+
 router.get("/leaderboard", checkInteractiveCredentials, handleGetLeaderboard);
-router.get("/key-asset-image", checkInteractiveCredentials, handleGetKeyAssetImage);
 router.post("/admin-settings", checkInteractiveCredentials, handleUpdateAdminSettings);
 
 // Dropped Asset
-router.get("/dropped-asset/data-object", checkInteractiveCredentials, handleGetDroppedAssetDataObject);
 router.get("/quest-items", checkInteractiveCredentials, handleGetQuestItems);
 router.post("/dropped-asset/remove-all-with-unique-name", checkInteractiveCredentials, handleRemoveQuestItems);
 router.delete("/dropped-asset/:droppedAssetId", checkInteractiveCredentials, handleRemoveDroppedAsset);

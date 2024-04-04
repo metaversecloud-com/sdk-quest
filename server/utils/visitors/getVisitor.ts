@@ -5,13 +5,13 @@ import { Credentials } from "../../types/Credentials.js";
 
 export const getVisitor = async (credentials: Credentials) => {
   try {
-    const { urlSlug, visitorId } = credentials;
+    const { profileId, urlSlug, visitorId } = credentials;
 
     const visitor: VisitorInterface = await Visitor.get(visitorId, urlSlug, { credentials });
 
     if (!visitor || !visitor.username) throw "Not in world";
 
-    return visitor;
+    return { isAdmin: visitor.isAdmin, profileId };
   } catch (error) {
     return errorHandler({
       error,

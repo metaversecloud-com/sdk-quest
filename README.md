@@ -47,7 +47,7 @@ Quest is a dynamic hide and seek game where an admin can drop multiple quest ite
 
 ```json
 API_KEY=xxxxxxxxxxxxx
-DEFAULT_KEY_ASSET_IMAGE_URL=pathtodefaultimage
+DEFAULT_QUEST_ITEM_IMAGE_URL=pathtodefaultimage
 INSTANCE_DOMAIN=api.topia.io
 INSTANCE_PROTOCOL=https
 INTERACTIVE_KEY=xxxxxxxxxxxxx
@@ -65,14 +65,12 @@ WEB_IMAGE_ASSET_ID=webImageAsset
 
 _We use data objects to store information about each implementation of the app per world._
 
-- Key Asset: the data object attached to the dropped key asset will store game settings related to this specific implementation of the app and would be deleted if the key asset is removed from world.
-  - Number Allowed To Collect (default 5)
-  - Quest Item Image,
-- World: the data object attached to the world will store analytics information for every instance of the app in a given world by keyAssetId and will persist even if a specific instance is removed from world.
+- Dropped Assets: the data object attached to the dropped assets can optionally include `questItemImage` which will be used instead of the default image when someone first interacts with the instance of Quest
+- World: the data object attached to the world will store information for every instance of the app in a given world by sceneDropId and will persist if a specific instance is removed manually from world instead of through the Admin screen.
 
-  - itemsCollectedByUser (`keyAssets.${keyAssetId}.itemsCollectedByUser.${profileId}.count`)
-  - totalItemsCollected (`keyAssets.${keyAssetId}.totalItemsCollected.count`)
-  - questItems (`keyAssets.${keyAssetId}.questItems.${assetId}.count`)
+  - itemsCollectedByUser (`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}.count`)
+  - totalItemsCollected (`scenes.${sceneDropId}.totalItemsCollected.count`)
+  - questItems (`scenes.${sceneDropId}.questItems.${assetId}.count`)
 
 ### Helpful links
 

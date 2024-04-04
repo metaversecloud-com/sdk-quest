@@ -1,71 +1,85 @@
 import { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
 
 // utils
 import { backendAPI } from "@utils/backendAPI";
 
 // context
+import { GlobalStateContext } from "@context/GlobalContext";
 import { GlobalDispatchContext } from "@context/GlobalContext";
+import { SET_QUEST_DETAILS } from "@/context/types";
 
-export const AdminForm = ({ numberAllowedToCollect, questItemImage, setErrorMessage, setNumberAllowedToCollect, setQuestItemImage }: { numberAllowedToCollect?: number, questItemImage: string, setErrorMessage: any, setNumberAllowedToCollect: any, setQuestItemImage: any }) => {
+export const AdminForm = ({ setErrorMessage }: { setErrorMessage: any }) => {
   const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // context
+  const { questDetails } = useContext(GlobalStateContext);
+  const { numberAllowedToCollect, questItemImage } = questDetails
   const dispatch = useContext(GlobalDispatchContext);
 
-  const saveAdminUpdates = async () => {
+  const {
+    handleSubmit,
+    register,
+  } = useForm();
+
+  const onSubmit = (data: any) => {
+    const { numberAllowedToCollect, questItemImage } = data
     setAreButtonsDisabled(true);
     setErrorMessage("");
     backendAPI.post("/admin-settings", { numberAllowedToCollect, questItemImage })
       .then(() => {
         dispatch!({
-          type: "SET_KEY_ASSET_IMAGE",
-          payload: questItemImage,
+          type: SET_QUEST_DETAILS,
+          payload: { ...questDetails, numberAllowedToCollect, questItemImage },
         });
       })
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
       .finally(() => setAreButtonsDisabled(false))
   };
 
-  const removeQuest = async () => {
+  const removeQuest = () => {
     setErrorMessage("");
     setAreButtonsDisabled(true);
+    setIsLoading(true);
     backendAPI.delete("/quest")
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
-      .finally(() => setAreButtonsDisabled(false))
+      .finally(() => {
+        setAreButtonsDisabled(false);
+        setIsLoading(false);
+        setShowModal(false);
+      })
   };
 
   return (
     <div className="container grid gap-2">
       <hr />
-      <div className="mt-4">
-        <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
-        <input
-          className="input"
-          id="numberAllowedToCollect"
-          onChange={(e) => setNumberAllowedToCollect(e.target.value)}
-          type="text"
-          value={numberAllowedToCollect}
-        />
-      </div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="mt-4">
+          <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
+          <input
+            className="input"
+            {...register("numberAllowedToCollect", { required: true, value: numberAllowedToCollect })}
+          />
+        </div>
 
-      <div>
-        <label htmlFor="questItemImage">Quest Item Image URL:</label>
-        <input
-          className="input"
-          id="questItemImage"
-          onChange={(e) => setQuestItemImage(e.target.value)}
-          type="text"
-          value={questItemImage}
-        />
-        <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
-      </div>
+        <div>
+          <label htmlFor="questItemImage">Quest Item Image URL:</label>
+          <input
+            className="input"
+            {...register("questItemImage", { required: true, value: questItemImage })}
+          />
+          <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
+        </div>
 
-      <button className="btn mt-2" disabled={areButtonsDisabled} onClick={saveAdminUpdates}>
-        Save
-      </button>
-      <button className="btn btn-danger" disabled={areButtonsDisabled} onClick={() => setShowModal(true)}>
-        Remove Quest from world
-      </button>
+        <button className="btn my-2" disabled={areButtonsDisabled} type="submit">
+          Save
+        </button>
+        <button className="btn btn-danger" disabled={areButtonsDisabled} onClick={() => setShowModal(true)}>
+          Remove Quest from world
+        </button>
+      </form>
       <hr className="mt-4 mb-2" />
 
       {showModal && (
@@ -76,10 +90,10 @@ export const AdminForm = ({ numberAllowedToCollect, questItemImage, setErrorMess
               This will remove this Quest and all associated data permanently. Are you sure you'd like to continue?
             </p>
             <div className="actions">
-              <button className="btn btn-outline" onClick={() => setShowModal(false)}>
+              <button disabled={isLoading} className="btn btn-outline" onClick={() => setShowModal(false)}>
                 Close
               </button>
-              <button className="btn btn-danger" onClick={removeQuest}>
+              <button disabled={isLoading} className="btn btn-danger" onClick={removeQuest}>
                 Remove
               </button>
             </div>

@@ -3,6 +3,7 @@ import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
 
 // pages
 import Home from "@pages/Home";
+import QuestItemClicked from "./pages/QuestItemClicked";
 import Error from "@pages/Error";
 
 // components
@@ -10,7 +11,7 @@ import { Loading } from "./components";
 
 // context
 import { GlobalDispatchContext } from "./context/GlobalContext";
-import { InteractiveParams, SET_HAS_SETUP_BACKEND, SET_INTERACTIVE_PARAMS, SET_KEY_ASSET_IMAGE, SET_VISITOR_INFO } from "./context/types";
+import { InteractiveParams, SET_INTERACTIVE_PARAMS, SET_QUEST_DETAILS, SET_VISITOR_INFO } from "./context/types";
 
 // utils
 import { backendAPI, setupBackendAPI } from "./utils/backendAPI";
@@ -72,31 +73,22 @@ const App = () => {
     [dispatch],
   );
 
-  const setHasSetupBackend = useCallback((success: boolean) => {
-    dispatch!({
-      type: SET_HAS_SETUP_BACKEND,
-      payload: { hasSetupBackend: success },
-    });
-  },
-    [dispatch],
-  );
-
   const setupBackend = () => {
     setupBackendAPI(interactiveParams)
-      .then(() => setHasSetupBackend(true))
-      .catch(() => navigate("*"))
+      .catch((error) => {
+        console.error(error?.response?.data?.message);
+        navigate("*");
+      })
       .finally(() => setHasInitBackendAPI(true))
   };
 
-  const getVisitor = async () => {
+  const getVisitor = () => {
     backendAPI.get("/visitor")
       .then((result) => {
-        if (result.data.success) {
-          dispatch!({
-            type: SET_VISITOR_INFO,
-            payload: result.data.visitor,
-          });
-        }
+        dispatch!({
+          type: SET_VISITOR_INFO,
+          payload: result.data.visitor,
+        });
       })
       .catch((error) => {
         console.error(error?.response?.data?.message);
@@ -105,17 +97,13 @@ const App = () => {
       .finally(() => setIsLoading(false))
   };
 
-  const getKeyAssetImage = async () => {
-    backendAPI.get("/key-asset-image")
+  const getQuestDetails = () => {
+    backendAPI.get("/quest")
       .then((result) => {
-        if (result.data.success) {
-          dispatch!({
-            type: SET_KEY_ASSET_IMAGE,
-            payload: result.data.keyAssetImage,
-          });
-        } else {
-          return console.error("ERROR getting key asset image");
-        }
+        dispatch!({
+          type: SET_QUEST_DETAILS,
+          payload: result.data,
+        });
       })
       .catch((error) => {
         console.error(error?.response?.data?.message);
@@ -136,7 +124,7 @@ const App = () => {
     if (!hasInitBackendAPI) setupBackend();
     else {
       getVisitor();
-      getKeyAssetImage();
+      getQuestDetails();
     }
   }, [hasInitBackendAPI, interactiveParams]);
 
@@ -144,8 +132,9 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<Error />} />
+      <Route element={<Home />} path="/" />
+      <Route element={<QuestItemClicked />} path="/quest-item-clicked" />
+      <Route element={<Error />} path="*" />
     </Routes>
   );
 };

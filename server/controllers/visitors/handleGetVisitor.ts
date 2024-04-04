@@ -6,7 +6,7 @@ export const handleGetVisitor = async (req: Request, res: Response): Promise<Rec
     const credentials = getCredentials(req.query);
     const visitor = await getVisitor(credentials);
 
-    return res.json({ visitor, success: true });
+    return res.json({ visitor });
   } catch (error) {
     return errorHandler({ error, functionName: "handleGetVisitor", message: "Error getting visitor", req, res });
   }

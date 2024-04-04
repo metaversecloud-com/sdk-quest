@@ -1,36 +1,28 @@
 import { Request, Response } from "express";
-import { errorHandler, getCredentials, getDroppedAssetDetails, World } from "../utils/index.js";
+import { errorHandler, getCredentials, getQuestItems, getWorldDetails } from "../utils/index.js";
 
 export const handleUpdateAdminSettings = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
-    const { assetId, urlSlug } = credentials;
+    const sceneDropId = credentials.sceneDropId || credentials.assetId
     const { numberAllowedToCollect, questItemImage } = req.body;
 
-    const droppedAsset = await getDroppedAssetDetails({
-      credentials,
-      droppedAssetId: assetId,
-    });
+    const { world } = await getWorldDetails(credentials);
 
-    const lockId = `${assetId}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
-    await droppedAsset.updateDataObject(
-      { numberAllowedToCollect, questItemImage },
+    const lockId = `${sceneDropId}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
+    await world.updateDataObject({
+      [`scenes.${sceneDropId}.numberAllowedToCollect`]: numberAllowedToCollect,
+      [`scenes.${sceneDropId}.questItemImage`]: questItemImage,
+      [`scenes.${sceneDropId}.lastInteractionDate`]: new Date(),
+    },
       { lock: { lockId, releaseLock: true } },
     );
 
-    const uniqueName = droppedAsset.uniqueName || "Quest"
-    const world = await World.create(urlSlug, { credentials });
-    const droppedAssets = await world.fetchDroppedAssetsBySceneDropId({
-      sceneDropId: `${assetId}_${uniqueName}`,
-    })
-    if (droppedAssets.length > 0) {
+    const droppedAssets = await getQuestItems(credentials);
+    if (Object.keys(droppedAssets).length > 0) {
       const promises: any[] = []
-      droppedAssets.map((droppedAsset) => {
-        // @ts-ignore
-        if (droppedAsset.uniqueName === `questItem_${uniqueName}`) {
-          promises.push(droppedAsset.updateWebImageLayers("", questItemImage));
-          promises.push(droppedAsset.updateDataObject({ questItemImage }));
-        }
+      Object.values(droppedAssets).map((droppedAsset: any) => {
+        promises.push(droppedAsset.updateWebImageLayers("", questItemImage));
       });
       await Promise.all(promises);
     }
@@ -40,7 +32,7 @@ export const handleUpdateAdminSettings = async (req: Request, res: Response) => 
     return errorHandler({
       error,
       functionName: "handleUpdateAdminSettings",
-      message: "Error updating quest items",
+      message: "Error updating admin settings",
       req,
       res,
     });

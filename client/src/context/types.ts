@@ -1,6 +1,6 @@
 export const SET_HAS_SETUP_BACKEND = "SET_HAS_SETUP_BACKEND";
 export const SET_INTERACTIVE_PARAMS = "SET_INTERACTIVE_PARAMS";
-export const SET_KEY_ASSET_IMAGE = "SET_KEY_ASSET_IMAGE";
+export const SET_QUEST_DETAILS = "SET_QUEST_DETAILS";
 export const SET_VISITOR_INFO = "SET_VISITOR_INFO";
 
 export type InteractiveParams = {
@@ -18,8 +18,24 @@ export type InteractiveParams = {
 
 export interface InitialState {
   hasInteractiveParams: boolean;
-  hasSetupBackend: boolean;
-  keyAssetImage: string;
+  questDetails: {
+    itemsCollectedByUser: {
+      [key: string]: {
+        currentStreak: number,
+        lastCollectedDate: Date,
+        longestStreak: number,
+        total: number,
+        totalCollectedToday: number,
+        username: string,
+      }
+    }
+    keyAssetId: string,
+    lastInteractionDate: Date,
+    numberAllowedToCollect: number,
+    sceneDropId: string,
+    totalItemsCollected: number,
+    questItemImage: string,
+  },
   visitor: {
     isAdmin: boolean;
     profileId: string;

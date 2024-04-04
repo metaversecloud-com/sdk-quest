@@ -9,7 +9,7 @@ import { backendAPI } from "@utils/backendAPI";
 // context
 import { GlobalStateContext } from "@context/GlobalContext";
 
-export const Leaderboard = ({ isKeyAsset, keyAssetImage }: { isKeyAsset: boolean, keyAssetImage: string }) => {
+export const Leaderboard = () => {
   const [visibleData, setVisibleData] = useState([]);
   const [total, setTotal] = useState();
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -17,10 +17,11 @@ export const Leaderboard = ({ isKeyAsset, keyAssetImage }: { isKeyAsset: boolean
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const { visitor } = useContext(GlobalStateContext);
+  const { questDetails, visitor } = useContext(GlobalStateContext);
+  const { questItemImage } = questDetails
 
   useEffect(() => {
-    backendAPI.get(`/leaderboard?isKeyAsset=${isKeyAsset}`)
+    backendAPI.get(`/leaderboard`)
       .then((result) => {
         const { leaderboard } = result.data;
         const index = leaderboard.findIndex((item: any) => item.profileId === visitor.profileId);
@@ -42,13 +43,13 @@ export const Leaderboard = ({ isKeyAsset, keyAssetImage }: { isKeyAsset: boolean
     <div className="container">
       {currentPosition && currentPosition > 0 ? (
         <>
-          <h4>My Stats</h4>
+          <h4 className="h4">My Stats</h4>
           <table className="table">
             <thead>
               <tr>
-                <th>Current Position</th>
-                <th>Streak</th>
-                <th>Collected</th>
+                <th className="h5">Current Position</th>
+                <th className="h5">Streak</th>
+                <th className="h5">Collected</th>
               </tr>
             </thead>
             <tbody>
@@ -64,18 +65,18 @@ export const Leaderboard = ({ isKeyAsset, keyAssetImage }: { isKeyAsset: boolean
         </>
       ) : (
         <p className="p1">
-          Explore and find <img alt="Find me" className="inline" style={{ height: 20 }} src={keyAssetImage} /> to complete your daily quest.
+          Explore and find <img alt="Find me" className="inline" style={{ height: 20 }} src={questItemImage} /> to complete your daily quest.
         </p>
       )}
       <div className="mt-6">
-        <h4>Leaderboard</h4>
+        <h4 className="h4">Leaderboard</h4>
         <table className="table">
           <thead>
             <tr>
               <th></th>
-              <th>Name</th>
-              <th>Streak</th>
-              <th>Collected</th>
+              <th className="h5">Name</th>
+              <th className="h5">Streak</th>
+              <th className="h5">Collected</th>
             </tr>
           </thead>
           <tbody>

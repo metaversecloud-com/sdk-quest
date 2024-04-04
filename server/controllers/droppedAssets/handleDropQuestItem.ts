@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
+import { DataObjectType } from "../../types/DataObjectType.js";
 import {
   Asset,
   DroppedAsset,
   errorHandler,
   getBaseURL,
-  getDroppedAssetDetails,
-  getDefaultKeyAssetImage,
   getRandomCoordinates,
   getWorldDetails,
   getCredentials,
@@ -14,23 +13,14 @@ import {
 export const handleDropQuestItem = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
-    const { assetId, interactivePublicKey, urlSlug } = credentials;
+    const { interactivePublicKey, urlSlug } = credentials;
+    const sceneDropId = credentials.sceneDropId || credentials.assetId
 
-    const [keyAsset, world] = await Promise.all([
-      getDroppedAssetDetails({
-        credentials,
-        droppedAssetId: assetId,
-        shouldInitDataObject: true,
-      }),
-      getWorldDetails(credentials),
-    ]);
-    const uniqueName = keyAsset.uniqueName || "Quest"
+    const { dataObject, world } = await getWorldDetails(credentials);
+    const { questItemImage } = dataObject as DataObjectType;
 
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
-
-    // Use questItemImage from key asset data object or fallback to default
-    const questItemImage = keyAsset.dataObject?.questItemImage || getDefaultKeyAssetImage(credentials);
 
     const asset = Asset.create(process.env.WEB_IMAGE_ASSET_ID || "webImageAsset", {
       credentials,
@@ -42,25 +32,18 @@ export const handleDropQuestItem = async (req: Request, res: Response) => {
       layer0: "",
       layer1: questItemImage,
       position,
-      sceneDropId: `${assetId}_${uniqueName}`,
-      uniqueName: `questItem_${uniqueName}`,
+      sceneDropId,
+      uniqueName: `questItem_${sceneDropId}`,
       urlSlug,
     });
 
-    await Promise.all([
-      droppedAsset.updateClickType({
-        // @ts-ignore
-        clickType: "link",
-        clickableLinkTitle: "Quest",
-        isOpenLinkInDrawer: true,
-        clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
-      }),
-      droppedAsset.setDataObject({
-        keyAssetId: keyAsset.id,
-        keyAssetUniqueName: uniqueName,
-        questItemImage: keyAsset.dataObject?.questItemImage,
-      }),
-    ]);
+    await droppedAsset.updateClickType({
+      // @ts-ignore
+      clickType: "link",
+      clickableLinkTitle: "Quest",
+      isOpenLinkInDrawer: true,
+      clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+    });
 
     return res.json({ droppedAsset, success: true });
   } catch (error) {
