@@ -6,6 +6,7 @@ export const SET_VISITOR_INFO = "SET_VISITOR_INFO";
 export type InteractiveParams = {
   assetId: string;
   displayName: string;
+  identityId: string;
   interactiveNonce: string;
   interactivePublicKey: string;
   profileId: string;
@@ -14,28 +15,28 @@ export type InteractiveParams = {
   urlSlug: string;
   username: string;
   visitorId: string;
-}
+};
 
 export interface InitialState {
   hasInteractiveParams: boolean;
   questDetails: {
     itemsCollectedByUser: {
       [key: string]: {
-        currentStreak: number,
-        lastCollectedDate: Date,
-        longestStreak: number,
-        total: number,
-        totalCollectedToday: number,
-        username: string,
-      }
-    }
-    keyAssetId: string,
-    lastInteractionDate: Date,
-    numberAllowedToCollect: number,
-    sceneDropId: string,
-    totalItemsCollected: number,
-    questItemImage: string,
-  },
+        currentStreak: number;
+        lastCollectedDate: Date;
+        longestStreak: number;
+        total: number;
+        totalCollectedToday: number;
+        username: string;
+      };
+    };
+    keyAssetId: string;
+    lastInteractionDate: Date;
+    numberAllowedToCollect: number;
+    sceneDropId: string;
+    totalItemsCollected: number;
+    questItemImage: string;
+  };
   visitor: {
     isAdmin: boolean;
     profileId: string;
@@ -44,5 +45,20 @@ export interface InitialState {
 
 export type ActionType = {
   type: string;
-  payload?: any;
+  payload?: {
+    assetId?: string;
+    displayName?: string;
+    identityId?: string;
+    interactiveNonce?: string;
+    interactivePublicKey?: string;
+    isInteractiveIframe?: string;
+    numberAllowedToCollect?: number;
+    profileId?: string;
+    questItemImage?: string;
+    sceneDropId?: string;
+    uniqueName?: string;
+    urlSlug?: string;
+    username?: string;
+    visitorId?: string;
+  };
 };

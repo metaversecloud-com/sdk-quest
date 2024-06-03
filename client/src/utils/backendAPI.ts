@@ -1,5 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
-import { InteractiveParams } from '../context/types';
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import { InteractiveParams } from "../context/types";
 
 let backendAPI: AxiosInstance = axios;
 
@@ -13,11 +13,12 @@ const setupBackendAPI = async (interactiveParams: InteractiveParams) => {
 
   // Only do this if have interactive nonce.
   if (interactiveParams.assetId) {
-    backendAPI.interceptors.request.use((config: any) => {
+    backendAPI.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       if (!config?.params) config.params = {};
       config.params = { ...config.params };
       config.params["assetId"] = interactiveParams.assetId;
       config.params["displayName"] = interactiveParams.displayName;
+      config.params["identityId"] = interactiveParams.identityId;
       config.params["interactiveNonce"] = interactiveParams.interactiveNonce;
       config.params["interactivePublicKey"] = interactiveParams.interactivePublicKey;
       config.params["profileId"] = interactiveParams.profileId;

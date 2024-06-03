@@ -9,7 +9,7 @@ import { GlobalStateContext } from "@context/GlobalContext";
 import { GlobalDispatchContext } from "@context/GlobalContext";
 import { SET_QUEST_DETAILS } from "@/context/types";
 
-export const AdminForm = ({ setErrorMessage }: { setErrorMessage: any }) => {
+export const AdminForm = ({ setErrorMessage }: { setErrorMessage: (value: string) => void }) => {
   const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ export const AdminForm = ({ setErrorMessage }: { setErrorMessage: any }) => {
     register,
   } = useForm();
 
-  const onSubmit = (data: any) => {
+  const onSubmit = handleSubmit((data) => {
     const { numberAllowedToCollect, questItemImage } = data
     setAreButtonsDisabled(true);
     setErrorMessage("");
@@ -37,7 +37,7 @@ export const AdminForm = ({ setErrorMessage }: { setErrorMessage: any }) => {
       })
       .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
       .finally(() => setAreButtonsDisabled(false))
-  };
+  });
 
   const removeQuest = () => {
     setErrorMessage("");
@@ -55,7 +55,7 @@ export const AdminForm = ({ setErrorMessage }: { setErrorMessage: any }) => {
   return (
     <div className="container grid gap-2">
       <hr />
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={onSubmit}>
         <div className="mt-4">
           <label htmlFor="numberAllowedToCollect">Number Allowed To Collect Per Day:</label>
           <input

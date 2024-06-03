@@ -70,8 +70,8 @@ export const Admin = () => {
           {questItemImage && (
             <img alt="Drop in world" src={questItemImage} style={{ height: 20, paddingLeft: 4, paddingRight: 4 }} />
           )}{" "}
-            hidden in this world
-          </h5>
+          hidden in this world
+        </h5>
         <div className="my-2">
           <button className="btn" disabled={areButtonsDisabled} onClick={dropItem}>
             Hide

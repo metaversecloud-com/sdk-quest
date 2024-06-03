@@ -1,25 +1,22 @@
 import { World } from "../topiaInit.js";
 import { errorHandler } from "../errorHandler.js";
 import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
-import { Credentials, DataObjectType } from '../../types/index.js';
+import { Credentials, DataObjectType } from "../../types/index.js";
 
 type WorldDataObject = {
   scenes: {
-    [key: string]: DataObjectType
-  },
-}
+    [key: string]: DataObjectType;
+  };
+};
 
-export const getWorldDetails = async (credentials: Credentials) => {
+export const getWorldDetails = async (credentials: Credentials, getDetails: boolean = true) => {
   try {
-    const { assetId, urlSlug } = credentials
-    const sceneDropId = credentials.sceneDropId || assetId
+    const { assetId, urlSlug } = credentials;
+    const sceneDropId = credentials.sceneDropId || assetId;
 
     const world = World.create(urlSlug, { credentials });
 
-    await Promise.all([
-      world.fetchDetails(),
-      world.fetchDataObject(),
-    ])
+    if (getDetails) await world.fetchDetails();
 
     await initializeWorldDataObject({ credentials, world });
 

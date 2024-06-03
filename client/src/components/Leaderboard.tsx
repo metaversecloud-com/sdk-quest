@@ -9,9 +9,16 @@ import { backendAPI } from "@utils/backendAPI";
 // context
 import { GlobalStateContext } from "@context/GlobalContext";
 
+type LeaderboardType = {
+  name: string,
+  collected: number,
+  profileId: string,
+  streak: number,
+}
+
 export const Leaderboard = () => {
-  const [visibleData, setVisibleData] = useState([]);
-  const [total, setTotal] = useState();
+  const [visibleData, setVisibleData] = useState<LeaderboardType[]>([]);
+  const [total, setTotal] = useState(0);
   const [currentPosition, setCurrentPosition] = useState(0);
   const [myData, setMyData] = useState({ streak: 0, collected: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +31,7 @@ export const Leaderboard = () => {
     backendAPI.get(`/leaderboard`)
       .then((result) => {
         const { leaderboard } = result.data;
-        const index = leaderboard.findIndex((item: any) => item.profileId === visitor.profileId);
+        const index = leaderboard.findIndex((item: { profileId: string }) => item.profileId === visitor.profileId);
         setMyData(leaderboard[index]);
         setCurrentPosition(index + 1);
         setTotal(leaderboard.length);

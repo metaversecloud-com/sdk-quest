@@ -28,6 +28,7 @@ const App = () => {
     return {
       assetId: searchParams.get("assetId") || "",
       displayName: searchParams.get("displayName") || "",
+      identityId: searchParams.get("identityId") || "",
       interactiveNonce: searchParams.get("interactiveNonce") || "",
       interactivePublicKey: searchParams.get("interactivePublicKey") || "",
       profileId: searchParams.get("profileId") || "",
@@ -43,6 +44,7 @@ const App = () => {
     ({
       assetId,
       displayName,
+      identityId,
       interactiveNonce,
       interactivePublicKey,
       profileId,
@@ -58,6 +60,7 @@ const App = () => {
         payload: {
           assetId,
           displayName,
+          identityId,
           interactiveNonce,
           interactivePublicKey,
           isInteractiveIframe,

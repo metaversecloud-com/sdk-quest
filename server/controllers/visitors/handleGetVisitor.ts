@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { errorHandler, getVisitor, getCredentials } from "../../utils/index.js"
+import { errorHandler, getVisitor, getCredentials } from "../../utils/index.js";
 
 export const handleGetVisitor = async (req: Request, res: Response): Promise<Record<string, any> | void> => {
   try {

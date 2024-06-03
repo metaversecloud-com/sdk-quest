@@ -5,7 +5,7 @@ export const handleGetQuestDetails = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
 
-    const { dataObject } = await getWorldDetails(credentials);
+    const { dataObject } = await getWorldDetails(credentials, false);
 
     return res.json(dataObject);
   } catch (error) {
