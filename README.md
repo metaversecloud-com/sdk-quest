@@ -68,9 +68,9 @@ _We use data objects to store information about each implementation of the app p
 - Dropped Assets: the data object attached to the dropped assets can optionally include `questItemImage` which will be used instead of the default image when someone first interacts with the instance of Quest
 - World: the data object attached to the world will store information for every instance of the app in a given world by sceneDropId and will persist if a specific instance is removed manually from world instead of through the Admin screen.
 
-  - itemsCollectedByUser (`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}.count`)
-  - totalItemsCollected (`scenes.${sceneDropId}.totalItemsCollected.count`)
-  - questItems (`scenes.${sceneDropId}.questItems.${assetId}.count`)
+  - itemsCollectedByUser (`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}`)
+  - totalItemsCollected (`scenes.${sceneDropId}.totalItemsCollected`)
+  - questItems (`scenes.${sceneDropId}.questItems.${assetId}`)
 
 ### Helpful links
 

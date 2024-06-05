@@ -11,6 +11,6 @@ export const defaultInitialState = {
   },
   visitor: {
     isAdmin: false,
-    profileId: ""
+    profileId: "",
   },
-}
+};

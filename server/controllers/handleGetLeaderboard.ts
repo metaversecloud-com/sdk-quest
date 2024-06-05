@@ -6,13 +6,14 @@ export const handleGetLeaderboard = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
 
-    const { dataObject } = await getWorldDetails(credentials);
+    const { dataObject } = await getWorldDetails(credentials, false);
+    if (!dataObject) throw "No data object found";
     const { itemsCollectedByUser } = dataObject as DataObjectType;
 
     const leaderboard = [];
 
     for (const profileId in itemsCollectedByUser) {
-      const thisUsersItems = itemsCollectedByUser[profileId]
+      const thisUsersItems = itemsCollectedByUser[profileId];
       leaderboard.push({
         name: thisUsersItems.username,
         collected: thisUsersItems.total,

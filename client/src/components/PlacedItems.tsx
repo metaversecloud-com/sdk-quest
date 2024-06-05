@@ -1,6 +1,6 @@
 import { backendAPI } from "@utils/backendAPI";
 
-export const PlacedItems = ({ getQuestItems, setErrorMessage, questItems }: { getQuestItems: any, setErrorMessage: any, questItems: any }) => {
+export const PlacedItems = ({ getQuestItems, setErrorMessage, questItems }: { getQuestItems: () => void, setErrorMessage: (value: string) => void, questItems: { [key: string]: { id: string, clickableLink: string, position: { x: number, y: number }, } } }) => {
   const removeQuestItem = async (id: string) => {
     setErrorMessage("");
     backendAPI.delete(`/dropped-asset/${id}`)
@@ -25,7 +25,7 @@ export const PlacedItems = ({ getQuestItems, setErrorMessage, questItems }: { ge
             let lastMovedFormatted = 0;
             if (item.clickableLink) {
               const clickableLink = new URL(item.clickableLink);
-              let params = new URLSearchParams(clickableLink.search);
+              const params = new URLSearchParams(clickableLink.search);
               const lastMovedParam = params.get("lastMoved")
               const now = new Date()
               const lastMoved = lastMovedParam ? new Date(parseInt(lastMovedParam)) : now;

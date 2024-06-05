@@ -14,9 +14,9 @@ export const handleDropQuestItem = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
     const { interactivePublicKey, urlSlug } = credentials;
-    const sceneDropId = credentials.sceneDropId || credentials.assetId
+    const sceneDropId = credentials.sceneDropId || credentials.assetId;
 
-    const { dataObject, world } = await getWorldDetails(credentials);
+    const { dataObject, world } = await getWorldDetails(credentials, true);
     const { questItemImage } = dataObject as DataObjectType;
 
     // Randomly place the quest item asset

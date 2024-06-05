@@ -1,6 +1,6 @@
 import { VisitorInterface } from "@rtsdk/topia";
-import { Visitor } from "../topiaInit.js"
-import { errorHandler } from "../errorHandler.js"
+import { Visitor } from "../topiaInit.js";
+import { errorHandler } from "../errorHandler.js";
 import { Credentials } from "../../types/Credentials.js";
 
 export const getVisitor = async (credentials: Credentials) => {

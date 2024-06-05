@@ -2,20 +2,21 @@ import { Request, Response } from "express";
 import { DataObjectType } from "../../types/DataObjectType.js";
 import {
   DroppedAsset,
+  Visitor,
+  addNewRowToGoogleSheets,
   errorHandler,
   getBaseURL,
   getCredentials,
   getDifferenceInDays,
   getRandomCoordinates,
-  getVisitor,
   getWorldDetails,
 } from "../../utils/index.js";
 
 export const handleQuestItemClicked = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
-    const { assetId, profileId, urlSlug, username } = credentials;
-    const sceneDropId = credentials.sceneDropId || assetId
+    const { assetId, displayName, identityId, profileId, urlSlug, username, visitorId } = credentials;
+    const sceneDropId = credentials.sceneDropId || assetId;
 
     const now = new Date();
     const localDateString = now.toLocaleDateString();
@@ -24,27 +25,30 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     const analytics = [];
 
+    const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
+
     const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
-    const { dataObject, world } = await getWorldDetails(credentials);
+    const { dataObject, world } = await getWorldDetails(credentials, true);
     const { itemsCollectedByUser, numberAllowedToCollect } = dataObject as DataObjectType;
 
     const lastCollectedDate = itemsCollectedByUser?.[profileId]?.lastCollectedDate;
     const differenceInDays = getDifferenceInDays(currentDate, new Date(lastCollectedDate));
-    const hasCollectedToday = differenceInDays === 0
+    const hasCollectedToday = differenceInDays === 0;
     let totalCollectedToday = 1,
       total = 1;
 
-    if (
-      hasCollectedToday &&
-      itemsCollectedByUser?.[profileId]?.totalCollectedToday >= numberAllowedToCollect
-    ) {
+    if (!hasCollectedToday) analytics.push({ analyticName: "starts", profileId, urlSlug, uniqueKey: profileId });
+
+    if (hasCollectedToday && itemsCollectedByUser?.[profileId]?.totalCollectedToday >= numberAllowedToCollect) {
       return res.json({ addedClick: false, numberAllowedToCollect, success: true });
     } else {
       const promises = [];
+      analytics.push({ analyticName: "itemsCollected" });
 
       // Move the quest item to a new random location
       const position = getRandomCoordinates(world.width, world.height);
+      promises.push(world.triggerParticle({ position: droppedAsset.position, name: "Smoke" }));
       promises.push(droppedAsset.updatePosition(position.x, position.y));
       promises.push(
         droppedAsset.updateClickType({
@@ -66,7 +70,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
               longestStreak: 1,
               total: 1,
               totalCollectedToday: 1,
-              username
+              username,
             },
             [`scenes.${sceneDropId}.lastInteractionDate`]: new Date(),
           }),
@@ -86,7 +90,18 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         }
 
         if (currentStreak > longestStreak) longestStreak = currentStreak;
-        if (totalCollectedToday === numberAllowedToCollect) analytics.push("dayCompletedCount");
+
+        if (totalCollectedToday === numberAllowedToCollect) {
+          promises.push(visitor.triggerParticle({ duration: 60, name: "firework3_blue" }));
+          analytics.push({ analyticName: "completions", profileId, urlSlug, uniqueKey: profileId });
+          addNewRowToGoogleSheets([
+            {
+              identityId,
+              displayName,
+              event: "completions",
+            },
+          ]);
+        }
 
         promises.push(
           world.updateDataObject({
@@ -96,24 +111,27 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
               longestStreak,
               total,
               totalCollectedToday,
-              username
+              username,
             },
           }),
         );
       }
 
-      const visitor = await getVisitor(credentials);
+      if (total % 50 === 0) {
+        analytics.push({ analyticName: `itemsCollected${total}`, profileId, uniqueKey: profileId });
 
-      if ([50, 100].includes(total)) {
-        const grantExpressionResult = await visitor.grantExpression({ name: "quest_1" });
+        const name = process.env.EMOTE_NAME || "quest_1";
+        const grantExpressionResult = await visitor.grantExpression({ name });
 
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";
+        // @ts-ignore
         if (grantExpressionResult.data?.statusCode === 409) {
           title = `Congrats! You collected ${total} quest items`;
           text = "Keep up the solid detective work 🔎";
         } else {
-          analytics.push("emoteUnlockedCount");
+          promises.push(visitor.triggerParticle({ name: "firework2_gold" }));
+          analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
         }
 
         promises.push(
@@ -125,9 +143,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         );
       }
 
-      promises.push(
-        world.incrementDataObjectValue([`scenes.${sceneDropId}.totalItemsCollected.count`], 1, { analytics }),
-      );
+      promises.push(world.incrementDataObjectValue([`scenes.${sceneDropId}.totalItemsCollected`], 1, { analytics }));
 
       await Promise.all(promises);
 
