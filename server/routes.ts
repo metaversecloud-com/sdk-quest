@@ -16,11 +16,14 @@ import { getVersion } from "./utils/getVersion.js";
 
 const router = express.Router();
 
+const SERVER_START_DATE = new Date();
 router.get("/system/health", (req, res) => {
   return res.json({
     appVersion: getVersion(),
     status: "OK",
+    deployDate: SERVER_START_DATE,
     envs: {
+      COMMIT_HASH: process.env.COMMIT_HASH,
       NODE_ENV: process.env.NODE_ENV,
       INSTANCE_DOMAIN: process.env.INSTANCE_DOMAIN,
       INTERACTIVE_KEY: process.env.INTERACTIVE_KEY,
