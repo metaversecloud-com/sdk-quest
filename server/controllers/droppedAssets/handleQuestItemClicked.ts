@@ -126,12 +126,12 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";
         // @ts-ignore
-        if (grantExpressionResult.data?.statusCode === 200) {
+        if (grantExpressionResult.data?.statusCode === 200 || grantExpressionResult.data?.status === 200) {
           promises.push(visitor.triggerParticle({ name: "firework2_gold" }));
           analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
         }
         // @ts-ignore
-        else if (grantExpressionResult.data?.statusCode === 409) {
+        else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.data?.status === 409) {
           title = `Congrats! You collected ${total} quest items`;
           text = "Keep up the solid detective work 🔎";
         }
