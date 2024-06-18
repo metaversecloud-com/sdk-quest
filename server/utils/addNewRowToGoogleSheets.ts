@@ -5,6 +5,7 @@ type SSAEvent = {
   identityId: string;
   displayName: string;
   event: string;
+  urlSlug: string;
 };
 
 // Configure the Google Sheets client
@@ -25,13 +26,21 @@ export const addNewRowToGoogleSheets = async (SSAEvents: SSAEvent[]) => {
       return;
     }
     for (const row of SSAEvents) {
-      const { identityId, displayName, event } = row;
+      const { identityId, displayName, event, urlSlug } = row;
 
       const now = new Date();
       const formattedDate = now.toISOString().split("T")[0];
       const formattedTime = now.toISOString().split("T")[1].split(".")[0];
 
-      const dataRowToBeInsertedInGoogleSheets = [formattedDate, formattedTime, identityId, displayName, "Quest", event];
+      const dataRowToBeInsertedInGoogleSheets = [
+        formattedDate,
+        formattedTime,
+        identityId,
+        displayName,
+        "Quest",
+        event,
+        urlSlug,
+      ];
 
       // @ts-ignore
       await sheetsClient.spreadsheets.values.append({
