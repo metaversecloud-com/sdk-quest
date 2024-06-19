@@ -45,10 +45,10 @@ export const addNewRowToGoogleSheets = async (SSAEvents: SSAEvent[]) => {
       // @ts-ignore
       await sheetsClient.spreadsheets.values.append({
         spreadsheetId: process.env.GOOGLESHEETS_SHEET_ID,
-        range: "Sheet1",
+        range: process.env.GOOGLESHEETS_SHEET_RANGE || "Sheet1",
         valueInputOption: "RAW",
         insertDataOption: "INSERT_ROWS",
-        resource: {
+        requestBody: {
           values: [dataRowToBeInsertedInGoogleSheets],
         },
       });
