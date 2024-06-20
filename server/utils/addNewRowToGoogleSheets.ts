@@ -5,6 +5,7 @@ type SSAEvent = {
   identityId: string;
   displayName: string;
   event: string;
+  urlSlug: string;
 };
 
 // Configure the Google Sheets client
@@ -21,29 +22,37 @@ const sheetsClient = sheets.sheets({ version: "v4", auth });
 export const addNewRowToGoogleSheets = async (SSAEvents: SSAEvent[]) => {
   try {
     // Only execute this function if we have GOOGLESHEETS_SHEET_ID in the environment variables.
-    if (!process.env.GOOGLESHEETS_SHEET_ID) {
-      return;
-    }
+    if (!process.env.GOOGLESHEETS_SHEET_ID) return;
+
+    const data = [];
     for (const row of SSAEvents) {
-      const { identityId, displayName, event } = row;
+      const { identityId, displayName, event, urlSlug } = row;
 
       const now = new Date();
       const formattedDate = now.toISOString().split("T")[0];
       const formattedTime = now.toISOString().split("T")[1].split(".")[0];
 
-      const dataRowToBeInsertedInGoogleSheets = [formattedDate, formattedTime, identityId, displayName, "Quest", event];
-
-      // @ts-ignore
-      await sheetsClient.spreadsheets.values.append({
-        spreadsheetId: process.env.GOOGLESHEETS_SHEET_ID,
-        range: "Sheet1",
-        valueInputOption: "RAW",
-        insertDataOption: "INSERT_ROWS",
-        resource: {
-          values: [dataRowToBeInsertedInGoogleSheets],
-        },
-      });
+      const dataRowToBeInsertedInGoogleSheets = [
+        formattedDate,
+        formattedTime,
+        identityId,
+        displayName,
+        "Quest",
+        event,
+        urlSlug,
+      ];
+      data.push(dataRowToBeInsertedInGoogleSheets);
     }
+
+    await sheetsClient.spreadsheets.values.append({
+      spreadsheetId: process.env.GOOGLESHEETS_SHEET_ID,
+      range: process.env.GOOGLESHEETS_SHEET_RANGE || "Sheet1",
+      valueInputOption: "RAW",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: {
+        values: [...data],
+      },
+    });
   } catch (error) {
     console.error(JSON.stringify(error));
   }

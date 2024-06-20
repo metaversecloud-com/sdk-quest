@@ -99,6 +99,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
               identityId,
               displayName,
               event: "completions",
+              urlSlug,
             },
           ]);
         }
