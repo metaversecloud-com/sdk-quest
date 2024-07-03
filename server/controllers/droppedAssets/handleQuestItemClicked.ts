@@ -30,7 +30,8 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
     const { dataObject, world } = await getWorldDetails(credentials, true);
-    const { itemsCollectedByUser, numberAllowedToCollect } = dataObject as DataObjectType;
+    let { itemsCollectedByUser, numberAllowedToCollect } = dataObject as DataObjectType;
+    if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
 
     const lastCollectedDate = itemsCollectedByUser?.[profileId]?.lastCollectedDate;
     const differenceInDays = getDifferenceInDays(currentDate, new Date(lastCollectedDate));
