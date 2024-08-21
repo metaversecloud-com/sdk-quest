@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@googleapis/sheets": "^7.0.0",
-    "@rtsdk/topia": "^0.11.7",
+    "@rtsdk/topia": "^0.12.0",
     "axios": "^1.6.8",
     "concurrently": "^8.2.2",
     "typescript": "^5.4.3",
