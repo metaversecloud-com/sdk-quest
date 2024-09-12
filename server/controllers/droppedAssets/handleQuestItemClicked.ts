@@ -49,7 +49,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
       // Move the quest item to a new random location
       const position = getRandomCoordinates(world.width, world.height);
-      promises.push(world.triggerParticle({ position: droppedAsset.position, name: "Smoke" }));
+      promises.push(world.triggerParticle({ position: droppedAsset.position, name: "lightBlueSmoke_puff" }));
       promises.push(droppedAsset.updatePosition(position.x, position.y));
       promises.push(
         droppedAsset.updateClickType({
@@ -93,7 +93,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         if (currentStreak > longestStreak) longestStreak = currentStreak;
 
         if (totalCollectedToday === numberAllowedToCollect) {
-          promises.push(visitor.triggerParticle({ duration: 60, name: "firework3_blue" }));
+          promises.push(visitor.triggerParticle({ duration: 60, name: "redPinkHeart_float" }));
           analytics.push({ analyticName: "completions", profileId, urlSlug, uniqueKey: profileId });
           addNewRowToGoogleSheets([
             {
