@@ -18,6 +18,7 @@ export const handleDropQuestItem = async (req: Request, res: Response) => {
 
     const { dataObject, world } = await getWorldDetails(credentials, true);
     const { questItemImage } = dataObject as DataObjectType;
+    if (!questItemImage) throw "questItemImage is required";
 
     // Randomly place the quest item asset
     const position = getRandomCoordinates(world.width, world.height);
