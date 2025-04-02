@@ -21,7 +21,6 @@ const sheetsClient = sheets.sheets({ version: "v4", auth });
 
 export const addNewRowToGoogleSheets = async (SSAEvents: SSAEvent[]) => {
   try {
-    // Only execute this function if we have GOOGLESHEETS_SHEET_ID in the environment variables.
     if (!process.env.GOOGLESHEETS_SHEET_ID) return;
 
     const data = [];
