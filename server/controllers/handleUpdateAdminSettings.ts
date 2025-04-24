@@ -7,6 +7,8 @@ export const handleUpdateAdminSettings = async (req: Request, res: Response) => 
     const sceneDropId = credentials.sceneDropId || credentials.assetId;
     const { numberAllowedToCollect, questItemImage } = req.body;
 
+    if (!questItemImage) throw "questItemImage is required";
+
     const { world } = await getWorldDetails(credentials, false);
 
     const lockId = `${sceneDropId}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
