@@ -16,23 +16,28 @@ export const QuestItemClicked = () => {
 
   // context
   const { questDetails, hasInteractiveParams } = useContext(GlobalStateContext);
-  const { questItemImage } = questDetails
+  const { questItemImage } = questDetails;
 
   useEffect(() => {
     if (hasInteractiveParams) {
-      backendAPI.post("/quest-item-clicked")
+      backendAPI
+        .post("/quest-item-clicked")
         .then((result) => {
           const { addedClick, numberAllowedToCollect, totalCollectedToday, success } = result.data;
           if (addedClick) {
             setCollectedText(`${totalCollectedToday}/${numberAllowedToCollect} collected today`);
-            setMessage(`🎉 Congratulations! You are one step closer to completing your daily quest!`);
+            if (totalCollectedToday === numberAllowedToCollect) {
+              setMessage(`🎉 Congratulations! You have completed your daily quest!`);
+            } else {
+              setMessage(`🎉 Congratulations! You are one step closer to completing your daily quest!`);
+            }
           } else if (success) {
             setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
             setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected today`);
           }
         })
         .catch(() => console.error("Error collecting Quest item"))
-        .finally(() => setIsLoading(false))
+        .finally(() => setIsLoading(false));
     }
   }, [hasInteractiveParams]);
 
@@ -61,4 +66,4 @@ export const QuestItemClicked = () => {
   );
 };
 
-export default QuestItemClicked
+export default QuestItemClicked;
