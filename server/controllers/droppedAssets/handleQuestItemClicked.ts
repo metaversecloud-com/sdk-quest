@@ -49,7 +49,6 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
       // Move the quest item to a new random location
       const position = getRandomCoordinates(world.width, world.height);
-      promises.push(world.triggerParticle({ position: droppedAsset.position, name: "lightBlueSmoke_puff" }));
       promises.push(droppedAsset.updatePosition(position.x, position.y));
       promises.push(
         droppedAsset.updateClickType({
@@ -58,6 +57,14 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           clickableLinkTitle: "Quest",
           isOpenLinkInDrawer: true,
           clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+        }),
+      );
+
+      world.triggerParticle({ position: droppedAsset.position, name: "lightBlueSmoke_puff" }).catch((error: any) =>
+        errorHandler({
+          error,
+          functionName: "handleQuestItemClicked",
+          message: "Error triggering particle effects",
         }),
       );
 
@@ -93,7 +100,14 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         if (currentStreak > longestStreak) longestStreak = currentStreak;
 
         if (totalCollectedToday === numberAllowedToCollect) {
-          promises.push(visitor.triggerParticle({ duration: 60, name: "redPinkHeart_float" }));
+          visitor.triggerParticle({ duration: 60, name: "redPinkHeart_float" }).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: "Error triggering particle effects",
+            }),
+          );
+
           analytics.push({ analyticName: "completions", profileId, urlSlug, uniqueKey: profileId });
           addNewRowToGoogleSheets([
             {
@@ -129,7 +143,14 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           text = "Congrats! Your detective skills paid off.";
         // @ts-ignore
         if (grantExpressionResult.data?.statusCode === 200 || grantExpressionResult.status === 200) {
-          promises.push(visitor.triggerParticle({ name: "firework2_gold" }));
+          visitor.triggerParticle({ name: "firework2_gold" }).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: "Error triggering particle effects",
+            }),
+          );
+
           analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
         }
         // @ts-ignore
@@ -138,13 +159,19 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           text = "Keep up the solid detective work 🔎";
         }
 
-        promises.push(
-          visitor.fireToast({
+        visitor
+          .fireToast({
             groupId: "QuestExpression",
             title,
             text,
-          }),
-        );
+          })
+          .catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: "Error firing toast",
+            }),
+          );
       }
 
       promises.push(world.incrementDataObjectValue([`scenes.${sceneDropId}.totalItemsCollected`], 1, { analytics }));
