@@ -33,7 +33,13 @@ export const handleRemoveQuestFromWorld = async (req: Request, res: Response) =>
 
     // close drawer and fire toast
     const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
-    visitor.closeIframe(assetId);
+    visitor.closeIframe(assetId).catch((error: any) =>
+      errorHandler({
+        error,
+        functionName: "handleRemoveQuestFromWorld",
+        message: "Error closing iframe",
+      }),
+    );
 
     visitor
       .fireToast({
