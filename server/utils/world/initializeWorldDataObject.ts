@@ -1,6 +1,5 @@
 import { Credentials } from "../../types/Credentials.js";
 import { errorHandler } from "../errorHandler.js";
-import { getDefaultKeyAssetImage } from "../getDefaultKeyAssetImage.js";
 import { DroppedAsset } from "../topiaInit.js";
 
 export const initializeWorldDataObject = async ({ credentials, world }: { credentials: Credentials; world: any }) => {
@@ -12,9 +11,11 @@ export const initializeWorldDataObject = async ({ credentials, world }: { creden
 
     let questItemImage;
     if (!world.dataObject?.scenes && !world.dataObject?.scenes?.[sceneDropId]) {
-      const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
-      // @ts-ignore
-      questItemImage = droppedAsset.dataObject?.questItemImage || (await getDefaultKeyAssetImage(urlSlug));
+      const droppedAsset = (await DroppedAsset.get(assetId, urlSlug, { credentials })) as {
+        dataObject: { questItemImage?: string };
+      };
+      questItemImage =
+        droppedAsset.dataObject?.questItemImage || "https://topiaimages.s3.us-west-1.amazonaws.com/Ruby.png";
     }
 
     const payload = {
