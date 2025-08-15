@@ -70,14 +70,8 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
       );
 
       totalCollected = totalCollected + 1;
-      if (lastCollectedDate) {
-        if (!hasCollectedToday) {
-          totalCollectedToday = 1;
-          if (differenceInDays === 1) currentStreak = currentStreak + 1;
-        } else if (hasCollectedToday) {
-          totalCollectedToday = totalCollectedToday + 1;
-        }
-      }
+      totalCollectedToday = totalCollectedToday + 1;
+      if (lastCollectedDate && differenceInDays === 1) currentStreak = currentStreak + 1;
 
       if (currentStreak > longestStreak) longestStreak = currentStreak;
 
