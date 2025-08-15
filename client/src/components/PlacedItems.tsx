@@ -60,7 +60,7 @@ export const PlacedItems = ({
                   </div>
                 </td>
                 <td style={{ textAlign: "right" }}>
-                  <div className="tooltip">
+                  <div className="tooltip mr-2">
                     <span className="tooltip-content">Walk to Item</span>
                     <button className="btn btn-icon" onClick={() => moveVisitor(item.position)}>
                       <img alt="Walk to" src="https://sdk-style.s3.amazonaws.com/icons/walk.svg" />

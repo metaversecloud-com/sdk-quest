@@ -33,7 +33,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     let { keyAssetId, numberAllowedToCollect } = worldDataObject as WorldDataObjectType;
     if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
 
-    const { visitor, visitorProgress } = await getVisitor(credentials);
+    const { visitor, visitorProgress } = await getVisitor(credentials, keyAssetId);
 
     let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
 
@@ -70,8 +70,12 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
       );
 
       totalCollected = totalCollected + 1;
-      totalCollectedToday = totalCollectedToday + 1;
-      if (lastCollectedDate && differenceInDays === 1) currentStreak = currentStreak + 1;
+      if (!hasCollectedToday) {
+        totalCollectedToday = 1;
+        if (differenceInDays === 1) currentStreak = currentStreak + 1;
+      } else {
+        totalCollectedToday = totalCollectedToday + 1;
+      }
 
       if (currentStreak > longestStreak) longestStreak = currentStreak;
 

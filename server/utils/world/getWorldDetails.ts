@@ -20,12 +20,7 @@ export const getWorldDetails = async (credentials: Credentials, getDetails: bool
 
     await initializeWorldDataObject({ credentials, world });
 
-    let dataObject = world.dataObject as WorldDataObject;
-
-    if (!dataObject?.scenes?.[sceneDropId]) {
-      await world.fetchDataObject();
-      dataObject = world.dataObject as WorldDataObject;
-    }
+    const dataObject = world.dataObject as WorldDataObject;
 
     return { dataObject: dataObject.scenes?.[sceneDropId], world };
   } catch (error) {

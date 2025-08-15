@@ -36,7 +36,7 @@ export const handleGetLeaderboard = async (req: Request, res: Response) => {
 
     formattedLeaderboard.sort((a, b) => b.collected - a.collected);
 
-    const { visitor } = await getVisitor(credentials);
+    const { visitor } = await getVisitor(credentials, keyAssetId);
 
     return res.json({
       leaderboard: formattedLeaderboard,

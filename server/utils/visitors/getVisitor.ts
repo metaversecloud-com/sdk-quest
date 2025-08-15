@@ -4,9 +4,10 @@ import { errorHandler } from "../errorHandler.js";
 import { Credentials } from "../../types/Credentials.js";
 import { UserDataObjectType } from "../../types/DataObjectTypes.js";
 
-export const getVisitor = async (credentials: Credentials) => {
+export const getVisitor = async (credentials: Credentials, keyAssetId: string) => {
   try {
-    const { sceneDropId, urlSlug, visitorId } = credentials;
+    const { urlSlug, visitorId } = credentials;
+    const sceneDropId = credentials.sceneDropId || keyAssetId;
 
     const visitor: VisitorInterface = await Visitor.get(visitorId, urlSlug, { credentials });
 
