@@ -65,12 +65,20 @@ WEB_IMAGE_ASSET_ID=webImageAsset
 
 _We use data objects to store information about each implementation of the app per world._
 
-- Dropped Assets: the data object attached to the dropped assets can optionally include `questItemImage` which will be used instead of the default image when someone first interacts with the instance of Quest
+- Dropped Assets: the data object attached to the dropped assets can optionally include `questItemImage` which will be used instead of the default image when someone first interacts with the instance of Quest. Additionally it'll capture user progress to be displayed in the leaderboard
+
+  - leaderboard (`leaderboard.${profileId}`)
+
 - World: the data object attached to the world will store information for every instance of the app in a given world by sceneDropId and will persist if a specific instance is removed manually from world instead of through the Admin screen.
 
-  - itemsCollectedByUser (`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}`)
-  - totalItemsCollected (`scenes.${sceneDropId}.totalItemsCollected`)
   - questItems (`scenes.${sceneDropId}.questItems.${assetId}`)
+
+- User: the data object attached to the user will store user's progress per instance of Quest across all worlds.
+  - currentStreak
+  - lastCollectedDate
+  - longestStreak
+  - totalCollected
+  - totalCollectedToday
 
 ### Helpful links
 

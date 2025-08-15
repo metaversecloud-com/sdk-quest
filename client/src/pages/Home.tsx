@@ -1,46 +1,47 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 // components
-import { Admin, Leaderboard } from "@/components";
+import { Leaderboard, PageContainer } from "@/components";
 
 // context
-import { GlobalStateContext } from "@context/GlobalContext";
+import { GlobalDispatchContext, GlobalStateContext } from "@context/GlobalContext";
+import { ErrorType, SET_QUEST_DETAILS, SET_VISITOR_INFO } from "@/context/types";
+
+// utils
+import { backendAPI, setErrorMessage } from "@/utils";
 
 export const Home = () => {
-  const [activeTab, setActiveTab] = useState("leaderboard");
+  const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const { questDetails, visitor } = useContext(GlobalStateContext);
-  const { questItemImage } = questDetails
+  const dispatch = useContext(GlobalDispatchContext);
+  const { hasInteractiveParams } = useContext(GlobalStateContext);
+
+  useEffect(() => {
+    if (hasInteractiveParams) {
+      backendAPI
+        .get("/quest")
+        .then((response) => {
+          const { questDetails, visitor } = response.data;
+          dispatch!({
+            type: SET_QUEST_DETAILS,
+            payload: { questDetails },
+          });
+          dispatch!({
+            type: SET_VISITOR_INFO,
+            payload: { visitor },
+          });
+        })
+        .catch((error) => setErrorMessage(dispatch, error as ErrorType))
+        .finally(() => setIsLoading(false));
+    }
+  }, [hasInteractiveParams]);
 
   return (
-    <div className="container p-6 items-center justify-center">
-      {visitor && visitor.isAdmin && (
-        <div className="flex flex-col items-end mb-6">
-          <div className="tab-container">
-            <button
-              className={activeTab !== "admin" ? "btn" : "btn btn-text"}
-              onClick={() => setActiveTab("leaderboard")}
-            >
-              Leaderboard
-            </button>
-            <button className={activeTab === "admin" ? "btn" : "btn btn-text"} onClick={() => setActiveTab("admin")}>
-              Admin
-            </button>
-          </div>
-        </div>
-      )}
-      {questItemImage ? <img alt="Find me" className="mx-auto" src={questItemImage} /> : <div />}
-      <div className="flex flex-col mb-6 mt-4">
-        <h1 className="h2 text-center">Quest</h1>
-      </div>
-      {activeTab === "admin" ? (
-        <Admin />
-      ) : (
-        <Leaderboard />
-      )}
-    </div>
+    <PageContainer isLoading={isLoading}>
+      <Leaderboard isKeyAsset={true} />
+    </PageContainer>
   );
 };
 
-export default Home
+export default Home;

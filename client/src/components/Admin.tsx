@@ -4,21 +4,22 @@ import { useContext, useEffect, useState } from "react";
 import { AdminForm, Loading, PlacedItems } from "./index.js";
 
 // utils
-import { backendAPI } from "@utils/backendAPI";
+import { backendAPI, setErrorMessage } from "@/utils";
 
 // context
-import { GlobalStateContext } from "@context/GlobalContext";
+import { GlobalDispatchContext, GlobalStateContext } from "@context/GlobalContext";
+import { ErrorType } from "@/context/types.js";
 
 export const Admin = () => {
   const [questItems, setQuestItems] = useState({});
   const [questItemCount, setQuestItemCount] = useState(0);
   const [areButtonsDisabled, setAreButtonsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
 
   // context
+  const dispatch = useContext(GlobalDispatchContext);
   const { hasInteractiveParams, questDetails } = useContext(GlobalStateContext);
-  const { questItemImage } = questDetails
+  const { questItemImage } = questDetails || {};
 
   useEffect(() => {
     if (hasInteractiveParams) {
@@ -27,42 +28,42 @@ export const Admin = () => {
   }, [hasInteractiveParams]);
 
   const getQuestItems = () => {
-    setErrorMessage("");
-    backendAPI.get("/quest-items")
-      .then((result) => {
-        setQuestItems(result.data.droppedAssets)
-        setQuestItemCount(Object.keys(result.data.droppedAssets).length)
+    backendAPI
+      .get("/quest-items")
+      .then((response) => {
+        setQuestItems(response.data.droppedAssets);
+        setQuestItemCount(Object.keys(response.data.droppedAssets).length);
       })
-      .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
-      .finally(() => setIsLoading(false))
+      .catch((error) => setErrorMessage(dispatch, error as ErrorType))
+      .finally(() => setIsLoading(false));
   };
 
   const dropItem = () => {
-    setErrorMessage("");
     setAreButtonsDisabled(true);
-    backendAPI.post("/drop-quest-item")
+    backendAPI
+      .post("/drop-quest-item")
       .then(() => getQuestItems())
-      .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
-      .finally(() => setAreButtonsDisabled(false))
+      .catch((error) => setErrorMessage(dispatch, error as ErrorType))
+      .finally(() => setAreButtonsDisabled(false));
   };
 
   const removeAllQuestItems = () => {
-    setErrorMessage("");
     setAreButtonsDisabled(true);
-    backendAPI.post("/dropped-asset/remove-all-with-unique-name")
+    backendAPI
+      .post("/dropped-asset/remove-all-with-unique-name")
       .then(() => {
-        setQuestItems({})
-        setQuestItemCount(0)
+        setQuestItems({});
+        setQuestItemCount(0);
       })
-      .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
-      .finally(() => setAreButtonsDisabled(false))
+      .catch((error) => setErrorMessage(dispatch, error as ErrorType))
+      .finally(() => setAreButtonsDisabled(false));
   };
 
   if (isLoading) return <Loading />;
 
   return (
     <>
-      <AdminForm setErrorMessage={setErrorMessage} />
+      <AdminForm />
 
       <div className="container py-6 items-center justify-center">
         <h5 className="h5 flex items-center justify-center pb-4">
@@ -92,9 +93,7 @@ export const Admin = () => {
         </div>
       </div>
 
-      {questItemCount > 0 && <PlacedItems questItems={questItems} getQuestItems={getQuestItems} setErrorMessage={setErrorMessage} />}
-
-      {errorMessage && <p className="p3 text-error">{`${errorMessage}`}</p>}
+      {questItemCount > 0 && <PlacedItems questItems={questItems} getQuestItems={getQuestItems} />}
     </>
   );
-}
+};

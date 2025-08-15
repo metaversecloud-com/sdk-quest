@@ -1,17 +1,32 @@
-import { backendAPI } from "@utils/backendAPI";
+import { useContext } from "react";
 
-export const PlacedItems = ({ getQuestItems, setErrorMessage, questItems }: { getQuestItems: () => void, setErrorMessage: (value: string) => void, questItems: { [key: string]: { id: string, clickableLink: string, position: { x: number, y: number }, } } }) => {
+// context
+import { ErrorType } from "@/context/types";
+import { GlobalDispatchContext } from "@/context/GlobalContext";
+
+// utils
+import { backendAPI, setErrorMessage } from "@/utils";
+
+export const PlacedItems = ({
+  getQuestItems,
+  questItems,
+}: {
+  getQuestItems: () => void;
+  questItems: { [key: string]: { id: string; clickableLink: string; position: { x: number; y: number } } };
+}) => {
+  const dispatch = useContext(GlobalDispatchContext);
+
   const removeQuestItem = async (id: string) => {
-    setErrorMessage("");
-    backendAPI.delete(`/dropped-asset/${id}`)
+    backendAPI
+      .delete(`/dropped-asset/${id}`)
       .then(() => getQuestItems())
-      .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
+      .catch((error) => setErrorMessage(dispatch, error as ErrorType));
   };
 
-  const moveVisitor = async (position: { x: number, y: number }) => {
-    setErrorMessage("");
-    backendAPI.put("/visitor/move", { moveTo: position })
-      .catch((error) => setErrorMessage(error?.response?.data?.message || error.message))
+  const moveVisitor = async (position: { x: number; y: number }) => {
+    backendAPI
+      .put("/visitor/move", { moveTo: position })
+      .catch((error) => setErrorMessage(dispatch, error as ErrorType));
   };
 
   return (
@@ -26,8 +41,8 @@ export const PlacedItems = ({ getQuestItems, setErrorMessage, questItems }: { ge
             if (item.clickableLink) {
               const clickableLink = new URL(item.clickableLink);
               const params = new URLSearchParams(clickableLink.search);
-              const lastMovedParam = params.get("lastMoved")
-              const now = new Date()
+              const lastMovedParam = params.get("lastMoved");
+              const now = new Date();
               const lastMoved = lastMovedParam ? new Date(parseInt(lastMovedParam)) : now;
               lastMovedFormatted = Math.round((now.getTime() - lastMoved.getTime()) / (1000 * 60 * 60 * 24));
             }
@@ -38,7 +53,9 @@ export const PlacedItems = ({ getQuestItems, setErrorMessage, questItems }: { ge
                   <div className="tooltip">
                     <span className="tooltip-content">Last Moved</span>
                     <p className="p3">
-                      {lastMovedFormatted === 0 ? "Today" : `${lastMovedFormatted} day${lastMovedFormatted > 1 ? 's' : ''} ago`}
+                      {lastMovedFormatted === 0
+                        ? "Today"
+                        : `${lastMovedFormatted} day${lastMovedFormatted > 1 ? "s" : ""} ago`}
                     </p>
                   </div>
                 </td>
@@ -63,4 +80,4 @@ export const PlacedItems = ({ getQuestItems, setErrorMessage, questItems }: { ge
       </table>
     </div>
   );
-}
+};

@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 export const errorHandler = ({
   error,
   functionName,
@@ -5,7 +7,7 @@ export const errorHandler = ({
   req,
   res,
 }: {
-  error: any;
+  error: AxiosError | Error | any;
   functionName: string;
   message: string;
   req?: any;

@@ -7,7 +7,7 @@ export const handleGetQuestItems = async (req: Request, res: Response) => {
 
     const droppedAssets = await getQuestItems(credentials);
 
-    return res.json({ droppedAssets, success: true });
+    return res.json({ droppedAssets });
   } catch (error) {
     return errorHandler({
       error,

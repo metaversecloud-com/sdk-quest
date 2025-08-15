@@ -1,11 +1,11 @@
 import { World } from "../topiaInit.js";
 import { errorHandler } from "../errorHandler.js";
 import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
-import { Credentials, DataObjectType } from "../../types/index.js";
+import { Credentials, WorldDataObjectType } from "../../types/index.js";
 
 type WorldDataObject = {
   scenes: {
-    [key: string]: DataObjectType;
+    [key: string]: WorldDataObjectType;
   };
 };
 

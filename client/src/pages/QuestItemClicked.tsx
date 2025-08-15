@@ -3,11 +3,12 @@ import { useContext, useEffect, useState } from "react";
 // components
 import { Leaderboard, Loading } from "@/components";
 
+// context
+import { GlobalDispatchContext, GlobalStateContext } from "@context/GlobalContext";
+import { SET_QUEST_DETAILS } from "@/context/types";
+
 // utils
 import { backendAPI } from "@utils/backendAPI";
-
-// context
-import { GlobalStateContext } from "@context/GlobalContext";
 
 export const QuestItemClicked = () => {
   const [message, setMessage] = useState("");
@@ -15,15 +16,20 @@ export const QuestItemClicked = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // context
+  const dispatch = useContext(GlobalDispatchContext);
   const { questDetails, hasInteractiveParams } = useContext(GlobalStateContext);
-  const { questItemImage } = questDetails;
+  const { questItemImage } = questDetails || {};
 
   useEffect(() => {
     if (hasInteractiveParams) {
       backendAPI
         .post("/quest-item-clicked")
-        .then((result) => {
-          const { addedClick, numberAllowedToCollect, totalCollectedToday, success } = result.data;
+        .then((response) => {
+          const { addedClick, numberAllowedToCollect, totalCollectedToday, questDetails } = response.data;
+          dispatch!({
+            type: SET_QUEST_DETAILS,
+            payload: { questDetails },
+          });
           if (addedClick) {
             setCollectedText(`${totalCollectedToday}/${numberAllowedToCollect} collected today`);
             if (totalCollectedToday === numberAllowedToCollect) {
@@ -31,7 +37,7 @@ export const QuestItemClicked = () => {
             } else {
               setMessage(`🎉 Congratulations! You are one step closer to completing your daily quest!`);
             }
-          } else if (success) {
+          } else {
             setMessage(`🎉 You have already completed your daily quest! Come back tomorrow!`);
             setCollectedText(`${numberAllowedToCollect}/${numberAllowedToCollect} collected today`);
           }
@@ -61,7 +67,7 @@ export const QuestItemClicked = () => {
           </div>
         )}
       </div>
-      <Leaderboard />
+      <Leaderboard isKeyAsset={false} />
     </div>
   );
 };

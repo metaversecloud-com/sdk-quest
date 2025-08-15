@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { DataObjectType } from "../../types/DataObjectType.js";
+import { WorldDataObjectType } from "../../types/DataObjectTypes.js";
 import {
   Asset,
   DroppedAsset,
@@ -17,7 +17,7 @@ export const handleDropQuestItem = async (req: Request, res: Response) => {
     const sceneDropId = credentials.sceneDropId || credentials.assetId;
 
     const { dataObject, world } = await getWorldDetails(credentials, true);
-    const { questItemImage } = dataObject as DataObjectType;
+    const { questItemImage } = dataObject as WorldDataObjectType;
     if (!questItemImage) throw "questItemImage is required";
 
     // Randomly place the quest item asset
@@ -46,7 +46,7 @@ export const handleDropQuestItem = async (req: Request, res: Response) => {
       clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
     });
 
-    return res.json({ droppedAsset, success: true });
+    return res.json({ droppedAsset });
   } catch (error) {
     return errorHandler({
       error,

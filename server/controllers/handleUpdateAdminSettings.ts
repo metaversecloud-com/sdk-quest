@@ -16,7 +16,6 @@ export const handleUpdateAdminSettings = async (req: Request, res: Response) => 
       {
         [`scenes.${sceneDropId}.numberAllowedToCollect`]: numberAllowedToCollect,
         [`scenes.${sceneDropId}.questItemImage`]: questItemImage,
-        [`scenes.${sceneDropId}.lastInteractionDate`]: new Date(),
       },
       { lock: { lockId, releaseLock: true } },
     );
@@ -31,7 +30,9 @@ export const handleUpdateAdminSettings = async (req: Request, res: Response) => 
       await Promise.all(promises);
     }
 
-    return res.json({ success: true });
+    await world.fetchDataObject();
+
+    return res.json({ questDetails: world.dataObject.scenes?.[sceneDropId] });
   } catch (error) {
     return errorHandler({
       error,
