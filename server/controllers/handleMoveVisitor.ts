@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { errorHandler, getCredentials, Visitor } from "../../utils/index.js";
+import { errorHandler, getCredentials, Visitor } from "../utils/index.js";
 
 export const handleMoveVisitor = async (req: Request, res: Response) => {
   try {
@@ -12,7 +12,7 @@ export const handleMoveVisitor = async (req: Request, res: Response) => {
     const visitor = Visitor.create(visitorId, urlSlug, { credentials });
     await visitor.moveVisitor({ x: moveTo.x, y: moveTo.y, shouldTeleportVisitor });
 
-    return res.json({ visitor, success: true });
+    return res.json({ success: true });
   } catch (error) {
     return errorHandler({ error, functionName: "handleMoveVisitor", message: "Error moving visitor", req, res });
   }

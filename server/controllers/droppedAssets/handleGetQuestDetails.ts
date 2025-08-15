@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { errorHandler, getCredentials, getWorldDetails } from "../../utils/index.js";
+import { errorHandler, getCredentials, getVisitor, getWorldDetails } from "../../utils/index.js";
 
 export const handleGetQuestDetails = async (req: Request, res: Response) => {
   try {
@@ -7,7 +7,12 @@ export const handleGetQuestDetails = async (req: Request, res: Response) => {
 
     const { dataObject } = await getWorldDetails(credentials, false);
 
-    return res.json(dataObject);
+    const { visitor } = await getVisitor(credentials, credentials.assetId);
+
+    return res.json({
+      questDetails: dataObject,
+      visitor: { isAdmin: visitor.isAdmin, profileId: credentials.profileId },
+    });
   } catch (error) {
     return errorHandler({
       error,

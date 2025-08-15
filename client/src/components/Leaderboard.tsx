@@ -3,20 +3,21 @@ import { useContext, useEffect, useState } from "react";
 // components
 import { Loading } from "./Loading";
 
+// context
+import { GlobalDispatchContext, GlobalStateContext } from "@context/GlobalContext";
+import { SET_VISITOR_INFO } from "@/context/types";
+
 // utils
 import { backendAPI } from "@utils/backendAPI";
 
-// context
-import { GlobalStateContext } from "@context/GlobalContext";
-
 type LeaderboardType = {
-  name: string,
-  collected: number,
-  profileId: string,
-  streak: number,
-}
+  name: string;
+  collected: number;
+  profileId: string;
+  streak: number;
+};
 
-export const Leaderboard = () => {
+export const Leaderboard = ({ isKeyAsset }: { isKeyAsset: boolean }) => {
   const [visibleData, setVisibleData] = useState<LeaderboardType[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPosition, setCurrentPosition] = useState(0);
@@ -24,13 +25,21 @@ export const Leaderboard = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // context
+  const dispatch = useContext(GlobalDispatchContext);
   const { questDetails, visitor } = useContext(GlobalStateContext);
-  const { questItemImage } = questDetails
+  const { questItemImage } = questDetails || {};
 
   useEffect(() => {
-    backendAPI.get(`/leaderboard`)
-      .then((result) => {
-        const { leaderboard } = result.data;
+    backendAPI
+      .get(`/leaderboard?isKeyAsset=${isKeyAsset}`)
+      .then((response) => {
+        const { leaderboard, visitor } = response.data;
+
+        dispatch!({
+          type: SET_VISITOR_INFO,
+          payload: { visitor },
+        });
+
         const index = leaderboard.findIndex((item: { profileId: string }) => item.profileId === visitor.profileId);
         setMyData(leaderboard[index]);
         setCurrentPosition(index + 1);
@@ -39,7 +48,7 @@ export const Leaderboard = () => {
         setIsLoading(false);
       })
       .catch(() => console.error("There was a problem while retrieving leaderboard data. Please try again later."))
-      .finally(() => setIsLoading(false))
+      .finally(() => setIsLoading(false));
   }, [visitor]);
 
   if (isLoading) return <Loading />;
@@ -72,7 +81,8 @@ export const Leaderboard = () => {
         </>
       ) : (
         <p className="p1">
-          Explore and find <img alt="Find me" className="inline" style={{ height: 20 }} src={questItemImage} /> to complete your daily quest.
+          Explore and find <img alt="Find me" className="inline" style={{ height: 20 }} src={questItemImage} /> to
+          complete your daily quest.
         </p>
       )}
       <div className="mt-6">
@@ -87,7 +97,7 @@ export const Leaderboard = () => {
             </tr>
           </thead>
           <tbody>
-            {visibleData.map((item: { collected: number, name: string, streak: number }, index) => {
+            {visibleData.map((item: { collected: number; name: string; streak: number }, index) => {
               return (
                 <tr key={index}>
                   <td className="p2">{index + 1}</td>
@@ -102,4 +112,4 @@ export const Leaderboard = () => {
       </div>
     </div>
   );
-}
+};

@@ -7,6 +7,7 @@ import {
   removeQuestItems,
   Visitor,
 } from "../utils/index.js";
+import { AxiosError } from "axios";
 
 export const handleRemoveQuestFromWorld = async (req: Request, res: Response) => {
   try {
@@ -33,7 +34,7 @@ export const handleRemoveQuestFromWorld = async (req: Request, res: Response) =>
 
     // close drawer and fire toast
     const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
-    visitor.closeIframe(assetId).catch((error: any) =>
+    visitor.closeIframe(assetId).catch((error: AxiosError) =>
       errorHandler({
         error,
         functionName: "handleRemoveQuestFromWorld",

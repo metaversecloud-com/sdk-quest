@@ -1,30 +1,47 @@
 import { Request, Response } from "express";
-import { DataObjectType } from "../types/DataObjectType.js";
-import { errorHandler, getCredentials, getWorldDetails } from "../utils/index.js";
+import { KeyAssetDataObjectType } from "../types/DataObjectTypes.js";
+import { errorHandler, getCredentials, getKeyAsset, getVisitor, getWorldDetails } from "../utils/index.js";
 
 export const handleGetLeaderboard = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
+    const isKeyAsset = req.query.isKeyAsset === "true";
+    let keyAssetId = credentials.assetId;
 
-    const { dataObject } = await getWorldDetails(credentials, false);
-    if (!dataObject) throw "No data object found";
-    const { itemsCollectedByUser } = dataObject as DataObjectType;
+    if (!isKeyAsset) {
+      const { dataObject } = await getWorldDetails(credentials, false);
+      keyAssetId = dataObject.keyAssetId;
+    }
 
-    const leaderboard = [];
+    const keyAsset = await getKeyAsset(credentials, keyAssetId);
 
-    for (const profileId in itemsCollectedByUser) {
-      const thisUsersItems = itemsCollectedByUser[profileId];
-      leaderboard.push({
-        name: thisUsersItems.username,
-        collected: thisUsersItems.total,
+    const { leaderboard } = (keyAsset.dataObject as KeyAssetDataObjectType) || {};
+
+    let formattedLeaderboard = [];
+
+    for (const profileId in leaderboard) {
+      const data = leaderboard[profileId];
+
+      const [displayName, totalCollected, longestStreak] = data.split("|");
+
+      const collected = parseInt(totalCollected) || 0;
+
+      formattedLeaderboard.push({
+        name: displayName,
+        collected,
         profileId,
-        streak: thisUsersItems.longestStreak || 0,
+        streak: parseInt(longestStreak) || 0,
       });
     }
 
-    leaderboard.sort((a, b) => b.collected - a.collected);
+    formattedLeaderboard.sort((a, b) => b.collected - a.collected);
 
-    return res.json({ leaderboard, success: true });
+    const { visitor } = await getVisitor(credentials, keyAssetId);
+
+    return res.json({
+      leaderboard: formattedLeaderboard,
+      visitor: { isAdmin: visitor.isAdmin, profileId: credentials.profileId },
+    });
   } catch (error) {
     return errorHandler({
       error,

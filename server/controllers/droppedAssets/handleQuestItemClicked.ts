@@ -1,21 +1,23 @@
 import { Request, Response } from "express";
-import { DataObjectType } from "../../types/DataObjectType.js";
+import { WorldDataObjectType } from "../../types/DataObjectTypes.js";
 import {
   DroppedAsset,
-  Visitor,
   addNewRowToGoogleSheets,
   errorHandler,
   getBaseURL,
   getCredentials,
   getDifferenceInDays,
+  getKeyAsset,
   getRandomCoordinates,
+  getVisitor,
   getWorldDetails,
 } from "../../utils/index.js";
+import { AxiosError } from "axios";
 
 export const handleQuestItemClicked = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
-    const { assetId, displayName, identityId, profileId, urlSlug, username, visitorId } = credentials;
+    const { assetId, displayName, identityId, profileId, urlSlug } = credentials;
     const sceneDropId = credentials.sceneDropId || assetId;
 
     const now = new Date();
@@ -25,33 +27,32 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     const analytics = [];
 
-    const visitor = await Visitor.create(visitorId, urlSlug, { credentials });
+    const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
-    const droppedAsset = await DroppedAsset.get(assetId, urlSlug, { credentials });
-
-    const { dataObject, world } = await getWorldDetails(credentials, true);
-    let { itemsCollectedByUser, numberAllowedToCollect } = dataObject as DataObjectType;
+    const { dataObject: worldDataObject, world } = await getWorldDetails(credentials, true);
+    let { keyAssetId, numberAllowedToCollect } = worldDataObject as WorldDataObjectType;
     if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
 
-    const lastCollectedDate = itemsCollectedByUser?.[profileId]?.lastCollectedDate;
+    const { visitor, visitorProgress } = await getVisitor(credentials, keyAssetId);
+
+    let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
+
     const differenceInDays = getDifferenceInDays(currentDate, new Date(lastCollectedDate));
     const hasCollectedToday = differenceInDays === 0;
-    let totalCollectedToday = 1,
-      total = 1;
 
     if (!hasCollectedToday) analytics.push({ analyticName: "starts", profileId, urlSlug, uniqueKey: profileId });
 
-    if (hasCollectedToday && itemsCollectedByUser?.[profileId]?.totalCollectedToday >= numberAllowedToCollect) {
-      return res.json({ addedClick: false, numberAllowedToCollect, success: true });
+    if (hasCollectedToday && totalCollectedToday >= numberAllowedToCollect) {
+      return res.json({ addedClick: false, numberAllowedToCollect, questDetails: worldDataObject });
     } else {
       const promises = [];
       analytics.push({ analyticName: "itemsCollected" });
 
       // Move the quest item to a new random location
       const position = getRandomCoordinates(world.width, world.height);
-      promises.push(droppedAsset.updatePosition(position.x, position.y));
+      promises.push(questItem.updatePosition(position.x, position.y));
       promises.push(
-        droppedAsset.updateClickType({
+        questItem.updateClickType({
           // @ts-ignore
           clickType: "link",
           clickableLinkTitle: "Quest",
@@ -60,7 +61,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         }),
       );
 
-      world.triggerParticle({ position: droppedAsset.position, name: "lightBlueSmoke_puff" }).catch((error: any) =>
+      world.triggerParticle({ position: questItem.position, name: "lightBlueSmoke_puff" }).catch((error: AxiosError) =>
         errorHandler({
           error,
           functionName: "handleQuestItemClicked",
@@ -68,73 +69,50 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         }),
       );
 
-      if (!itemsCollectedByUser?.[profileId]) {
-        // first time user has interacted with Quest ever
-        promises.push(
-          world.updateDataObject({
-            [`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}`]: {
-              currentStreak: 1,
-              lastCollectedDate: currentDate,
-              longestStreak: 1,
-              total: 1,
-              totalCollectedToday: 1,
-              username,
-            },
-            [`scenes.${sceneDropId}.lastInteractionDate`]: new Date(),
-          }),
-        );
+      totalCollected = totalCollected + 1;
+      if (!hasCollectedToday) {
+        totalCollectedToday = 1;
+        if (differenceInDays === 1) currentStreak = currentStreak + 1;
       } else {
-        let currentStreak = itemsCollectedByUser[profileId].currentStreak || 1;
-        total = itemsCollectedByUser[profileId].total ? itemsCollectedByUser[profileId].total + 1 : 1;
-
-        let longestStreak = itemsCollectedByUser[profileId].longestStreak || 0;
-
-        if (lastCollectedDate) {
-          if (hasCollectedToday) {
-            totalCollectedToday = itemsCollectedByUser[profileId].totalCollectedToday + 1;
-          } else if (differenceInDays === 1) {
-            currentStreak = currentStreak + 1;
-          }
-        }
-
-        if (currentStreak > longestStreak) longestStreak = currentStreak;
-
-        if (totalCollectedToday === numberAllowedToCollect) {
-          visitor.triggerParticle({ duration: 60, name: "redPinkHeart_float" }).catch((error) =>
-            errorHandler({
-              error,
-              functionName: "handleQuestItemClicked",
-              message: "Error triggering particle effects",
-            }),
-          );
-
-          analytics.push({ analyticName: "completions", profileId, urlSlug, uniqueKey: profileId });
-          addNewRowToGoogleSheets([
-            {
-              identityId,
-              displayName,
-              event: "completions",
-              urlSlug,
-            },
-          ]);
-        }
-
-        promises.push(
-          world.updateDataObject({
-            [`scenes.${sceneDropId}.itemsCollectedByUser.${profileId}`]: {
-              currentStreak,
-              lastCollectedDate: currentDate,
-              longestStreak,
-              total,
-              totalCollectedToday,
-              username,
-            },
-          }),
-        );
+        totalCollectedToday = totalCollectedToday + 1;
       }
 
-      if (total % 50 === 0) {
-        analytics.push({ analyticName: `itemsCollected${total}`, profileId, uniqueKey: profileId });
+      if (currentStreak > longestStreak) longestStreak = currentStreak;
+
+      if (totalCollectedToday === numberAllowedToCollect) {
+        visitor.triggerParticle({ duration: 60, name: "redPinkHeart_float" }).catch((error: AxiosError) =>
+          errorHandler({
+            error,
+            functionName: "handleQuestItemClicked",
+            message: "Error triggering particle effects",
+          }),
+        );
+
+        analytics.push({ analyticName: "completions", profileId, urlSlug, uniqueKey: profileId });
+        addNewRowToGoogleSheets([
+          {
+            identityId,
+            displayName,
+            event: "completions",
+            urlSlug,
+          },
+        ]);
+      }
+
+      promises.push(
+        visitor.updateDataObject({
+          [`${urlSlug}-${sceneDropId}`]: {
+            currentStreak,
+            lastCollectedDate: currentDate,
+            longestStreak,
+            totalCollected,
+            totalCollectedToday,
+          },
+        }),
+      );
+
+      if (totalCollected % 50 === 0) {
+        analytics.push({ analyticName: `itemsCollected${totalCollected}`, profileId, uniqueKey: profileId });
 
         const name = process.env.EMOTE_NAME || "quest_1";
         const grantExpressionResult = await visitor.grantExpression({ name });
@@ -143,7 +121,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           text = "Congrats! Your detective skills paid off.";
         // @ts-ignore
         if (grantExpressionResult.data?.statusCode === 200 || grantExpressionResult.status === 200) {
-          visitor.triggerParticle({ name: "firework2_gold" }).catch((error) =>
+          visitor.triggerParticle({ name: "firework2_gold" }).catch((error: AxiosError) =>
             errorHandler({
               error,
               functionName: "handleQuestItemClicked",
@@ -152,10 +130,8 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           );
 
           analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
-        }
-        // @ts-ignore
-        else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
-          title = `Congrats! You collected ${total} quest items`;
+        } else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
+          title = `Congrats! You collected ${totalCollected} quest items`;
           text = "Keep up the solid detective work 🔎";
         }
 
@@ -165,7 +141,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
             title,
             text,
           })
-          .catch((error) =>
+          .catch((error: AxiosError) =>
             errorHandler({
               error,
               functionName: "handleQuestItemClicked",
@@ -174,7 +150,15 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           );
       }
 
-      promises.push(world.incrementDataObjectValue([`scenes.${sceneDropId}.totalItemsCollected`], 1, { analytics }));
+      const keyAsset = await getKeyAsset(credentials, keyAssetId);
+      promises.push(
+        keyAsset.updateDataObject(
+          {
+            [`leaderboard.${profileId}`]: `${displayName}|${totalCollected}|${longestStreak}`,
+          },
+          { analytics },
+        ),
+      );
 
       await Promise.all(promises);
 
@@ -182,7 +166,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         addedClick: true,
         numberAllowedToCollect,
         totalCollectedToday,
-        success: true,
+        questDetails: worldDataObject,
       });
     }
   } catch (error) {

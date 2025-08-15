@@ -6,7 +6,6 @@ import {
   handleGetQuestDetails,
   handleGetQuestItems,
   handleQuestItemClicked,
-  handleGetVisitor,
   handleRemoveDroppedAsset,
   handleRemoveQuestFromWorld,
   handleRemoveQuestItems,
@@ -37,10 +36,7 @@ router.get("/system/health", (req, res) => {
 });
 
 router.get("/quest", handleGetQuestDetails);
-router.delete("/quest", handleRemoveQuestFromWorld);
-
 router.get("/leaderboard", handleGetLeaderboard);
-router.post("/admin-settings", handleUpdateAdminSettings);
 
 // Dropped Asset
 router.get("/quest-items", handleGetQuestItems);
@@ -49,8 +45,9 @@ router.delete("/dropped-asset/:droppedAssetId", handleRemoveDroppedAsset);
 router.post("/drop-quest-item", handleDropQuestItem);
 router.post("/quest-item-clicked", handleQuestItemClicked);
 
-// Visitor
-router.get("/visitor", handleGetVisitor);
+// Admins
 router.put("/visitor/move", handleMoveVisitor);
+router.post("/admin-settings", handleUpdateAdminSettings);
+router.delete("/quest", handleRemoveQuestFromWorld);
 
 export default router;
