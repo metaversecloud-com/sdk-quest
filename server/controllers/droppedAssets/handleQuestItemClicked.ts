@@ -17,7 +17,7 @@ import { AxiosError } from "axios";
 export const handleQuestItemClicked = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
-    const { assetId, displayName, identityId, profileId, urlSlug, username } = credentials;
+    const { assetId, displayName, identityId, profileId, urlSlug } = credentials;
     const sceneDropId = credentials.sceneDropId || assetId;
 
     const now = new Date();
@@ -107,7 +107,6 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
             longestStreak,
             totalCollected,
             totalCollectedToday,
-            username,
           },
         }),
       );
