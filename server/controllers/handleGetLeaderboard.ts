@@ -9,12 +9,17 @@ export const handleGetLeaderboard = async (req: Request, res: Response) => {
     let keyAssetId = credentials.assetId;
 
     if (!isKeyAsset) {
-      const { dataObject } = await getWorldDetails(credentials, false);
+      const getWorldDetailsResponse = await getWorldDetails(credentials, false);
+      if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
+
+      const { dataObject } = getWorldDetailsResponse;
       keyAssetId = dataObject.keyAssetId;
     }
 
-    const keyAsset = await getKeyAsset(credentials, keyAssetId);
+    const getKeyAssetResponse = await getKeyAsset(credentials, keyAssetId);
+    if (getKeyAssetResponse instanceof Error) throw getKeyAssetResponse;
 
+    const keyAsset = getKeyAssetResponse;
     const { leaderboard } = (keyAsset.dataObject as KeyAssetDataObjectType) || {};
 
     let formattedLeaderboard = [];
@@ -36,7 +41,10 @@ export const handleGetLeaderboard = async (req: Request, res: Response) => {
 
     formattedLeaderboard.sort((a, b) => b.collected - a.collected);
 
-    const { visitor } = await getVisitor(credentials, keyAssetId);
+    const getVisitorResponse = await getVisitor(credentials, keyAssetId);
+    if (getVisitorResponse instanceof Error) throw getVisitorResponse;
+
+    const { visitor } = getVisitorResponse;
 
     return res.json({
       leaderboard: formattedLeaderboard,

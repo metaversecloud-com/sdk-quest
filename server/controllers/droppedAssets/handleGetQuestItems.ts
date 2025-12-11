@@ -5,7 +5,10 @@ export const handleGetQuestItems = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
 
-    const droppedAssets = await getQuestItems(credentials);
+    const getQuestItemsResponse = await getQuestItems(credentials);
+    if (getQuestItemsResponse instanceof Error) throw getQuestItemsResponse;
+
+    const droppedAssets = getQuestItemsResponse;
 
     return res.json({ droppedAssets });
   } catch (error) {

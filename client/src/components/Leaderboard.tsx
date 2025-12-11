@@ -26,7 +26,7 @@ export const Leaderboard = ({ isKeyAsset }: { isKeyAsset: boolean }) => {
 
   // context
   const dispatch = useContext(GlobalDispatchContext);
-  const { questDetails, visitor } = useContext(GlobalStateContext);
+  const { questDetails } = useContext(GlobalStateContext);
   const { questItemImage } = questDetails || {};
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export const Leaderboard = ({ isKeyAsset }: { isKeyAsset: boolean }) => {
       })
       .catch(() => console.error("There was a problem while retrieving leaderboard data. Please try again later."))
       .finally(() => setIsLoading(false));
-  }, [visitor]);
+  }, []);
 
   if (isLoading) return <Loading />;
 

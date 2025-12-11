@@ -5,9 +5,15 @@ export const handleGetQuestDetails = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
 
-    const { dataObject } = await getWorldDetails(credentials, false);
+    const getWorldDetailsResponse = await getWorldDetails(credentials, false);
+    if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
 
-    const { visitor } = await getVisitor(credentials, credentials.assetId);
+    const { dataObject } = getWorldDetailsResponse;
+
+    const getVisitorResponse = await getVisitor(credentials, credentials.assetId);
+    if (getVisitorResponse instanceof Error) throw getVisitorResponse;
+
+    const { visitor } = getVisitorResponse;
 
     return res.json({
       questDetails: dataObject,

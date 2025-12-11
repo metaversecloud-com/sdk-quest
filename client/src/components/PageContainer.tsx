@@ -24,14 +24,8 @@ export const PageContainer = ({ children, isLoading }: { children: ReactNode; is
       <div className="flex flex-col mb-4 mt-2">
         <h1 className="h2 text-center">Quest</h1>
       </div>
-      {showSettings ? (
-        <Admin />
-      ) : (
-        <>
-          {children}
-          {error && <p className="p3 pt-10 text-center text-error">{error}</p>}
-        </>
-      )}
+      {showSettings ? <Admin /> : children}
+      {error && <p className="p3 pt-10 text-center text-error">{error}</p>}
     </div>
   );
 };

@@ -28,7 +28,7 @@ const globalReducer = (state: InitialState, action: ActionType) => {
     case SET_ERROR:
       return {
         ...state,
-        error: payload?.error,
+        error: payload.error,
       };
     default: {
       throw new Error(`Unhandled action type: ${type}`);

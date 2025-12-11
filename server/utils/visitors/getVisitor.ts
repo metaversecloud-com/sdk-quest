@@ -1,8 +1,8 @@
 import { VisitorInterface } from "@rtsdk/topia";
 import { Visitor } from "../topiaInit.js";
-import { errorHandler } from "../errorHandler.js";
 import { Credentials } from "../../types/Credentials.js";
 import { UserDataObjectType } from "../../types/DataObjectTypes.js";
+import { standardizedError } from "../standardizedError.js";
 
 export const getVisitor = async (credentials: Credentials, keyAssetId: string) => {
   try {
@@ -40,12 +40,22 @@ export const getVisitor = async (credentials: Credentials, keyAssetId: string) =
       );
     }
 
-    return { visitor, visitorProgress };
+    await visitor.fetchInventoryItems();
+    let visitorInventory: { [key: string]: { id: string; icon: string; name: string } } = {};
+
+    for (const item of visitor.inventoryItems) {
+      // @ts-ignore
+      const { id, name = "", image_url } = item;
+
+      visitorInventory[name] = {
+        id,
+        icon: image_url,
+        name,
+      };
+    }
+
+    return { visitor, visitorProgress, visitorInventory };
   } catch (error) {
-    return errorHandler({
-      error,
-      functionName: "getVisitor",
-      message: "Error getting visitor",
-    });
+    return standardizedError(error);
   }
 };

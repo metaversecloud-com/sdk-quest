@@ -1,6 +1,6 @@
 import { World } from "../topiaInit.js";
-import { errorHandler } from "../errorHandler.js";
 import { Credentials } from "../../types/Credentials.js";
+import { standardizedError } from "../standardizedError.js";
 
 export const getQuestItems = async (credentials: Credentials) => {
   try {
@@ -18,10 +18,6 @@ export const getQuestItems = async (credentials: Credentials) => {
 
     return questItems;
   } catch (error) {
-    return errorHandler({
-      error,
-      functionName: "handleGetQuestItems",
-      message: "Error fetching Quest items",
-    });
+    return standardizedError(error);
   }
 };

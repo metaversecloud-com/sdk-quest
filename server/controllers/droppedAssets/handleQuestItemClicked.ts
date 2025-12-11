@@ -11,6 +11,7 @@ import {
   getRandomCoordinates,
   getVisitor,
   getWorldDetails,
+  grantBadge,
 } from "../../utils/index.js";
 import { AxiosError } from "axios";
 
@@ -29,13 +30,31 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
-    const { dataObject: worldDataObject, world } = await getWorldDetails(credentials, true);
+    const getWorldDetailsResponse = await getWorldDetails(credentials, true);
+    if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
+
+    const { dataObject: worldDataObject, world } = getWorldDetailsResponse;
+
     let { keyAssetId, numberAllowedToCollect } = worldDataObject as WorldDataObjectType;
     if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
 
-    const { visitor, visitorProgress } = await getVisitor(credentials, keyAssetId);
+    const getVisitorResponse = await getVisitor(credentials, keyAssetId);
+    if (getVisitorResponse instanceof Error) throw getVisitorResponse;
+
+    const { visitor, visitorProgress, visitorInventory } = getVisitorResponse;
 
     let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
+
+    // Grant First Find badge if visitor collected their first quest item
+    if (totalCollected === 0) {
+      grantBadge({ credentials, visitor, visitorInventory, badgeName: "First Find" }).catch((error) =>
+        errorHandler({
+          error,
+          functionName: "handleQuestItemClicked",
+          message: "Error granting First Find badge",
+        }),
+      );
+    }
 
     const differenceInDays = getDifferenceInDays(currentDate, new Date(lastCollectedDate));
     const hasCollectedToday = differenceInDays === 0;
@@ -72,7 +91,28 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
       totalCollected = totalCollected + 1;
       if (!hasCollectedToday) {
         totalCollectedToday = 1;
-        if (differenceInDays === 1) currentStreak = currentStreak + 1;
+        if (differenceInDays === 1) {
+          currentStreak = currentStreak + 1;
+
+          // Grant Streak badges if visitor collected their item for 3 or 5 days in a row
+          if (currentStreak === 3) {
+            grantBadge({ credentials, visitor, visitorInventory, badgeName: "3-Day Streak" }).catch((error) =>
+              errorHandler({
+                error,
+                functionName: "handleQuestItemClicked",
+                message: "Error granting 3-Day Streak badge",
+              }),
+            );
+          } else if (currentStreak === 5) {
+            grantBadge({ credentials, visitor, visitorInventory, badgeName: "5-Day Streak" }).catch((error) =>
+              errorHandler({
+                error,
+                functionName: "handleQuestItemClicked",
+                message: "Error granting 5-Day Streak badge",
+              }),
+            );
+          }
+        }
       } else {
         totalCollectedToday = totalCollectedToday + 1;
       }
@@ -97,18 +137,30 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
             urlSlug,
           },
         ]);
+
+        // Grant Inventory Pro badge if visitor has collected all allowed quest items for the day
+        grantBadge({ credentials, visitor, visitorInventory, badgeName: "Inventory Pro" }).catch((error) =>
+          errorHandler({
+            error,
+            functionName: "handleQuestItemClicked",
+            message: "Error granting Inventory Pro badge",
+          }),
+        );
       }
 
       promises.push(
-        visitor.updateDataObject({
-          [`${urlSlug}-${sceneDropId}`]: {
-            currentStreak,
-            lastCollectedDate: currentDate,
-            longestStreak,
-            totalCollected,
-            totalCollectedToday,
+        visitor.updateDataObject(
+          {
+            [`${urlSlug}-${sceneDropId}`]: {
+              currentStreak,
+              lastCollectedDate: currentDate,
+              longestStreak,
+              totalCollected,
+              totalCollectedToday,
+            },
           },
-        }),
+          {},
+        ),
       );
 
       if (totalCollected % 50 === 0) {
@@ -130,6 +182,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           );
 
           analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
+          // @ts-ignore
         } else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
           title = `Congrats! You collected ${totalCollected} quest items`;
           text = "Keep up the solid detective work 🔎";
@@ -150,7 +203,11 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
           );
       }
 
-      const keyAsset = await getKeyAsset(credentials, keyAssetId);
+      const getKeyAssetResponse = await getKeyAsset(credentials, keyAssetId);
+      if (getKeyAssetResponse instanceof Error) throw getKeyAssetResponse;
+
+      const keyAsset = getKeyAssetResponse;
+
       promises.push(
         keyAsset.updateDataObject(
           {
