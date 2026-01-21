@@ -1,8 +1,7 @@
 import { Credentials } from "../types";
-import { standardizedError } from "./standardizedError";
-import { Ecosystem } from "./topiaInit";
+import { Ecosystem, standardizeError } from "./index.js";
 
-export const grantBadge = async ({
+export const awardBadge = async ({
   credentials,
   visitor,
   visitorInventory,
@@ -26,6 +25,6 @@ export const grantBadge = async ({
 
     return { success: true };
   } catch (error: any) {
-    return standardizedError(error);
+    return standardizeError(error);
   }
 };

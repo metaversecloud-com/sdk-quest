@@ -1,7 +1,7 @@
 import { World } from "../topiaInit.js";
 import { getQuestItems } from "./getQuestItems.js";
 import { Credentials } from "../../types/Credentials";
-import { standardizedError } from "../standardizedError.js";
+import { standardizeError } from "../standardizeError.js";
 
 export const removeQuestItems = async (credentials: Credentials) => {
   try {
@@ -25,6 +25,6 @@ export const removeQuestItems = async (credentials: Credentials) => {
 
     return { success: true };
   } catch (error) {
-    return standardizedError(error);
+    return standardizeError(error);
   }
 };

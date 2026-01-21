@@ -1,6 +1,6 @@
 import { World } from "../topiaInit.js";
 import { Credentials } from "../../types/Credentials.js";
-import { standardizedError } from "../standardizedError.js";
+import { standardizeError } from "../standardizeError.js";
 
 export const getQuestItems = async (credentials: Credentials) => {
   try {
@@ -18,6 +18,6 @@ export const getQuestItems = async (credentials: Credentials) => {
 
     return questItems;
   } catch (error) {
-    return standardizedError(error);
+    return standardizeError(error);
   }
 };

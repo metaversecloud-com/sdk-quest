@@ -1,4 +1,4 @@
-import { standardizedError } from "./standardizedError.js";
+import { standardizeError } from "./standardizeError.js";
 
 export const getDefaultKeyAssetImage = async (urlSlug: string) => {
   try {
@@ -11,6 +11,6 @@ export const getDefaultKeyAssetImage = async (urlSlug: string) => {
 
     return questItemImage;
   } catch (error) {
-    return standardizedError(error);
+    return standardizeError(error);
   }
 };

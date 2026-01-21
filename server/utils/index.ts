@@ -9,6 +9,6 @@ export * from "./getCredentials.js";
 export * from "./getDefaultKeyAssetImage.js";
 export * from "./getDifferenceInDays.js";
 export * from "./getRandomCoordinates.js";
-export * from "./grantBadge.js";
-export * from "./standardizedError.js";
+export * from "./awardBadge.js";
+export * from "./standardizeError.js";
 export * from "./topiaInit.js";
