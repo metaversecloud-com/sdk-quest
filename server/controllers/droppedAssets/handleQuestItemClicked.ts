@@ -11,7 +11,7 @@ import {
   getRandomCoordinates,
   getVisitor,
   getWorldDetails,
-  grantBadge,
+  awardBadge,
 } from "../../utils/index.js";
 import { AxiosError } from "axios";
 
@@ -26,7 +26,8 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     const currentDate = new Date(localDateString);
     currentDate.setHours(0, 0, 0, 0);
 
-    const analytics = [];
+    const analytics = [],
+      promises = [];
 
     const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
@@ -45,14 +46,16 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
 
-    // Grant First Find badge if visitor collected their first quest item
+    // Award First Find badge if visitor collected their first quest item
     if (totalCollected === 0) {
-      grantBadge({ credentials, visitor, visitorInventory, badgeName: "First Find" }).catch((error) =>
-        errorHandler({
-          error,
-          functionName: "handleQuestItemClicked",
-          message: "Error granting First Find badge",
-        }),
+      promises.push(
+        awardBadge({ credentials, visitor, visitorInventory, badgeName: "First Find" }).catch((error) =>
+          errorHandler({
+            error,
+            functionName: "handleQuestItemClicked",
+            message: "Error awarding First Find badge",
+          }),
+        ),
       );
     }
 
@@ -64,7 +67,6 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     if (hasCollectedToday && totalCollectedToday >= numberAllowedToCollect) {
       return res.json({ addedClick: false, numberAllowedToCollect, questDetails: worldDataObject });
     } else {
-      const promises = [];
       analytics.push({ analyticName: "itemsCollected" });
 
       // Move the quest item to a new random location
@@ -80,36 +82,63 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         }),
       );
 
-      world.triggerParticle({ position: questItem.position, name: "lightBlueSmoke_puff" }).catch((error: AxiosError) =>
-        errorHandler({
-          error,
-          functionName: "handleQuestItemClicked",
-          message: "Error triggering particle effects",
-        }),
+      promises.push(
+        world
+          .triggerParticle({ position: questItem.position, name: "lightBlueSmoke_puff" })
+          .catch((error: AxiosError) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: "Error triggering particle effects",
+            }),
+          ),
       );
 
       totalCollected = totalCollected + 1;
+
+      // Award Quest Veteran badges if visitor collected [x] quest items
+      let veteranBadgeName;
+      if (totalCollected === 25) veteranBadgeName = "Quest Veteran - Bronze";
+      else if (totalCollected === 50) veteranBadgeName = "Quest Veteran - Silver";
+      else if (totalCollected === 75) veteranBadgeName = "Quest Veteran - Gold";
+      else if (totalCollected === 100) veteranBadgeName = "Quest Veteran - Diamond";
+      if (veteranBadgeName) {
+        promises.push(
+          awardBadge({ credentials, visitor, visitorInventory, badgeName: veteranBadgeName }).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: `Error awarding ${veteranBadgeName} badge`,
+            }),
+          ),
+        );
+      }
+
       if (!hasCollectedToday) {
         totalCollectedToday = 1;
         if (differenceInDays === 1) {
           currentStreak = currentStreak + 1;
 
-          // Grant Streak badges if visitor collected their item for 3 or 5 days in a row
+          // Award Streak badges if visitor collected their item for 3 or 5 days in a row
           if (currentStreak === 3) {
-            grantBadge({ credentials, visitor, visitorInventory, badgeName: "3-Day Streak" }).catch((error) =>
-              errorHandler({
-                error,
-                functionName: "handleQuestItemClicked",
-                message: "Error granting 3-Day Streak badge",
-              }),
+            promises.push(
+              awardBadge({ credentials, visitor, visitorInventory, badgeName: "3-Day Streak" }).catch((error) =>
+                errorHandler({
+                  error,
+                  functionName: "handleQuestItemClicked",
+                  message: "Error awarding 3-Day Streak badge",
+                }),
+              ),
             );
           } else if (currentStreak === 5) {
-            grantBadge({ credentials, visitor, visitorInventory, badgeName: "5-Day Streak" }).catch((error) =>
-              errorHandler({
-                error,
-                functionName: "handleQuestItemClicked",
-                message: "Error granting 5-Day Streak badge",
-              }),
+            promises.push(
+              awardBadge({ credentials, visitor, visitorInventory, badgeName: "5-Day Streak" }).catch((error) =>
+                errorHandler({
+                  error,
+                  functionName: "handleQuestItemClicked",
+                  message: "Error awarding 5-Day Streak badge",
+                }),
+              ),
             );
           }
         }
@@ -120,31 +149,37 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
       if (currentStreak > longestStreak) longestStreak = currentStreak;
 
       if (totalCollectedToday === numberAllowedToCollect) {
-        visitor.triggerParticle({ duration: 60, name: "redPinkHeart_float" }).catch((error: AxiosError) =>
-          errorHandler({
-            error,
-            functionName: "handleQuestItemClicked",
-            message: "Error triggering particle effects",
-          }),
+        promises.push(
+          visitor.triggerParticle({ duration: 60, name: "redPinkHeart_float" }).catch((error: AxiosError) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: "Error triggering particle effects",
+            }),
+          ),
         );
 
         analytics.push({ analyticName: "completions", profileId, urlSlug, uniqueKey: profileId });
-        addNewRowToGoogleSheets([
-          {
-            identityId,
-            displayName,
-            event: "completions",
-            urlSlug,
-          },
-        ]);
+        promises.push(
+          addNewRowToGoogleSheets([
+            {
+              identityId,
+              displayName,
+              event: "completions",
+              urlSlug,
+            },
+          ]),
+        );
 
-        // Grant Inventory Pro badge if visitor has collected all allowed quest items for the day
-        grantBadge({ credentials, visitor, visitorInventory, badgeName: "Inventory Pro" }).catch((error) =>
-          errorHandler({
-            error,
-            functionName: "handleQuestItemClicked",
-            message: "Error granting Inventory Pro badge",
-          }),
+        // Award Inventory Pro badge if visitor has collected all allowed quest items for the day
+        promises.push(
+          awardBadge({ credentials, visitor, visitorInventory, badgeName: "Inventory Pro" }).catch((error) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: "Error awarding Inventory Pro badge",
+            }),
+          ),
         );
       }
 
@@ -167,40 +202,45 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         analytics.push({ analyticName: `itemsCollected${totalCollected}`, profileId, uniqueKey: profileId });
 
         const name = process.env.EMOTE_NAME || "quest_1";
-        const grantExpressionResult = await visitor.grantExpression({ name });
+        // @ts-ignore
+        const awardExpressionResult = await visitor.awardExpression({ name });
 
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";
         // @ts-ignore
-        if (grantExpressionResult.data?.statusCode === 200 || grantExpressionResult.status === 200) {
-          visitor.triggerParticle({ name: "firework2_gold" }).catch((error: AxiosError) =>
-            errorHandler({
-              error,
-              functionName: "handleQuestItemClicked",
-              message: "Error triggering particle effects",
-            }),
+        if (awardExpressionResult.data?.statusCode === 200 || awardExpressionResult.status === 200) {
+          promises.push(
+            visitor.triggerParticle({ name: "firework2_gold" }).catch((error: AxiosError) =>
+              errorHandler({
+                error,
+                functionName: "handleQuestItemClicked",
+                message: "Error triggering particle effects",
+              }),
+            ),
           );
 
           analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
           // @ts-ignore
-        } else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
+        } else if (awardExpressionResult.data?.statusCode === 409 || awardExpressionResult.status === 409) {
           title = `Congrats! You collected ${totalCollected} quest items`;
           text = "Keep up the solid detective work 🔎";
         }
 
-        visitor
-          .fireToast({
-            groupId: "QuestExpression",
-            title,
-            text,
-          })
-          .catch((error: AxiosError) =>
-            errorHandler({
-              error,
-              functionName: "handleQuestItemClicked",
-              message: "Error firing toast",
-            }),
-          );
+        promises.push(
+          visitor
+            .fireToast({
+              groupId: "QuestExpression",
+              title,
+              text,
+            })
+            .catch((error: AxiosError) =>
+              errorHandler({
+                error,
+                functionName: "handleQuestItemClicked",
+                message: "Error firing toast",
+              }),
+            ),
+        );
       }
 
       const getKeyAssetResponse = await getKeyAsset(credentials, keyAssetId);
@@ -217,7 +257,10 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         ),
       );
 
-      await Promise.all(promises);
+      const results = await Promise.allSettled(promises);
+      results.forEach((result) => {
+        if (result.status === "rejected") console.error(result.reason);
+      });
 
       return res.json({
         addedClick: true,

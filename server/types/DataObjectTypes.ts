@@ -11,13 +11,15 @@ export type WorldDataObjectType = {
   questItemImage: string;
 };
 
+export type VisitorProgressType = {
+  currentStreak: number;
+  lastCollectedDate: Date;
+  longestStreak: number;
+  totalCollected: number;
+  totalCollectedToday: number;
+};
+
 export type UserDataObjectType = {
-  [key: string]: {
-    // key = `${urlSlug}-${sceneDropId}`
-    currentStreak: number;
-    lastCollectedDate: Date;
-    longestStreak: number;
-    totalCollected: number;
-    totalCollectedToday: number;
-  };
+  // key = `${urlSlug}-${sceneDropId}`
+  [key: string]: VisitorProgressType;
 };

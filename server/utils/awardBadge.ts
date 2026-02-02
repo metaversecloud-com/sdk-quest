@@ -1,8 +1,7 @@
 import { Credentials } from "../types";
-import { standardizedError } from "./standardizedError";
-import { Ecosystem } from "./topiaInit";
+import { Ecosystem, standardizeError } from "./index.js";
 
-export const grantBadge = async ({
+export const awardBadge = async ({
   credentials,
   visitor,
   visitorInventory,
@@ -24,8 +23,15 @@ export const grantBadge = async ({
 
     await visitor.grantInventoryItem(inventoryItem, 1);
 
+    await visitor
+      .fireToast({
+        title: "Badge Awarded",
+        text: `You have earned the ${badgeName} badge!`,
+      })
+      .catch(() => console.error(`Failed to fire toast after awarding the ${badgeName} badge.`));
+
     return { success: true };
   } catch (error: any) {
-    return standardizedError(error);
+    return standardizeError(error);
   }
 };

@@ -1,10 +1,20 @@
 import { VisitorInterface } from "@rtsdk/topia";
 import { Visitor } from "../topiaInit.js";
 import { Credentials } from "../../types/Credentials.js";
-import { UserDataObjectType } from "../../types/DataObjectTypes.js";
-import { standardizedError } from "../standardizedError.js";
+import { UserDataObjectType, VisitorProgressType } from "../../types/DataObjectTypes.js";
+import { standardizeError } from "../standardizeError.js";
 
-export const getVisitor = async (credentials: Credentials, keyAssetId: string) => {
+export const getVisitor = async (
+  credentials: Credentials,
+  keyAssetId: string,
+): Promise<
+  | {
+      visitor: VisitorInterface;
+      visitorProgress: VisitorProgressType;
+      visitorInventory: { [key: string]: { id: string; icon: string; name: string } };
+    }
+  | Error
+> => {
   try {
     const { urlSlug, visitorId } = credentials;
     const sceneDropId = credentials.sceneDropId || keyAssetId;
@@ -44,18 +54,19 @@ export const getVisitor = async (credentials: Credentials, keyAssetId: string) =
     let visitorInventory: { [key: string]: { id: string; icon: string; name: string } } = {};
 
     for (const item of visitor.inventoryItems) {
-      // @ts-ignore
-      const { id, name = "", image_url } = item;
+      const { id, name = "", image_url, status, type } = item;
 
-      visitorInventory[name] = {
-        id,
-        icon: image_url,
-        name,
-      };
+      if (status === "ACTIVE" && type === "BADGE") {
+        visitorInventory[name] = {
+          id,
+          icon: image_url,
+          name,
+        };
+      }
     }
 
     return { visitor, visitorProgress, visitorInventory };
   } catch (error) {
-    return standardizedError(error);
+    return standardizeError(error);
   }
 };

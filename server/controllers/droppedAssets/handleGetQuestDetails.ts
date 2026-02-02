@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
-import { errorHandler, getCredentials, getVisitor, getWorldDetails } from "../../utils/index.js";
+import {
+  errorHandler,
+  getCachedInventoryItems,
+  getCredentials,
+  getVisitor,
+  getWorldDetails,
+} from "../../utils/index.js";
 
 export const handleGetQuestDetails = async (req: Request, res: Response) => {
   try {
@@ -13,11 +19,36 @@ export const handleGetQuestDetails = async (req: Request, res: Response) => {
     const getVisitorResponse = await getVisitor(credentials, credentials.assetId);
     if (getVisitorResponse instanceof Error) throw getVisitorResponse;
 
-    const { visitor } = getVisitorResponse;
+    const { visitor, visitorInventory } = getVisitorResponse;
+
+    const inventoryItems = await getCachedInventoryItems({ credentials });
+
+    const badges: {
+      [name: string]: {
+        id: string;
+        name: string;
+        icon: string;
+        description: string;
+      };
+    } = {};
+
+    for (const item of inventoryItems) {
+      const { id, name, image_path, description, type, status } = item;
+      if (name && type === "BADGE" && status === "ACTIVE") {
+        badges[name] = {
+          id: id,
+          name,
+          icon: image_path || "",
+          description: description || "",
+        };
+      }
+    }
 
     return res.json({
       questDetails: dataObject,
       visitor: { isAdmin: visitor.isAdmin, profileId: credentials.profileId },
+      visitorInventory,
+      badges,
     });
   } catch (error) {
     return errorHandler({

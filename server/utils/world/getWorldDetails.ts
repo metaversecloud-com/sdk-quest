@@ -1,7 +1,7 @@
 import { World } from "../topiaInit.js";
 import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
 import { Credentials, WorldDataObjectType } from "../../types/index.js";
-import { standardizedError } from "../standardizedError.js";
+import { standardizeError } from "../standardizeError.js";
 import { WorldInterface } from "@rtsdk/topia";
 
 type WorldDataObject = {
@@ -34,6 +34,6 @@ export const getWorldDetails = async (
 
     return { dataObject: dataObject.scenes?.[sceneDropId], world: world as WorldType };
   } catch (error) {
-    return standardizedError(error);
+    return standardizeError(error);
   }
 };

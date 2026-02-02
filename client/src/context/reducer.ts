@@ -19,11 +19,13 @@ const globalReducer = (state: InitialState, action: ActionType) => {
       return {
         ...state,
         questDetails: payload.questDetails,
+        badges: payload.badges,
       };
     case SET_VISITOR_INFO:
       return {
         ...state,
         visitor: payload.visitor,
+        visitorInventory: payload.visitorInventory,
       };
     case SET_ERROR:
       return {

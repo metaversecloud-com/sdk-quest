@@ -11,25 +11,26 @@ import { ErrorType, SET_QUEST_DETAILS, SET_VISITOR_INFO } from "@/context/types"
 import { backendAPI, setErrorMessage } from "@/utils";
 
 export const Home = () => {
+  const [activeTab, setActiveTab] = useState("leaderboard");
   const [isLoading, setIsLoading] = useState(true);
 
   // context
   const dispatch = useContext(GlobalDispatchContext);
-  const { hasInteractiveParams } = useContext(GlobalStateContext);
+  const { hasInteractiveParams, badges, visitorInventory } = useContext(GlobalStateContext);
 
   useEffect(() => {
     if (hasInteractiveParams) {
       backendAPI
         .get("/quest")
         .then((response) => {
-          const { questDetails, visitor } = response.data;
+          const { questDetails, visitor, visitorInventory, badges } = response.data;
           dispatch!({
             type: SET_QUEST_DETAILS,
-            payload: { questDetails },
+            payload: { questDetails, badges },
           });
           dispatch!({
             type: SET_VISITOR_INFO,
-            payload: { visitor },
+            payload: { visitor, visitorInventory },
           });
         })
         .catch((error) => setErrorMessage(dispatch, error as ErrorType))
@@ -39,7 +40,38 @@ export const Home = () => {
 
   return (
     <PageContainer isLoading={isLoading}>
-      <Leaderboard isKeyAsset={true} />
+      <>
+        <div className="tab-container mb-4">
+          <button
+            className={activeTab === "leaderboard" ? "btn" : "btn btn-text"}
+            onClick={() => setActiveTab("leaderboard")}
+          >
+            Leaderboard
+          </button>
+          <button className={activeTab === "badges" ? "btn" : "btn btn-text"} onClick={() => setActiveTab("badges")}>
+            Badges
+          </button>
+        </div>
+
+        {activeTab === "leaderboard" ? (
+          <Leaderboard isKeyAsset={true} />
+        ) : (
+          <div className="grid grid-cols-3 gap-6 pt-4">
+            {badges &&
+              Object.values(badges).map((badge) => {
+                const hasBadge = visitorInventory && Object.keys(visitorInventory).includes(badge.name);
+                const style = { width: "90px", filter: "none" };
+                if (!hasBadge) style.filter = "grayscale(1)";
+                return (
+                  <div className="tooltip" key={badge.id}>
+                    <span className="tooltip-content">{badge.name}</span>
+                    <img src={badge.icon} alt={badge.name} style={style} />
+                  </div>
+                );
+              })}
+          </div>
+        )}
+      </>
     </PageContainer>
   );
 };
