@@ -202,13 +202,12 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         analytics.push({ analyticName: `itemsCollected${totalCollected}`, profileId, uniqueKey: profileId });
 
         const name = process.env.EMOTE_NAME || "quest_1";
-        // @ts-ignore
-        const awardExpressionResult = await visitor.awardExpression({ name });
+        const grantExpressionResult = await visitor.grantExpression({ name });
 
         let title = "🔎 New Emote Unlocked",
           text = "Congrats! Your detective skills paid off.";
         // @ts-ignore
-        if (awardExpressionResult.data?.statusCode === 200 || awardExpressionResult.status === 200) {
+        if (grantExpressionResult.data?.statusCode === 200 || grantExpressionResult.status === 200) {
           promises.push(
             visitor.triggerParticle({ name: "firework2_gold" }).catch((error: AxiosError) =>
               errorHandler({
@@ -221,7 +220,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
           analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
           // @ts-ignore
-        } else if (awardExpressionResult.data?.statusCode === 409 || awardExpressionResult.status === 409) {
+        } else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
           title = `Congrats! You collected ${totalCollected} quest items`;
           text = "Keep up the solid detective work 🔎";
         }
