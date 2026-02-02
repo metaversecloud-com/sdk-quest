@@ -98,10 +98,10 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
       // Award Quest Veteran badges if visitor collected [x] quest items
       let veteranBadgeName;
-      if (totalCollected === 25) veteranBadgeName = "Quest Veteran 25";
-      else if (totalCollected === 50) veteranBadgeName = "Quest Veteran 50";
-      else if (totalCollected === 75) veteranBadgeName = "Quest Veteran 75";
-      else if (totalCollected === 100) veteranBadgeName = "Quest Veteran 100";
+      if (totalCollected === 25) veteranBadgeName = "Quest Veteran - Bronze";
+      else if (totalCollected === 50) veteranBadgeName = "Quest Veteran - Silver";
+      else if (totalCollected === 75) veteranBadgeName = "Quest Veteran - Gold";
+      else if (totalCollected === 100) veteranBadgeName = "Quest Veteran - Diamond";
       if (veteranBadgeName) {
         promises.push(
           awardBadge({ credentials, visitor, visitorInventory, badgeName: veteranBadgeName }).catch((error) =>

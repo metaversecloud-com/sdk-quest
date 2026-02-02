@@ -23,6 +23,13 @@ export const awardBadge = async ({
 
     await visitor.grantInventoryItem(inventoryItem, 1);
 
+    await visitor
+      .fireToast({
+        title: "Badge Awarded",
+        text: `You have earned the ${badgeName} badge!`,
+      })
+      .catch(() => console.error(`Failed to fire toast after awarding the ${badgeName} badge.`));
+
     return { success: true };
   } catch (error: any) {
     return standardizeError(error);

@@ -25,6 +25,15 @@ export interface InitialState {
     isAdmin: boolean;
     profileId: string;
   };
+  visitorInventory?: { [name: string]: { id: string; icon: string; name: string } };
+  badges?: {
+    [name: string]: {
+      id: string;
+      name: string;
+      icon: string;
+      description: string;
+    };
+  };
   error?: string;
 }
 

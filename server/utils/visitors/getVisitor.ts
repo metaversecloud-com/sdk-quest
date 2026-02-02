@@ -54,14 +54,15 @@ export const getVisitor = async (
     let visitorInventory: { [key: string]: { id: string; icon: string; name: string } } = {};
 
     for (const item of visitor.inventoryItems) {
-      // @ts-ignore
-      const { id, name = "", image_url } = item;
+      const { id, name = "", image_url, status, type } = item;
 
-      visitorInventory[name] = {
-        id,
-        icon: image_url,
-        name,
-      };
+      if (status === "ACTIVE" && type === "BADGE") {
+        visitorInventory[name] = {
+          id,
+          icon: image_url,
+          name,
+        };
+      }
     }
 
     return { visitor, visitorProgress, visitorInventory };
