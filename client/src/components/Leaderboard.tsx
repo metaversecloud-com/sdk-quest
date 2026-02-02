@@ -33,11 +33,11 @@ export const Leaderboard = ({ isKeyAsset }: { isKeyAsset: boolean }) => {
     backendAPI
       .get(`/leaderboard?isKeyAsset=${isKeyAsset}`)
       .then((response) => {
-        const { leaderboard, visitor } = response.data;
+        const { leaderboard, visitor, visitorInventory } = response.data;
 
         dispatch!({
           type: SET_VISITOR_INFO,
-          payload: { visitor },
+          payload: { visitor, visitorInventory },
         });
 
         const index = leaderboard.findIndex((item: { profileId: string }) => item.profileId === visitor.profileId);

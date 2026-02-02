@@ -44,11 +44,12 @@ export const handleGetLeaderboard = async (req: Request, res: Response) => {
     const getVisitorResponse = await getVisitor(credentials, keyAssetId);
     if (getVisitorResponse instanceof Error) throw getVisitorResponse;
 
-    const { visitor } = getVisitorResponse;
+    const { visitor, visitorInventory } = getVisitorResponse;
 
     return res.json({
       leaderboard: formattedLeaderboard,
       visitor: { isAdmin: visitor.isAdmin, profileId: credentials.profileId },
+      visitorInventory,
     });
   } catch (error) {
     return errorHandler({
