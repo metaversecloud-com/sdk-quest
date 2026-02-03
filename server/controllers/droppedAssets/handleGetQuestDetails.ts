@@ -1,11 +1,5 @@
 import { Request, Response } from "express";
-import {
-  errorHandler,
-  getCachedInventoryItems,
-  getCredentials,
-  getVisitor,
-  getWorldDetails,
-} from "../../utils/index.js";
+import { errorHandler, getBadges, getCredentials, getVisitor, getWorldDetails } from "../../utils/index.js";
 
 export const handleGetQuestDetails = async (req: Request, res: Response) => {
   try {
@@ -21,28 +15,7 @@ export const handleGetQuestDetails = async (req: Request, res: Response) => {
 
     const { visitor, visitorInventory } = getVisitorResponse;
 
-    const inventoryItems = await getCachedInventoryItems({ credentials });
-
-    const badges: {
-      [name: string]: {
-        id: string;
-        name: string;
-        icon: string;
-        description: string;
-      };
-    } = {};
-
-    for (const item of inventoryItems) {
-      const { id, name, image_path, description, type, status } = item;
-      if (name && type === "BADGE" && status === "ACTIVE") {
-        badges[name] = {
-          id: id,
-          name,
-          icon: image_path || "",
-          description: description || "",
-        };
-      }
-    }
+    const badges = await getBadges(credentials);
 
     return res.json({
       questDetails: dataObject,

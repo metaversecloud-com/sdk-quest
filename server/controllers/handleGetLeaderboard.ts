@@ -41,15 +41,8 @@ export const handleGetLeaderboard = async (req: Request, res: Response) => {
 
     formattedLeaderboard.sort((a, b) => b.collected - a.collected);
 
-    const getVisitorResponse = await getVisitor(credentials, keyAssetId);
-    if (getVisitorResponse instanceof Error) throw getVisitorResponse;
-
-    const { visitor, visitorInventory } = getVisitorResponse;
-
     return res.json({
       leaderboard: formattedLeaderboard,
-      visitor: { isAdmin: visitor.isAdmin, profileId: credentials.profileId },
-      visitorInventory,
     });
   } catch (error) {
     return errorHandler({

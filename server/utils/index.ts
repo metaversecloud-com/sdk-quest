@@ -5,6 +5,7 @@ export * from "./addNewRowToGoogleSheets.js";
 export * from "./awardBadge.js";
 export * from "./cleanReturnPayload.js";
 export * from "./errorHandler.js";
+export * from "./getBadges.js";
 export * from "./getBaseURL.js";
 export * from "./getCredentials.js";
 export * from "./getDefaultKeyAssetImage.js";

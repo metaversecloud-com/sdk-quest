@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 
 // components
-import { Leaderboard, Loading } from "@/components";
+import { Leaderboard, Loading, PageContainer } from "@/components";
 
 // context
 import { GlobalDispatchContext, GlobalStateContext } from "@context/GlobalContext";
-import { SET_QUEST_DETAILS } from "@/context/types";
+import { SET_QUEST_DETAILS, SET_VISITOR_INFO } from "@/context/types";
 
 // utils
 import { backendAPI } from "@utils/backendAPI";
@@ -17,18 +17,29 @@ export const QuestItemClicked = () => {
 
   // context
   const dispatch = useContext(GlobalDispatchContext);
-  const { questDetails, hasInteractiveParams } = useContext(GlobalStateContext);
-  const { questItemImage } = questDetails || {};
+  const { hasInteractiveParams } = useContext(GlobalStateContext);
 
   useEffect(() => {
     if (hasInteractiveParams) {
       backendAPI
         .post("/quest-item-clicked")
         .then((response) => {
-          const { addedClick, numberAllowedToCollect, totalCollectedToday, questDetails } = response.data;
+          const {
+            addedClick,
+            numberAllowedToCollect,
+            totalCollectedToday,
+            questDetails,
+            visitor,
+            visitorInventory,
+            badges,
+          } = response.data;
           dispatch!({
             type: SET_QUEST_DETAILS,
-            payload: { questDetails },
+            payload: { questDetails, badges },
+          });
+          dispatch!({
+            type: SET_VISITOR_INFO,
+            payload: { visitor, visitorInventory },
           });
           if (addedClick) {
             setCollectedText(`${totalCollectedToday}/${numberAllowedToCollect} collected today`);
@@ -50,25 +61,13 @@ export const QuestItemClicked = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="container p-6 items-center justify-start">
-      {questItemImage ? <img alt="Find me" className="mx-auto" src={questItemImage} /> : <div />}
-      <div className="flex flex-col mb-6 mt-4">
-        <h1 className="h2 text-center">Quest</h1>
+    <PageContainer isLoading={isLoading} showAdminIcon={false}>
+      <div className="grid gap-4">
+        {message && <p>{message}</p>}
+        {collectedText && <p>{collectedText}</p>}
+        <Leaderboard isKeyAsset={false} />
       </div>
-      <div className="container py-6 items-center justify-start">
-        {message && (
-          <div className="flex flex-col p-1">
-            <p>{message}</p>
-          </div>
-        )}
-        {collectedText && (
-          <div className="flex flex-col p-1">
-            <p>{collectedText}</p>
-          </div>
-        )}
-      </div>
-      <Leaderboard isKeyAsset={false} />
-    </div>
+    </PageContainer>
   );
 };
 

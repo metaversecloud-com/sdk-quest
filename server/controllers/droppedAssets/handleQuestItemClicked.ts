@@ -12,6 +12,7 @@ import {
   getVisitor,
   getWorldDetails,
   awardBadge,
+  getBadges,
 } from "../../utils/index.js";
 import { AxiosError } from "axios";
 
@@ -46,6 +47,8 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
 
+    const badges = await getBadges(credentials);
+
     // Award First Find badge if visitor collected their first quest item
     if (totalCollected === 0) {
       promises.push(
@@ -65,7 +68,13 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     if (!hasCollectedToday) analytics.push({ analyticName: "starts", profileId, urlSlug, uniqueKey: profileId });
 
     if (hasCollectedToday && totalCollectedToday >= numberAllowedToCollect) {
-      return res.json({ addedClick: false, numberAllowedToCollect, questDetails: worldDataObject });
+      return res.json({
+        addedClick: false,
+        numberAllowedToCollect,
+        questDetails: worldDataObject,
+        badges,
+        visitorInventory,
+      });
     } else {
       analytics.push({ analyticName: "itemsCollected" });
 
@@ -261,11 +270,18 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         if (result.status === "rejected") console.error(result.reason);
       });
 
+      const getVisitorResponse = await getVisitor(credentials, keyAssetId);
+      if (getVisitorResponse instanceof Error) throw getVisitorResponse;
+
+      const { visitorInventory: updatedInventory } = getVisitorResponse;
+
       return res.json({
         addedClick: true,
         numberAllowedToCollect,
         totalCollectedToday,
         questDetails: worldDataObject,
+        badges,
+        visitorInventory: updatedInventory,
       });
     }
   } catch (error) {
