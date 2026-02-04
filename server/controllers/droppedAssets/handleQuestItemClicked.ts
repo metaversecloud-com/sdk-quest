@@ -50,7 +50,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     const badges = await getBadges(credentials);
 
     // Award First Find badge if visitor collected their first quest item
-    if (totalCollected === 0) {
+    if (totalCollected === 0 || !visitorInventory["First Find"]) {
       promises.push(
         awardBadge({ credentials, visitor, visitorInventory, badgeName: "First Find" }).catch((error) =>
           errorHandler({
