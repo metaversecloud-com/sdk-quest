@@ -1,7 +1,7 @@
 import { DroppedAsset } from "../topiaInit.js";
-import { errorHandler } from "../errorHandler.js";
 import { Credentials } from "../../types/Credentials.js";
 import { KeyAssetDataObjectType } from "../../types/DataObjectTypes.js";
+import { standardizeError } from "../standardizeError.js";
 
 export const getKeyAsset = async (credentials: Credentials, keyAssetId: string) => {
   try {
@@ -27,10 +27,6 @@ export const getKeyAsset = async (credentials: Credentials, keyAssetId: string) 
 
     return keyAsset;
   } catch (error) {
-    return errorHandler({
-      error,
-      functionName: "getKeyAsset",
-      message: "Error getting key asset",
-    });
+    return standardizeError(error);
   }
 };

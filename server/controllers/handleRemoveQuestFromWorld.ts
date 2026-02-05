@@ -16,11 +16,15 @@ export const handleRemoveQuestFromWorld = async (req: Request, res: Response) =>
     const sceneDropId = credentials.sceneDropId || assetId;
 
     // remove all quest items
-    const { success } = await removeQuestItems(credentials);
-    if (!success) throw "Error removing quest items.";
+    const removeQuestItemsResponse = await removeQuestItems(credentials);
+    if (removeQuestItemsResponse instanceof Error) throw removeQuestItemsResponse;
 
     // remove data from world data object
-    const { world } = await getWorldDetails(credentials, false);
+    const getWorldDetailsResponse = await getWorldDetails(credentials, false);
+    if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
+
+    const { world } = getWorldDetailsResponse;
+
     await world.updateDataObject(
       {
         [`scenes.${sceneDropId}`]: `Removed from world on ${new Date()}`,

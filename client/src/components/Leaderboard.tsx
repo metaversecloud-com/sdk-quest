@@ -4,11 +4,11 @@ import { useContext, useEffect, useState } from "react";
 import { Loading } from "./Loading";
 
 // context
-import { GlobalDispatchContext, GlobalStateContext } from "@context/GlobalContext";
-import { SET_VISITOR_INFO } from "@/context/types";
+import { GlobalStateContext } from "@context/GlobalContext";
 
 // utils
 import { backendAPI } from "@utils/backendAPI";
+import { useSearchParams } from "react-router-dom";
 
 type LeaderboardType = {
   name: string;
@@ -25,22 +25,18 @@ export const Leaderboard = ({ isKeyAsset }: { isKeyAsset: boolean }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // context
-  const dispatch = useContext(GlobalDispatchContext);
-  const { questDetails, visitor } = useContext(GlobalStateContext);
+  const { questDetails } = useContext(GlobalStateContext);
   const { questItemImage } = questDetails || {};
+
+  const [searchParams] = useSearchParams();
+  const profileId = searchParams.get("profileId");
 
   useEffect(() => {
     backendAPI
       .get(`/leaderboard?isKeyAsset=${isKeyAsset}`)
       .then((response) => {
-        const { leaderboard, visitor } = response.data;
-
-        dispatch!({
-          type: SET_VISITOR_INFO,
-          payload: { visitor },
-        });
-
-        const index = leaderboard.findIndex((item: { profileId: string }) => item.profileId === visitor.profileId);
+        const { leaderboard } = response.data;
+        const index = leaderboard.findIndex((item: { profileId: string }) => item.profileId === profileId);
         setMyData(leaderboard[index]);
         setCurrentPosition(index + 1);
         setTotal(leaderboard.length);
@@ -49,11 +45,9 @@ export const Leaderboard = ({ isKeyAsset }: { isKeyAsset: boolean }) => {
       })
       .catch(() => console.error("There was a problem while retrieving leaderboard data. Please try again later."))
       .finally(() => setIsLoading(false));
-  }, [visitor]);
+  }, []);
 
   if (isLoading) return <Loading />;
-
-  if (visibleData.length === 0) return <p>No quest items have been found yet. Search the world and be the first!</p>;
 
   return (
     <div className="container">

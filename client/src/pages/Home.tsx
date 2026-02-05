@@ -22,14 +22,14 @@ export const Home = () => {
       backendAPI
         .get("/quest")
         .then((response) => {
-          const { questDetails, visitor } = response.data;
+          const { questDetails, visitor, badges, visitorInventory } = response.data;
           dispatch!({
             type: SET_QUEST_DETAILS,
-            payload: { questDetails },
+            payload: { questDetails, badges },
           });
           dispatch!({
             type: SET_VISITOR_INFO,
-            payload: { visitor },
+            payload: { visitor, visitorInventory },
           });
         })
         .catch((error) => setErrorMessage(dispatch, error as ErrorType))
@@ -38,7 +38,7 @@ export const Home = () => {
   }, [hasInteractiveParams]);
 
   return (
-    <PageContainer isLoading={isLoading}>
+    <PageContainer isLoading={isLoading} showAdminIcon={true}>
       <Leaderboard isKeyAsset={true} />
     </PageContainer>
   );

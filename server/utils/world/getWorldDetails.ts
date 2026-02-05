@@ -1,7 +1,8 @@
 import { World } from "../topiaInit.js";
-import { errorHandler } from "../errorHandler.js";
 import { initializeWorldDataObject } from "./initializeWorldDataObject.js";
 import { Credentials, WorldDataObjectType } from "../../types/index.js";
+import { standardizeError } from "../standardizeError.js";
+import { WorldInterface } from "@rtsdk/topia";
 
 type WorldDataObject = {
   scenes: {
@@ -9,7 +10,14 @@ type WorldDataObject = {
   };
 };
 
-export const getWorldDetails = async (credentials: Credentials, getDetails: boolean = true) => {
+interface WorldType extends WorldInterface {
+  dataObject: WorldDataObject;
+}
+
+export const getWorldDetails = async (
+  credentials: Credentials,
+  getDetails: boolean = true,
+): Promise<{ dataObject: WorldDataObjectType; world: WorldType } | Error> => {
   try {
     const { assetId, urlSlug } = credentials;
     const sceneDropId = credentials.sceneDropId || assetId;
@@ -20,10 +28,12 @@ export const getWorldDetails = async (credentials: Credentials, getDetails: bool
 
     await initializeWorldDataObject({ credentials, world });
 
+    // Ensure world.dataObject is defined and of correct type
+    if (!world.dataObject) world.dataObject = { scenes: {} };
     const dataObject = world.dataObject as WorldDataObject;
 
-    return { dataObject: dataObject.scenes?.[sceneDropId], world };
+    return { dataObject: dataObject.scenes?.[sceneDropId], world: world as WorldType };
   } catch (error) {
-    return errorHandler({ error, functionName: "getWorldDetails", message: "Error getting world details" });
+    return standardizeError(error);
   }
 };

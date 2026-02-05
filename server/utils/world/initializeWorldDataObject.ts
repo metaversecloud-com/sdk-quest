@@ -1,5 +1,5 @@
 import { Credentials } from "../../types/Credentials.js";
-import { errorHandler } from "../errorHandler.js";
+import { standardizeError } from "../standardizeError.js";
 import { DroppedAsset } from "../topiaInit.js";
 
 export const initializeWorldDataObject = async ({ credentials, world }: { credentials: Credentials; world: any }) => {
@@ -67,11 +67,7 @@ export const initializeWorldDataObject = async ({ credentials, world }: { creden
     await world.fetchDataObject();
     return;
   } catch (error) {
-    errorHandler({
-      error,
-      functionName: "initializeWorldDataObject",
-      message: "Error initializing world data object",
-    });
+    standardizeError(error);
     return await world.fetchDataObject();
   }
 };

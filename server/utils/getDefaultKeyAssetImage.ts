@@ -1,4 +1,4 @@
-import { errorHandler } from "./errorHandler.js";
+import { standardizeError } from "./standardizeError.js";
 
 export const getDefaultKeyAssetImage = async (urlSlug: string) => {
   try {
@@ -11,10 +11,6 @@ export const getDefaultKeyAssetImage = async (urlSlug: string) => {
 
     return questItemImage;
   } catch (error) {
-    return errorHandler({
-      error,
-      functionName: "getDefaultKeyAssetImage",
-      message: "Error getting default key asset image",
-    });
+    return standardizeError(error);
   }
 };

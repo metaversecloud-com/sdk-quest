@@ -1,11 +1,14 @@
 import { World } from "../topiaInit.js";
 import { getQuestItems } from "./getQuestItems.js";
-import { errorHandler } from "../errorHandler.js";
 import { Credentials } from "../../types/Credentials";
+import { standardizeError } from "../standardizeError.js";
 
 export const removeQuestItems = async (credentials: Credentials) => {
   try {
-    const droppedAssets = await getQuestItems(credentials);
+    const getQuestItemsResponse = await getQuestItems(credentials);
+    if (getQuestItemsResponse instanceof Error) throw getQuestItemsResponse;
+
+    const droppedAssets: Record<string, { id: string }> = getQuestItemsResponse;
 
     if (Object.keys(droppedAssets).length > 0) {
       const droppedAssetIds = [];
@@ -22,10 +25,6 @@ export const removeQuestItems = async (credentials: Credentials) => {
 
     return { success: true };
   } catch (error) {
-    return errorHandler({
-      error,
-      functionName: "removeQuestItems",
-      message: "Error removing Quest items",
-    });
+    return standardizeError(error);
   }
 };

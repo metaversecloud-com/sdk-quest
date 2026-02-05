@@ -1,17 +1,27 @@
 import { Request, Response } from "express";
-import { errorHandler, getCredentials, getVisitor, getWorldDetails } from "../../utils/index.js";
+import { errorHandler, getBadges, getCredentials, getVisitor, getWorldDetails } from "../../utils/index.js";
 
 export const handleGetQuestDetails = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
 
-    const { dataObject } = await getWorldDetails(credentials, false);
+    const getWorldDetailsResponse = await getWorldDetails(credentials, false);
+    if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
 
-    const { visitor } = await getVisitor(credentials, credentials.assetId);
+    const { dataObject } = getWorldDetailsResponse;
+
+    const getVisitorResponse = await getVisitor(credentials, credentials.assetId);
+    if (getVisitorResponse instanceof Error) throw getVisitorResponse;
+
+    const { visitor, visitorInventory } = getVisitorResponse;
+
+    const badges = await getBadges(credentials);
 
     return res.json({
       questDetails: dataObject,
       visitor: { isAdmin: visitor.isAdmin, profileId: credentials.profileId },
+      visitorInventory,
+      badges,
     });
   } catch (error) {
     return errorHandler({
