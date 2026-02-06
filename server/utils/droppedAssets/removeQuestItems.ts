@@ -5,10 +5,7 @@ import { standardizeError } from "../standardizeError.js";
 
 export const removeQuestItems = async (credentials: Credentials) => {
   try {
-    const getQuestItemsResponse = await getQuestItems(credentials);
-    if (getQuestItemsResponse instanceof Error) throw getQuestItemsResponse;
-
-    const droppedAssets: Record<string, { id: string }> = getQuestItemsResponse;
+    const droppedAssets: Record<string, { id: string }> = await getQuestItems(credentials);
 
     if (Object.keys(droppedAssets).length > 0) {
       const droppedAssetIds = [];
@@ -25,6 +22,6 @@ export const removeQuestItems = async (credentials: Credentials) => {
 
     return { success: true };
   } catch (error) {
-    return standardizeError(error);
+    throw standardizeError(error);
   }
 };

@@ -9,17 +9,11 @@ export const handleGetLeaderboard = async (req: Request, res: Response) => {
     let keyAssetId = credentials.assetId;
 
     if (!isKeyAsset) {
-      const getWorldDetailsResponse = await getWorldDetails(credentials, false);
-      if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
-
-      const { dataObject } = getWorldDetailsResponse;
+      const { dataObject } = await getWorldDetails(credentials, false);
       keyAssetId = dataObject.keyAssetId;
     }
 
-    const getKeyAssetResponse = await getKeyAsset(credentials, keyAssetId);
-    if (getKeyAssetResponse instanceof Error) throw getKeyAssetResponse;
-
-    const keyAsset = getKeyAssetResponse;
+    const keyAsset = await getKeyAsset(credentials, keyAssetId);
     const { leaderboard } = (keyAsset.dataObject as KeyAssetDataObjectType) || {};
 
     let formattedLeaderboard = [];

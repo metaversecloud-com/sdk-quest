@@ -18,6 +18,6 @@ export const getQuestItems = async (credentials: Credentials) => {
 
     return questItems;
   } catch (error) {
-    return standardizeError(error);
+    throw standardizeError(error);
   }
 };

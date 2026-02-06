@@ -16,10 +16,7 @@ export const handleDropQuestItem = async (req: Request, res: Response) => {
     const { interactivePublicKey, urlSlug } = credentials;
     const sceneDropId = credentials.sceneDropId || credentials.assetId;
 
-    const getWorldDetailsResponse = await getWorldDetails(credentials, true);
-    if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
-
-    const { dataObject, world } = getWorldDetailsResponse;
+    const { dataObject, world } = await getWorldDetails(credentials, true);
 
     const { questItemImage } = dataObject as WorldDataObjectType;
     if (!questItemImage) throw "questItemImage is required";

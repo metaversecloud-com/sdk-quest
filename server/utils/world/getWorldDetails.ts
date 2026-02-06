@@ -17,7 +17,7 @@ interface WorldType extends WorldInterface {
 export const getWorldDetails = async (
   credentials: Credentials,
   getDetails: boolean = true,
-): Promise<{ dataObject: WorldDataObjectType; world: WorldType } | Error> => {
+): Promise<{ dataObject: WorldDataObjectType; world: WorldType }> => {
   try {
     const { assetId, urlSlug } = credentials;
     const sceneDropId = credentials.sceneDropId || assetId;
@@ -34,6 +34,6 @@ export const getWorldDetails = async (
 
     return { dataObject: dataObject.scenes?.[sceneDropId], world: world as WorldType };
   } catch (error) {
-    return standardizeError(error);
+    throw standardizeError(error);
   }
 };
