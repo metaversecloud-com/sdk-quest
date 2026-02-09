@@ -32,18 +32,12 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
 
-    const getWorldDetailsResponse = await getWorldDetails(credentials, true);
-    if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
-
-    const { dataObject: worldDataObject, world } = getWorldDetailsResponse;
+    const { dataObject: worldDataObject, world } = await getWorldDetails(credentials, true);
 
     let { keyAssetId, numberAllowedToCollect } = worldDataObject as WorldDataObjectType;
     if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
 
-    const getVisitorResponse = await getVisitor(credentials, keyAssetId);
-    if (getVisitorResponse instanceof Error) throw getVisitorResponse;
-
-    const { visitor, visitorProgress, visitorInventory } = getVisitorResponse;
+    const { visitor, visitorProgress, visitorInventory } = await getVisitor(credentials, keyAssetId);
 
     let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
 
@@ -251,10 +245,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         );
       }
 
-      const getKeyAssetResponse = await getKeyAsset(credentials, keyAssetId);
-      if (getKeyAssetResponse instanceof Error) throw getKeyAssetResponse;
-
-      const keyAsset = getKeyAssetResponse;
+      const keyAsset = await getKeyAsset(credentials, keyAssetId);
 
       promises.push(
         keyAsset.updateDataObject(
@@ -270,10 +261,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         if (result.status === "rejected") console.error(result.reason);
       });
 
-      const getVisitorResponse = await getVisitor(credentials, keyAssetId);
-      if (getVisitorResponse instanceof Error) throw getVisitorResponse;
-
-      const { visitorInventory: updatedInventory } = getVisitorResponse;
+      const { visitorInventory: updatedInventory } = await getVisitor(credentials, keyAssetId);
 
       return res.json({
         addedClick: true,

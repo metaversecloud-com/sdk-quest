@@ -9,10 +9,7 @@ export const handleUpdateAdminSettings = async (req: Request, res: Response) => 
 
     if (!questItemImage) throw "questItemImage is required";
 
-    const getWorldDetailsResponse = await getWorldDetails(credentials, false);
-    if (getWorldDetailsResponse instanceof Error) throw getWorldDetailsResponse;
-
-    const { world } = getWorldDetailsResponse;
+    const { world } = await getWorldDetails(credentials, false);
 
     const lockId = `${sceneDropId}-adminUpdates-${new Date(Math.round(new Date().getTime() / 10000) * 10000)}`;
     await world.updateDataObject(
@@ -23,10 +20,7 @@ export const handleUpdateAdminSettings = async (req: Request, res: Response) => 
       { lock: { lockId, releaseLock: true } },
     );
 
-    const getQuestItemsResponse = await getQuestItems(credentials);
-    if (getQuestItemsResponse instanceof Error) throw getQuestItemsResponse;
-
-    const droppedAssets = getQuestItemsResponse;
+    const droppedAssets = await getQuestItems(credentials);
 
     if (Object.keys(droppedAssets).length > 0) {
       const promises: any[] = [];

@@ -7,14 +7,11 @@ import { standardizeError } from "../standardizeError.js";
 export const getVisitor = async (
   credentials: Credentials,
   keyAssetId: string,
-): Promise<
-  | {
-      visitor: VisitorInterface;
-      visitorProgress: VisitorProgressType;
-      visitorInventory: { [key: string]: { id: string; icon: string; name: string } };
-    }
-  | Error
-> => {
+): Promise<{
+  visitor: VisitorInterface;
+  visitorProgress: VisitorProgressType;
+  visitorInventory: { [key: string]: { id: string; icon: string; name: string } };
+}> => {
   try {
     const { urlSlug, visitorId } = credentials;
     const sceneDropId = credentials.sceneDropId || keyAssetId;
@@ -67,6 +64,6 @@ export const getVisitor = async (
 
     return { visitor, visitorProgress, visitorInventory };
   } catch (error) {
-    return standardizeError(error);
+    throw standardizeError(error);
   }
 };

@@ -27,6 +27,6 @@ export const getKeyAsset = async (credentials: Credentials, keyAssetId: string) 
 
     return keyAsset;
   } catch (error) {
-    return standardizeError(error);
+    throw standardizeError(error);
   }
 };

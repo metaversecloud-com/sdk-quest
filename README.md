@@ -4,6 +4,20 @@
 
 Quest is a dynamic hide and seek game where an admin can drop multiple quest items within a world for users to find.
 
+## Built With
+
+### Client
+
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+### Server
+
+![Node.js](https://img.shields.io/badge/node.js-%2343853D.svg?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/express-%23000000.svg?style=for-the-badge&logo=express&logoColor=white)
+
 ## Key Features
 
 - Search the world to find Quest items
@@ -33,7 +47,24 @@ Quest is a dynamic hide and seek game where an admin can drop multiple quest ite
 
 ---
 
-## Developers:
+## Implementation Requirements
+
+### Required Assets with Unique Names
+
+| Unique Name Pattern | Description |
+|---------------------|-------------|
+| `questItem_{sceneDropId}` | Quest items dropped in the world. The app uses this pattern to track and manage quest items. |
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `WEB_IMAGE_ASSET_ID` | The asset ID used to create web image assets for quest items. Default: `webImageAsset` |
+| `DEFAULT_QUEST_ITEM_IMAGE_URL` | Default image URL for quest items when no custom image is set |
+
+---
+
+## Developers
 
 ### Getting Started
 
