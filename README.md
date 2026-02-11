@@ -51,16 +51,29 @@ Quest is a dynamic hide and seek game where an admin can drop multiple quest ite
 
 ### Required Assets with Unique Names
 
-| Unique Name Pattern | Description |
-|---------------------|-------------|
+| Unique Name Pattern       | Description                                                                                  |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
 | `questItem_{sceneDropId}` | Quest items dropped in the world. The app uses this pattern to track and manage quest items. |
 
 ### Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `WEB_IMAGE_ASSET_ID` | The asset ID used to create web image assets for quest items. Default: `webImageAsset` |
-| `DEFAULT_QUEST_ITEM_IMAGE_URL` | Default image URL for quest items when no custom image is set |
+Create a `.env` file in the root directory. See `.env-example` for a template.
+
+| Variable                      | Description                                                                         | Required |
+| ----------------------------- | ----------------------------------------------------------------------------------- | -------- |
+| `NODE_ENV`                    | Node environment (`development` or `production`)                                    | No       |
+| `PORT`                        | Server port (default: `3000`)                                                       | No       |
+| `INSTANCE_DOMAIN`             | Topia API domain (`api.topia.io` for production, `api-stage.topia.io` for staging)  | Yes      |
+| `INTERACTIVE_KEY`             | Topia interactive app key                                                           | Yes      |
+| `INTERACTIVE_SECRET`          | Topia interactive app secret                                                        | Yes      |
+| `WEB_IMAGE_ASSET_ID`          | Asset ID used to create web image assets for quest items (default: `webImageAsset`) | No       |
+| `DEFAULT_EGG_IMAGE_URL`       | Default image URL for quest egg items                                               | No       |
+| `DEFAULT_KEY_ASSET_IMAGE_URL` | Default image URL for the key asset                                                 | No       |
+| `DEV_URL`                     | Development URL (e.g., ngrok URL for webhook forwarding)                            | No       |
+| `EMOTE_NAME`                  | Name of the emote to trigger on quest completion (e.g., `quest_1`)                  | No       |
+| `GOOGLESHEETS_CLIENT_EMAIL`   | Google service account email for analytics                                          | No       |
+| `GOOGLESHEETS_SHEET_ID`       | Google Sheet ID for analytics                                                       | No       |
+| `GOOGLESHEETS_PRIVATE_KEY`    | Google service account private key                                                  | No       |
 
 ---
 
@@ -76,17 +89,9 @@ Quest is a dynamic hide and seek game where an admin can drop multiple quest ite
 
 ### Add your .env environmental variables
 
-```json
-API_KEY=xxxxxxxxxxxxx
-DEFAULT_QUEST_ITEM_IMAGE_URL=pathtodefaultimage
-INSTANCE_DOMAIN=api.topia.io
-INSTANCE_PROTOCOL=https
-INTERACTIVE_KEY=xxxxxxxxxxxxx
-INTERACTIVE_SECRET=xxxxxxxxxxxxxx
-WEB_IMAGE_ASSET_ID=webImageAsset
-```
+See [Environment Variables](#environment-variables) above.
 
-### Where to find API_KEY, INTERACTIVE_KEY and INTERACTIVE_SECRET
+### Where to find INTERACTIVE_KEY and INTERACTIVE_SECRET
 
 [Topia Dev Account Dashboard](https://dev.topia.io/t/dashboard/integrations)
 

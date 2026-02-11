@@ -2,9 +2,9 @@ import { Credentials } from "../types/Credentials.js";
 import { getCachedInventoryItems } from "./inventoryCache.js";
 import { standardizeError } from "./standardizeError.js";
 
-export const getBadges = async (credentials: Credentials) => {
+export const getBadges = async (credentials: Credentials, forceRefresh = false) => {
   try {
-    const inventoryItems = await getCachedInventoryItems({ credentials });
+    const inventoryItems = await getCachedInventoryItems({ credentials, forceRefresh });
 
     const badges: {
       [name: string]: {

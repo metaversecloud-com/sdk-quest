@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 // components
 import { Leaderboard, PageContainer } from "@/components";
@@ -12,6 +13,8 @@ import { backendAPI, setErrorMessage } from "@/utils";
 
 export const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const forceRefreshInventory = searchParams.get("forceRefreshInventory") === "true";
 
   // context
   const dispatch = useContext(GlobalDispatchContext);
@@ -20,7 +23,7 @@ export const Home = () => {
   useEffect(() => {
     if (hasInteractiveParams) {
       backendAPI
-        .get("/quest")
+        .get("/quest", { params: { forceRefreshInventory } })
         .then((response) => {
           const { questDetails, visitor, badges, visitorInventory } = response.data;
           dispatch!({

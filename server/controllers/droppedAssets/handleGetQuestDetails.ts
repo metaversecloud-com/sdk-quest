@@ -4,12 +4,13 @@ import { errorHandler, getBadges, getCredentials, getVisitor, getWorldDetails } 
 export const handleGetQuestDetails = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
+    const forceRefreshInventory = req.query.forceRefreshInventory === "true";
 
     const { dataObject } = await getWorldDetails(credentials, false);
 
     const { visitor, visitorInventory } = await getVisitor(credentials, credentials.assetId);
 
-    const badges = await getBadges(credentials);
+    const badges = await getBadges(credentials, forceRefreshInventory);
 
     return res.json({
       questDetails: dataObject,
