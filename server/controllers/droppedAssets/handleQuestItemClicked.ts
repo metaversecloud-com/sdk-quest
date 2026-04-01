@@ -15,6 +15,7 @@ import {
   getBadges,
 } from "../../utils/index.js";
 import { AxiosError } from "axios";
+import { AnalyticType, DroppedAssetClickType } from "@rtsdk/topia";
 
 export const handleQuestItemClicked = async (req: Request, res: Response) => {
   try {
@@ -27,7 +28,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     const currentDate = new Date(localDateString);
     currentDate.setHours(0, 0, 0, 0);
 
-    const analytics = [],
+    const analytics: AnalyticType[] = [],
       promises = [];
 
     const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
@@ -74,15 +75,30 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
       // Move the quest item to a new random location
       const position = getRandomCoordinates(world.width, world.height);
-      promises.push(questItem.updatePosition(position.x, position.y));
       promises.push(
-        questItem.updateClickType({
-          // @ts-ignore
-          clickType: "link",
-          clickableLinkTitle: "Quest",
-          isOpenLinkInDrawer: true,
-          clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
-        }),
+        questItem.updatePosition(position.x, position.y).catch((error: AxiosError) =>
+          errorHandler({
+            error,
+            functionName: "handleQuestItemClicked",
+            message: "Error updating quest item position",
+          }),
+        ),
+      );
+      promises.push(
+        questItem
+          .updateClickType({
+            clickType: DroppedAssetClickType.LINK,
+            clickableLinkTitle: "Quest",
+            isOpenLinkInDrawer: true,
+            clickableLink: getBaseURL(req) + "/quest-item-clicked/" + `?lastMoved=${new Date().valueOf()}`,
+          })
+          .catch((error: AxiosError) =>
+            errorHandler({
+              error,
+              functionName: "handleQuestItemClicked",
+              message: "Error updating quest item click type",
+            }),
+          ),
       );
 
       promises.push(
@@ -205,61 +221,75 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         analytics.push({ analyticName: `itemsCollected${totalCollected}`, profileId, uniqueKey: profileId });
 
         const name = process.env.EMOTE_NAME || "quest_1";
-        const grantExpressionResult = await visitor.grantExpression({ name });
+        try {
+          const grantExpressionResult = await visitor.grantExpression({ name });
 
-        let title = "🔎 New Emote Unlocked",
-          text = "Congrats! Your detective skills paid off.";
-        // @ts-ignore
-        if (grantExpressionResult.data?.statusCode === 200 || grantExpressionResult.status === 200) {
-          promises.push(
-            visitor.triggerParticle({ name: "firework2_gold" }).catch((error: AxiosError) =>
-              errorHandler({
-                error,
-                functionName: "handleQuestItemClicked",
-                message: "Error triggering particle effects",
-              }),
-            ),
-          );
-
-          analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
+          let title = "🔎 New Emote Unlocked",
+            text = "Congrats! Your detective skills paid off.";
           // @ts-ignore
-        } else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
-          title = `Congrats! You collected ${totalCollected} quest items`;
-          text = "Keep up the solid detective work 🔎";
+          if (grantExpressionResult.data?.statusCode === 200 || grantExpressionResult.status === 200) {
+            promises.push(
+              visitor.triggerParticle({ name: "firework2_gold" }).catch((error: AxiosError) =>
+                errorHandler({
+                  error,
+                  functionName: "handleQuestItemClicked",
+                  message: "Error triggering particle effects",
+                }),
+              ),
+            );
+
+            analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
+            // @ts-ignore
+          } else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
+            title = `Congrats! You collected ${totalCollected} quest items`;
+            text = "Keep up the solid detective work 🔎";
+          }
+
+          promises.push(
+            visitor
+              .fireToast({
+                groupId: "QuestExpression",
+                title,
+                text,
+              })
+              .catch((error: AxiosError) =>
+                errorHandler({
+                  error,
+                  functionName: "handleQuestItemClicked",
+                  message: "Error firing toast",
+                }),
+              ),
+          );
+        } catch (error) {
+          errorHandler({
+            error,
+            functionName: "handleQuestItemClicked",
+            message: "Error granting expression",
+          });
         }
-
-        promises.push(
-          visitor
-            .fireToast({
-              groupId: "QuestExpression",
-              title,
-              text,
-            })
-            .catch((error: AxiosError) =>
-              errorHandler({
-                error,
-                functionName: "handleQuestItemClicked",
-                message: "Error firing toast",
-              }),
-            ),
-        );
       }
-
-      const keyAsset = await getKeyAsset(credentials, keyAssetId);
-
-      promises.push(
-        keyAsset.updateDataObject(
-          {
-            [`leaderboard.${profileId}`]: `${displayName}|${totalCollected}|${longestStreak}`,
-          },
-          { analytics },
-        ),
-      );
 
       const results = await Promise.allSettled(promises);
       results.forEach((result) => {
         if (result.status === "rejected") console.error(result.reason);
       });
+
+      await getKeyAsset(credentials, keyAssetId)
+        .then((keyAsset) =>
+          keyAsset.updateDataObject(
+            {
+              [`leaderboard.${profileId}`]: `${displayName}|${totalCollected}|${longestStreak}`,
+            },
+            { analytics },
+          ),
+        )
+        .catch((error: AxiosError) =>
+          errorHandler({
+            error,
+            functionName: "handleQuestItemClicked",
+            message: "Error updating leaderboard data object",
+          }),
+        );
 
       const { visitorInventory: updatedInventory } = await getVisitor(credentials, keyAssetId);
 
