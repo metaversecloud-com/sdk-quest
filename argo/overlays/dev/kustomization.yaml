@@ -26,4 +26,4 @@ patches:
 images:
   - name: quest0
     newName: 368076259134.dkr.ecr.us-east-1.amazonaws.com/sdk-example
-    digest: sha256:ed696f1f7206d7500d20c220583988782ccedb4447436572a3ad1a608db0a39d
+    digest: sha256:ebe9580697719a8be3b11355994343ceb79a2a941f259bbdccb523a67fe78dd7
