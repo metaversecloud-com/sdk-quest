@@ -71,7 +71,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         visitorInventory,
       });
     } else {
-      analytics.push({ analyticName: "itemsCollected" });
+      analytics.push({ analyticName: "itemsCollected", profileId, urlSlug, uniqueKey: profileId });
 
       // Move the quest item to a new random location
       const position = getRandomCoordinates(world.width, world.height);
@@ -218,7 +218,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
       );
 
       if (totalCollected % 50 === 0) {
-        analytics.push({ analyticName: `itemsCollected${totalCollected}`, profileId, uniqueKey: profileId });
+        analytics.push({ analyticName: `itemsCollected${totalCollected}`, profileId, uniqueKey: profileId, urlSlug });
 
         const name = process.env.EMOTE_NAME || "quest_1";
         try {
@@ -238,7 +238,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
               ),
             );
 
-            analytics.push({ analyticName: `${name}-emoteUnlocked`, urlSlug, uniqueKey: urlSlug });
+            analytics.push({ analyticName: `${name}-emoteUnlocked`, profileId, urlSlug, uniqueKey: urlSlug });
             // @ts-ignore
           } else if (grantExpressionResult.data?.statusCode === 409 || grantExpressionResult.status === 409) {
             title = `Congrats! You collected ${totalCollected} quest items`;
