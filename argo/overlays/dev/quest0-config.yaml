@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quest0-config
+  labels:
+    app.kubernetes.io/name: quest0
+data:
+  INTERACTIVE_KEY: '61K9d6HrZGXdJh9BXfQi'
+  PORT: '3000'
+  INSTANCE_DOMAIN: 'api.topia.io'
+  API_DOMAIN: 'api.topia.io'
+  DEFAULT_EGG_IMAGE_URL: 'https://topiaimages.s3.us-west-1.amazonaws.com/arva_egg.png'
+  ANALYTICS_GA: 'G-3V4ZGJPD5S'
+  NODE_ENV: 'production'

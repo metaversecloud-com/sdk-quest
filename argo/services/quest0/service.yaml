@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quest0
+  labels:
+    app.kubernetes.io/name: quest0
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: quest0
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
