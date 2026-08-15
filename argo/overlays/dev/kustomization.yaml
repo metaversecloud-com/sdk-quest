@@ -27,3 +27,4 @@ images:
   - name: quest0
     newName: 368076259134.dkr.ecr.us-east-1.amazonaws.com/sdk-example
     digest: sha256:57c8412f1a1426219dec94e4ef1dc67499bbc1c4919fcb31a77455d2c5c5c1fa
+    newTag: sdk-quest
