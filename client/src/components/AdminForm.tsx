@@ -1,5 +1,8 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+
+// components
+import { ImageUrlField } from "@/components";
 
 // context
 import { GlobalStateContext } from "@context/GlobalContext";
@@ -19,13 +22,26 @@ export const AdminForm = () => {
   const { numberAllowedToCollect, questItemImage } = questDetails || {};
   const dispatch = useContext(GlobalDispatchContext);
 
+  // The image field is controlled (ImageUrlField owns a modal with
+  // upload/browse/URL affordances) while numberAllowedToCollect stays in
+  // react-hook-form's registered-input flow.
+  const [imageUrl, setImageUrl] = useState<string>(questItemImage ?? "");
+  useEffect(() => {
+    // Re-sync when the context's questDetails loads/changes under us.
+    setImageUrl(questItemImage ?? "");
+  }, [questItemImage]);
+
   const { handleSubmit, register } = useForm();
 
   const onSubmit = handleSubmit((data) => {
-    const { numberAllowedToCollect, questItemImage } = data;
+    const { numberAllowedToCollect } = data;
+    if (!imageUrl) {
+      setErrorMessage(dispatch, "Quest Item Image is required" as unknown as ErrorType);
+      return;
+    }
     setAreButtonsDisabled(true);
     backendAPI
-      .post("/admin-settings", { numberAllowedToCollect, questItemImage })
+      .post("/admin-settings", { numberAllowedToCollect, questItemImage: imageUrl })
       .then((response) => {
         dispatch!({
           type: SET_QUEST_DETAILS,
@@ -62,8 +78,13 @@ export const AdminForm = () => {
         </div>
 
         <div>
-          <label htmlFor="questItemImage">Quest Item Image URL:</label>
-          <input className="input" {...register("questItemImage", { required: true, value: questItemImage })} />
+          <ImageUrlField
+            label="Quest Item Image:"
+            value={imageUrl}
+            onChange={setImageUrl}
+            emptyCtaLabel="Add Quest Item Image"
+            editLabel="Change Image"
+          />
           <p className="p3">Update image for all Quest Items in world. This will not change the Key Asset image.</p>
         </div>
 
