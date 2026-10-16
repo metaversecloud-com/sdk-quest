@@ -1,7 +1,9 @@
 import express from "express";
 import {
+  handleDeleteUpload,
   handleDropQuestItem,
   handleGetLeaderboard,
+  handleListUploads,
   handleMoveVisitor,
   handleGetQuestDetails,
   handleGetQuestItems,
@@ -10,6 +12,7 @@ import {
   handleRemoveQuestFromWorld,
   handleRemoveQuestItems,
   handleUpdateAdminSettings,
+  handleUploadImage,
 } from "./controllers/index.js";
 import { getVersion } from "./utils/getVersion.js";
 
@@ -50,5 +53,10 @@ router.post("/quest-item-clicked", handleQuestItemClicked);
 router.put("/visitor/move", handleMoveVisitor);
 router.post("/admin-settings", handleUpdateAdminSettings);
 router.delete("/quest", handleRemoveQuestFromWorld);
+
+// Image uploads — base64 in, server-side PutObject; list; admin-owned delete.
+router.post("/uploads", handleUploadImage);
+router.get("/uploads", handleListUploads);
+router.delete("/uploads", handleDeleteUpload);
 
 export default router;
