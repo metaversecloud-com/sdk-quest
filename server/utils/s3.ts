@@ -69,7 +69,7 @@ export const getS3Client = (): S3Client => {
 };
 
 export const getBucket = (): string => {
-  const bucket = process.env.S3_BUCKET;
+  const bucket = process.env.S3_BUCKET || "sdk-quest";
   if (!bucket) throw new Error("S3_BUCKET env var is not set");
   return bucket;
 };
