@@ -76,30 +76,28 @@ export const QuestItemClicked = () => {
 
   if (wasQuestRemoved) {
     return (
-      <PageContainer isLoading={isLoading} showAdminIcon={false}>
-        <div className="grid gap-4">
-          {removedIsAdmin ? (
-            <>
-              <h2 className="h2">This Quest has been removed</h2>
-              <p className="p1">
-                This Quest&apos;s key asset was deleted, so we&apos;re removing its leftover quest items from the world
-                now. To start a new Quest, add the Quest app again.
-              </p>
-              <p className="p2">
-                Tip: Next time, use Remove Quest from World in the Quest admin settings to clean up all quest items at
-                once.
-              </p>
-            </>
-          ) : (
-            <>
-              <h2 className="h2">This Quest has ended</h2>
-              <p className="p1">
-                This Quest was removed from the world, so we&apos;re clearing away its leftover items. Keep exploring!
-              </p>
-            </>
-          )}
-        </div>
-      </PageContainer>
+      <div className="grid gap-4 p-3">
+        {removedIsAdmin ? (
+          <>
+            <h2 className="h2">This Quest has been removed</h2>
+            <p className="p1">
+              This Quest&apos;s key asset was deleted, so we&apos;re removing its leftover quest items from the world
+              now. To start a new Quest, add the Quest app again.
+            </p>
+            <p className="p2">
+              Tip: Next time, use Remove Quest from World in the Quest admin settings to clean up all quest items at
+              once.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="h2">This Quest has ended</h2>
+            <p className="p1">
+              This Quest was removed from the world, so we&apos;re clearing away its leftover items. Keep exploring!
+            </p>
+          </>
+        )}
+      </div>
     );
   }
 

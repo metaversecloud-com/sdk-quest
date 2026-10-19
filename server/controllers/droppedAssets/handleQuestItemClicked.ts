@@ -56,7 +56,9 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     }
 
     if (keyAssetMissing) {
-      await removeQuestItems(credentials).catch((error) =>
+      const visitor = (await Visitor.get(visitorId, urlSlug, { credentials })) as VisitorInterface;
+
+      const test = await removeQuestItems(credentials).catch((error) =>
         errorHandler({
           error,
           functionName: "handleQuestItemClicked",
@@ -64,15 +66,7 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
         }),
       );
 
-      let isAdmin = false;
-      try {
-        const visitorForAdminCheck = (await Visitor.get(visitorId, urlSlug, { credentials })) as VisitorInterface;
-        isAdmin = !!visitorForAdminCheck.isAdmin;
-      } catch {
-        // Fall back to non-admin messaging if we can't resolve the visitor.
-      }
-
-      return res.json({ questRemoved: true, isAdmin });
+      return res.json({ wasQuestRemoved: true, isAdmin: visitor.isAdmin });
     }
 
     const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
