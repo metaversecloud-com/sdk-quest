@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { WorldDataObjectType } from "../../types/DataObjectTypes.js";
+import { KeyAssetDataObjectType, WorldDataObjectType } from "../../types/DataObjectTypes.js";
 import {
   DroppedAsset,
   Visitor,
@@ -35,8 +35,13 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
 
     const { dataObject: worldDataObject, world } = await getWorldDetails(credentials, true);
 
-    let { keyAssetId, numberAllowedToCollect } = worldDataObject as WorldDataObjectType;
-    if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
+    const worldCfg = (worldDataObject as WorldDataObjectType) || {};
+    const keyAssetId = worldCfg.keyAssetId;
+    // `numberAllowedToCollect` lives on the key asset now; the world's
+    // legacy value is the pre-migration fallback. Resolved after the
+    // key-asset-missing check so we don't spin up a fetch when the asset
+    // isn't there any more.
+    let numberAllowedToCollect: number | undefined;
 
     // If the Quest key asset has been manually deleted, any orphaned quest
     // items for THIS instance (scoped by sceneDropId in removeQuestItems)
@@ -96,6 +101,14 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     }
 
     const { visitor, visitorProgress, visitorInventory } = await getVisitor(credentials, keyAssetId);
+
+    // Resolve config from the key asset (new home). Falls back to the
+    // world's legacy value when the key asset hasn't been seeded yet.
+    const keyAssetForConfig = await getKeyAsset(credentials, keyAssetId, worldCfg);
+    const keyData = (keyAssetForConfig.dataObject as KeyAssetDataObjectType) || {};
+    numberAllowedToCollect = keyData.numberAllowedToCollect ?? worldCfg.numberAllowedToCollect;
+    if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
+    if (numberAllowedToCollect === undefined) numberAllowedToCollect = 5;
 
     let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
 
