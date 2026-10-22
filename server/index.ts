@@ -24,8 +24,15 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Body size has to accommodate the base64-encoded admin uploads sent via
+// POST /api/uploads. The controller enforces the raw size cap
+// (`MAX_UPLOAD_BYTES = 2 MB` in `utils/s3.ts`); here we only need to
+// let the base64-inflated payload through. 2 MB raw → ~2.7 MB base64,
+// so 4 MB covers it with headroom for the surrounding JSON envelope.
+// Without this, Express's 100 KB default rejects every real image with
+// a 413 before the controller's size check can report a friendly error.
+app.use(express.json({ limit: "4mb" }));
+app.use(express.urlencoded({ extended: false, limit: "4mb" }));
 app.use("/api", router);
 
 if (process.env.NODE_ENV === "development") {
