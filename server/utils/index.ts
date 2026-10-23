@@ -12,5 +12,6 @@ export * from "./getDefaultKeyAssetImage.js";
 export * from "./getDifferenceInDays.js";
 export * from "./getRandomCoordinates.js";
 export * from "./inventoryCache.js";
+export * from "./s3.js";
 export * from "./standardizeError.js";
 export * from "./topiaInit.js";

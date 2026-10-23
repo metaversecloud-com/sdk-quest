@@ -15,9 +15,10 @@ export const getBadges = async (credentials: Credentials, forceRefresh = false) 
       };
     } = {};
 
+    // INACTIVE items are filtered at the cache layer.
     for (const item of inventoryItems) {
-      const { id, name, image_path, description, type, status } = item;
-      if (name && type === "BADGE" && status === "ACTIVE") {
+      const { id, name, image_path, description, type } = item;
+      if (name && type === "BADGE") {
         badges[name] = {
           id: id,
           name,

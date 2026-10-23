@@ -29,7 +29,7 @@ export const PageContainer = ({
       {isAdmin && showAdminIcon && (
         <AdminIconButton setShowSettings={() => setShowSettings(!showSettings)} showSettings={showSettings} />
       )}
-      {questItemImage ? <img alt="Find me" className="mx-auto" src={questItemImage} /> : <div />}
+      {questItemImage && !showSettings ? <img alt="Find me" className="mx-auto" src={questItemImage} /> : <div />}
       <div className="flex flex-col mb-4 mt-2">
         <h1 className="h2 text-center">Quest</h1>
       </div>

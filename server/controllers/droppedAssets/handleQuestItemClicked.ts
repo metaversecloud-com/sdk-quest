@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { WorldDataObjectType } from "../../types/DataObjectTypes.js";
+import { KeyAssetDataObjectType, WorldDataObjectType } from "../../types/DataObjectTypes.js";
 import {
   DroppedAsset,
+  Visitor,
   addNewRowToGoogleSheets,
   errorHandler,
   getBaseURL,
@@ -13,14 +14,15 @@ import {
   getWorldDetails,
   awardBadge,
   getBadges,
+  removeQuestItems,
 } from "../../utils/index.js";
 import { AxiosError } from "axios";
-import { AnalyticType, DroppedAssetClickType } from "@rtsdk/topia";
+import { AnalyticType, DroppedAssetClickType, VisitorInterface } from "@rtsdk/topia";
 
 export const handleQuestItemClicked = async (req: Request, res: Response) => {
   try {
     const credentials = getCredentials(req.query);
-    const { assetId, displayName, identityId, profileId, urlSlug } = credentials;
+    const { assetId, displayName, identityId, profileId, urlSlug, visitorId } = credentials;
     const sceneDropId = credentials.sceneDropId || assetId;
 
     const now = new Date();
@@ -31,14 +33,82 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     const analytics: AnalyticType[] = [],
       promises = [];
 
-    const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
-
     const { dataObject: worldDataObject, world } = await getWorldDetails(credentials, true);
 
-    let { keyAssetId, numberAllowedToCollect } = worldDataObject as WorldDataObjectType;
-    if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
+    const worldCfg = (worldDataObject as WorldDataObjectType) || {};
+    const keyAssetId = worldCfg.keyAssetId;
+    // `numberAllowedToCollect` lives on the key asset now; the world's
+    // legacy value is the pre-migration fallback. Resolved after the
+    // key-asset-missing check so we don't spin up a fetch when the asset
+    // isn't there any more.
+    let numberAllowedToCollect: number | undefined;
+
+    // If the Quest key asset has been manually deleted, any orphaned quest
+    // items for THIS instance (scoped by sceneDropId in removeQuestItems)
+    // should be cleaned up on the first click. Subsequent clicks are
+    // impossible — the items are gone — so this path is naturally idempotent.
+    let keyAssetMissing = false;
+    if (keyAssetId) {
+      try {
+        await DroppedAsset.get(keyAssetId, urlSlug, {
+          credentials: { ...credentials, assetId: keyAssetId },
+        });
+      } catch {
+        keyAssetMissing = true;
+      }
+    } else {
+      keyAssetMissing = true;
+    }
+
+    if (keyAssetMissing) {
+      const visitor = (await Visitor.get(visitorId, urlSlug, { credentials })) as VisitorInterface;
+
+      const test = await removeQuestItems(credentials).catch((error) =>
+        errorHandler({
+          error,
+          functionName: "handleQuestItemClicked",
+          message: "Error removing orphaned quest items after key asset deletion",
+        }),
+      );
+
+      return res.json({ wasQuestRemoved: true, isAdmin: visitor.isAdmin });
+    }
+
+    const questItem = await DroppedAsset.get(assetId, urlSlug, { credentials });
+
+    // Debounce rapid repeat clicks on the same quest item.
+    const CLICK_COOLDOWN_MS = 3000;
+    const nowMs = now.valueOf();
+    const questItemData = ((questItem.dataObject as
+      | { lastProcessedAt?: number; questItemImage?: string }
+      | null
+      | undefined) ?? {}) as {
+      lastProcessedAt?: number;
+      questItemImage?: string;
+    };
+
+    let isDuplicateClick = nowMs - (questItemData.lastProcessedAt ?? 0) < CLICK_COOLDOWN_MS;
+    if (!isDuplicateClick) {
+      const claimLockId = `questItem-click-${assetId}-${Math.floor(nowMs / CLICK_COOLDOWN_MS)}`;
+      try {
+        await questItem.setDataObject(
+          { ...questItemData, lastProcessedAt: nowMs },
+          { lock: { lockId: claimLockId, releaseLock: true } },
+        );
+      } catch {
+        isDuplicateClick = true;
+      }
+    }
 
     const { visitor, visitorProgress, visitorInventory } = await getVisitor(credentials, keyAssetId);
+
+    // Resolve config from the key asset (new home). Falls back to the
+    // world's legacy value when the key asset hasn't been seeded yet.
+    const keyAssetForConfig = await getKeyAsset(credentials, keyAssetId, worldCfg);
+    const keyData = (keyAssetForConfig.dataObject as KeyAssetDataObjectType) || {};
+    numberAllowedToCollect = keyData.numberAllowedToCollect ?? worldCfg.numberAllowedToCollect;
+    if (typeof numberAllowedToCollect === "string") numberAllowedToCollect = parseInt(numberAllowedToCollect);
+    if (numberAllowedToCollect === undefined) numberAllowedToCollect = 5;
 
     let { currentStreak, lastCollectedDate, longestStreak, totalCollected, totalCollectedToday } = visitorProgress;
 
@@ -61,6 +131,17 @@ export const handleQuestItemClicked = async (req: Request, res: Response) => {
     const hasCollectedToday = differenceInDays === 0;
 
     if (!hasCollectedToday) analytics.push({ analyticName: "starts", profileId, urlSlug, uniqueKey: profileId });
+
+    if (isDuplicateClick) {
+      return res.json({
+        totalCollectedToday,
+        wasItemAlreadyFound: true,
+        numberAllowedToCollect,
+        questDetails: worldDataObject,
+        badges,
+        visitorInventory,
+      });
+    }
 
     if (hasCollectedToday && totalCollectedToday >= numberAllowedToCollect) {
       return res.json({

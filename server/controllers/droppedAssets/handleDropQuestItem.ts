@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { WorldDataObjectType } from "../../types/DataObjectTypes.js";
+import { KeyAssetDataObjectType, WorldDataObjectType } from "../../types/DataObjectTypes.js";
 import {
   Asset,
   DroppedAsset,
   errorHandler,
   getBaseURL,
+  getKeyAsset,
   getRandomCoordinates,
   getWorldDetails,
   getCredentials,
@@ -16,9 +17,15 @@ export const handleDropQuestItem = async (req: Request, res: Response) => {
     const { interactivePublicKey, urlSlug } = credentials;
     const sceneDropId = credentials.sceneDropId || credentials.assetId;
 
-    const { dataObject, world } = await getWorldDetails(credentials, true);
+    const { dataObject: worldSceneData, world } = await getWorldDetails(credentials, true);
+    const worldCfg = (worldSceneData as WorldDataObjectType) || {};
+    const keyAssetId = worldCfg.keyAssetId || credentials.assetId;
 
-    const { questItemImage } = dataObject as WorldDataObjectType;
+    // Config is on the key asset now; world's `questItemImage` is only
+    // the pre-migration fallback.
+    const keyAsset = await getKeyAsset(credentials, keyAssetId, worldCfg);
+    const keyData = (keyAsset.dataObject as KeyAssetDataObjectType) || {};
+    const questItemImage = keyData.questItemImage ?? worldCfg.questItemImage;
     if (!questItemImage) throw "questItemImage is required";
 
     // Randomly place the quest item asset
