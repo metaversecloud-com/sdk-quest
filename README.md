@@ -26,13 +26,15 @@ Progression is tracked per-visitor per-scene (`${urlSlug}-${sceneDropId}`): `cur
 
 ### Admin features
 
-Admin UI is gated **client-side only** via `visitor.isAdmin` — no server route enforces admin status. Any authenticated visitor calling `/admin-settings`, `/drop-quest-item`, `/dropped-asset/*`, `/visitor/move`, or `DELETE /quest` will succeed.
+Admin UI is gated **client-side only** via `visitor.isAdmin` — no server route enforces admin status. Any authenticated visitor calling `/admin-settings`, `/drop-quest-item`, `/dropped-asset/*`, `/visitor/move`, `DELETE /quest`, or the `/uploads` routes will succeed.
 
-- Update **Number Allowed To Collect Per Day** and **Quest Item Image URL** (rewrites `layer1` on every existing quest item in the scene).
+- Update **Number Allowed To Collect Per Day** and **Quest Item Image** (rewrites `layer1` on every existing quest item in the scene).
+- **Image picker modal** — admins can either paste a URL or upload a custom PNG/JPG/WebP from disk (same UX as `sdk-scavenger-hunt`). Uploads go to the `S3_BUCKET` bucket keyed under `userUploads/{interactivePublicKey}/`; the picker lists everything uploaded to that bucket by the same ecosystem and supports delete.
 - **Hide in world** — drops a new quest item at random coordinates.
 - **Remove all** — deletes every dropped asset in the scene whose `uniqueName` includes `questItem`.
 - **Placed items table** — per-item "walk to" (uses `PUT /visitor/move` with `shouldTeleportVisitor: false`) and "remove item" buttons; each row shows days since last relocation.
 - **Remove Quest from world** — deletes all quest items, tombstones the scene data (`scenes.${sceneDropId} = "Removed from world on ${date}"`), fires a confirmation toast, and deletes the key asset itself.
+- **Orphan self-heal** — if an admin manually deletes the key asset from the world but leaves quest items behind, the next click on any orphaned item (per instance, scoped by `sceneDropId`) sweeps every item in that instance, tombstones the scene entry, and shows a dedicated drawer message. Admin and student see different copy. See **Orphan cleanup** below.
 
 ## Required Assets with Unique Names
 
@@ -50,31 +52,44 @@ Every data-object read goes through `initializeWorldDataObject`, `getKeyAsset`, 
 
 #### World (`scenes.${sceneDropId}`)
 
-Initialized on first `getWorldDetails`. `initializeWorldDataObject` also strips legacy fields (`itemsCollectedByUser`, `lastInteractionDate`, `sceneDropId`, `totalItemsCollected`) from any pre-existing scene.
+Minimal — only the `sceneDropId → keyAssetId` link lives here now, so two Quest instances in the same world can't share state through the world's scene map.
 
 ```ts
 {
   keyAssetId: string;
-  numberAllowedToCollect: number; // default 5
-  questItemImage: string; // default: https://topiaimages.s3.us-west-1.amazonaws.com/Ruby.png
 }
 ```
 
-On `DELETE /quest` the scene entry is overwritten with the string `"Removed from world on ${new Date()}"` (tombstone; not deleted).
+On `DELETE /quest` the scene entry is overwritten with the string `"Removed from world on ${new Date()}"` (tombstone; not deleted). The orphan-self-heal path writes the same tombstone when it detects a missing key asset.
+
+**Backwards-compatible read fallbacks.** Pre-this-change deployments carried `numberAllowedToCollect` and `questItemImage` on the scene entry. Legacy fields are **never deleted** by the new init path; every read path still does `keyAsset.{field} ?? world.scenes[sceneDropId].{field} ?? default`, so old worlds keep working with no admin intervention. The first `getKeyAsset` call seeds the key-asset dataObject with whatever the world had (or defaults), and the next admin save writes to the key asset for good. `initializeWorldDataObject` also backfills `keyAssetId` on legacy scenes without touching their config fields.
 
 #### Key Asset (DroppedAsset — the initial drop)
 
-Attached to `credentials.assetId`. Hosts the per-scene leaderboard.
+Attached to `credentials.assetId`. Hosts both the per-scene leaderboard **and** the per-instance game config (moved off the world's scene entry).
 
 ```ts
 {
-  questItemImage?: string;   // optional; used as fallback default at scene init
+  numberAllowedToCollect: number;  // default 5. Source of truth for admin settings.
+  questItemImage: string;          // default: https://topiaimages.s3.us-west-1.amazonaws.com/Ruby.png
   leaderboard: {
     // Pipe-delimited string, parsed by handleGetLeaderboard
     [profileId: string]: `${displayName}|${totalCollected}|${longestStreak}`;
   };
 }
 ```
+
+#### Dropped Quest Items
+
+Each dropped `webImageAsset` quest item carries a small dataObject used by the dup-click guard:
+
+```ts
+{
+  lastProcessedAt?: number; // epoch ms of the most recent successful click
+}
+```
+
+See **Dup-click guard** below.
 
 #### Visitor (`${urlSlug}-${sceneDropId}`)
 
@@ -109,6 +124,31 @@ Badges are ecosystem inventory items awarded via `visitor.grantInventoryItem`. `
 
 Every 50 items collected (`totalCollected % 50 === 0`) also triggers `visitor.grantExpression({ name: EMOTE_NAME })`. On HTTP 200 the app fires `firework2_gold` and a "🔎 New Emote Unlocked" toast; on 409 (already owned) it swaps in a "Congrats! You collected {N} quest items" toast.
 
+### Image uploads
+
+- `POST /api/uploads` takes the image as a base64 string in the JSON body. Server decodes, enforces `MAX_UPLOAD_BYTES = 2 MB`, and puts to `s3://${S3_BUCKET}/userUploads/{interactivePublicKey}/{filename}` (the ecosystem-scoped S3 convention used across Topia SDK apps — see `topia-sdk-apps/CLAUDE.md`).
+- Express's JSON body limit is raised from the 100 KB default to **4 MB** in `server/index.ts` so a ~2 MB image doesn't 413 before the controller's own friendlier size check can run.
+- `GET /api/uploads` lists objects under the ecosystem prefix for the admin picker; `DELETE /api/uploads` removes one.
+- `S3_BUCKET` defaults to `sdk-quest` (hardcoded fallback in `server/utils/s3.ts`), so a working install just needs AWS creds in the standard env.
+
+### Orphan cleanup
+
+If an admin manually deletes the key asset from the world but leaves quest items placed, those items become orphans — their `clickableLink` still fires `POST /quest-item-clicked`. The handler detects a missing key asset on the next click and performs a one-shot sweep scoped by `sceneDropId`:
+
+1. Delete every dropped asset whose `uniqueName` includes `questItem` in that scene.
+2. Overwrite `world.dataObject.scenes.${sceneDropId}` with the standard `"Removed from world on ${date}"` tombstone.
+3. Return a drawer message tailored to admin vs. student copy — admins get an actionable "set it up again" note; students get a soft "this quest is no longer available" message.
+
+This is instance-scoped: a second Quest instance in the same world (different `sceneDropId`) is untouched.
+
+### Dup-click guard
+
+Rapid repeat clicks on the same physical quest item (double-click, lag replays) could otherwise award two collections for one real action. The guard uses a time-window + lock on the dropped item itself:
+
+- Each quest item carries a `lastProcessedAt` in its own dataObject.
+- `handleQuestItemClicked` reads it, treats the click as a duplicate if `now - lastProcessedAt < CLICK_COOLDOWN_MS` (`3000ms`), and short-circuits.
+- A bucketed lockId (`questItem-click-${assetId}-${floor(now / CLICK_COOLDOWN_MS)}`) serializes concurrent requests inside the same window, so even a tie that passes the read check can't both commit.
+
 ### Real-time transport
 
 None. All updates are HTTP request/response; the client re-fetches `/quest` on mount and after mutations. No SSE, no websockets, no polling loop.
@@ -127,9 +167,12 @@ All routes mount under `/api`. Credentials (`assetId`, `interactiveNonce`, `inte
 | `POST`   | `/quest-item-clicked`                        | Core game logic. Increments streaks/totals, awards badges, teleports the item to a new random position, fires `lightBlueSmoke_puff`, writes to the leaderboard.    |
 | `POST`   | `/dropped-asset/remove-all-with-unique-name` | Deletes every quest item in the scene (calls `World.deleteDroppedAssets` in one batch).                                                                            |
 | `DELETE` | `/dropped-asset/:droppedAssetId`             | Deletes a single dropped asset by id.                                                                                                                              |
-| `POST`   | `/admin-settings`                            | Body: `{ numberAllowedToCollect, questItemImage }`. Updates the scene config, then rewrites `layer1` and `dataObject.questItemImage` on every existing quest item. |
+| `POST`   | `/admin-settings`                            | Body: `{ numberAllowedToCollect, questItemImage }`. Writes to the **key asset's** dataObject, then rewrites `layer1` and `dataObject.questItemImage` on every existing quest item. |
 | `PUT`    | `/visitor/move`                              | Body: `{ moveTo: { x, y }, shouldTeleportVisitor }`. Moves the calling visitor (used by the admin "Walk to Item" button).                                          |
 | `DELETE` | `/quest`                                     | Removes all quest items, tombstones `scenes.${sceneDropId}`, closes the drawer, fires a confirmation toast, and deletes the key asset.                             |
+| `POST`   | `/uploads`                                   | Admin image upload. Body: base64-encoded image + metadata. Writes to `s3://${S3_BUCKET}/userUploads/{interactivePublicKey}/`. Max 2 MB after decode. See **Image uploads** below. |
+| `GET`    | `/uploads`                                   | Lists everything uploaded to the ecosystem's prefix for the picker.                                                                                               |
+| `DELETE` | `/uploads`                                   | Deletes a single S3 object by key.                                                                                                                                |
 
 Response payloads are stripped of `topia`, `credentials`, `jwt`, and `requestOptions` fields by the `cleanReturnPayload` middleware before send.
 
@@ -179,7 +222,8 @@ Create a `.env` at the app root. See `.env-example` for a template.
 | `WEB_IMAGE_ASSET_ID`        | Asset id used as the base for every dropped quest item.                                                                                                                           | No (defaults to `webImageAsset`) |
 | `EMOTE_NAME`                | Emote granted at every 50-item milestone.                                                                                                                                         | No (defaults to `quest_1`)       |
 | `DEV_URL`                   | Base URL used to build quest-item `clickableLink`s when `NODE_ENV=development` (e.g., ngrok URL).                                                                                 | No                               |
-| `COMMIT_HASH`, `S3_BUCKET`  | Reported in `/system/health` only.                                                                                                                                                | No                               |
+| `COMMIT_HASH`               | Reported in `/system/health` only.                                                                                                                                                | No                               |
+| `S3_BUCKET`                 | Bucket for admin-uploaded quest-item images (`POST /uploads`). Objects go under `userUploads/{interactivePublicKey}/`. Also reported in `/system/health`.                        | No (defaults to `sdk-quest`)     |
 | `GOOGLESHEETS_CLIENT_EMAIL` | Google service account email for the completions log.                                                                                                                             | No                               |
 | `GOOGLESHEETS_PRIVATE_KEY`  | Google service account private key (`\n` escapes are un-escaped at boot).                                                                                                         | No                               |
 | `GOOGLESHEETS_SHEET_ID`     | Google Sheet id — when unset, `addNewRowToGoogleSheets` is a no-op.                                                                                                               | No                               |
@@ -227,7 +271,7 @@ npm run dev
 - **No server-side admin gating.** `handleGetQuestDetails` returns `visitor.isAdmin` to the client, which is used only to show/hide the settings cog in `PageContainer`. Every admin route (`/admin-settings`, `/drop-quest-item`, `/dropped-asset/*`, `/visitor/move`, `DELETE /quest`) will succeed for any authenticated visitor. If admin enforcement is intended, it needs to be wired.
 - **`sceneDropId` fallback:** everywhere in the server, `credentials.sceneDropId || credentials.assetId` is used. If the iframe launcher omits `sceneDropId`, the key asset id doubles as the scene id — this is why the world data-object shape is `scenes.${sceneDropId}` even for single-drop installs.
 - **Leaderboard is stored as a pipe-delimited string** (`${displayName}|${totalCollected}|${longestStreak}`) — cheap to update per profile but parsed on read by `handleGetLeaderboard`.
-- **Legacy scene-data cleanup:** `initializeWorldDataObject` strips `itemsCollectedByUser`, `lastInteractionDate`, `sceneDropId`, and `totalItemsCollected` from every scene on load. Safe no-op for new installs.
+- **Legacy world config is preserved, not stripped.** `initializeWorldDataObject` leaves pre-this-change scene fields (`numberAllowedToCollect`, `questItemImage`, and older bits like `itemsCollectedByUser`, `lastInteractionDate`, `totalItemsCollected`) in place. Reads fall back to them when the key asset's own copy is missing; the next admin save writes to the key asset for good. New scenes seed only `keyAssetId`.
 - **Ecosystem inventory cache** (`inventoryCache.ts`): 6-hour in-memory TTL with stale-fallback on error. `?forceRefreshInventory=true` on `/quest` busts it.
 - **`cleanReturnPayload` middleware** strips `topia`, `credentials`, `jwt`, and `requestOptions` from every JSON response before send.
 
