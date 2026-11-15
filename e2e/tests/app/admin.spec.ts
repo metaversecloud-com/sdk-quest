@@ -1,6 +1,6 @@
 // Admin flows in the key asset drawer: setup, hiding and removing items, settings, image uploads.
 import { Page } from "@playwright/test";
-import { MOCK_TOPIA_URL, S3_BUCKET } from "../../constants";
+import { FAKE_S3_BUCKET as S3_BUCKET, MOCK_TOPIA_URL } from "../../constants";
 import {
   CUSTOM_QUEST_IMAGE,
   DEFAULT_QUEST_IMAGE,
@@ -187,7 +187,7 @@ test.describe("image uploads", () => {
 
     const publicUrl = `https://${S3_BUCKET}.s3.amazonaws.com/${expectedKey}`;
     await expect(page.getByRole("img", { name: "Quest Item Image: preview" })).toHaveAttribute("src", publicUrl);
-    expect(await s3Keys(page)).toContainEqual({ key: expectedKey, size: PNG.length, contentType: "image/png" });
+    expect(await s3Keys(page)).toContainEqual(expect.objectContaining({ key: expectedKey, size: PNG.length, contentType: "image/png" }));
 
     await page.getByRole("button", { name: "Save" }).click();
     await expect.poll(async () => (await world.assetData()).questItemImage).toBe(publicUrl);

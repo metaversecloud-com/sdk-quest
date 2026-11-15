@@ -129,7 +129,7 @@ test.describe("milestones", () => {
 
     await collect(page, world);
 
-    expect(await world.events("particles")).toContainEqual(expect.objectContaining({ particleId: "particle-3", followPlayerId: VISITOR_ID }));
+    expect(await world.events("particles")).toContainEqual(expect.objectContaining({ particleName: "firework2_gold", followPlayerId: VISITOR_ID }));
     expect(await analytics(world)).toContain("quest_1-emoteUnlocked");
   });
 
@@ -137,7 +137,7 @@ test.describe("milestones", () => {
     test.fail(true, EMOTE_RESULT);
     await seedQuest(world, {
       badges: ["First Find"],
-      expressions: ["quest_1"],
+      visitor: { expressions: ["expression-quest_1"] },
       visitorData: { [world.progressKey]: progress({ totalCollected: 99, lastCollectedDate: day(0), totalCollectedToday: 1 }) },
     });
 

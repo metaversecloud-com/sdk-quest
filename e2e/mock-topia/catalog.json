@@ -1,0 +1,66 @@
+[
+  {
+    "id": "badge-1",
+    "name": "First Find",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "First Find badge",
+    "image_path": "https://example.invalid/badges/1.png"
+  },
+  {
+    "id": "badge-2",
+    "name": "3-Day Streak",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "3-Day Streak badge",
+    "image_path": "https://example.invalid/badges/2.png"
+  },
+  {
+    "id": "badge-3",
+    "name": "5-Day Streak",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "5-Day Streak badge",
+    "image_path": "https://example.invalid/badges/3.png"
+  },
+  {
+    "id": "badge-4",
+    "name": "Quest Veteran - Bronze",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "Quest Veteran - Bronze badge",
+    "image_path": "https://example.invalid/badges/4.png"
+  },
+  {
+    "id": "badge-5",
+    "name": "Quest Veteran - Silver",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "Quest Veteran - Silver badge",
+    "image_path": "https://example.invalid/badges/5.png"
+  },
+  {
+    "id": "badge-6",
+    "name": "Quest Veteran - Gold",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "Quest Veteran - Gold badge",
+    "image_path": "https://example.invalid/badges/6.png"
+  },
+  {
+    "id": "badge-7",
+    "name": "Quest Veteran - Diamond",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "Quest Veteran - Diamond badge",
+    "image_path": "https://example.invalid/badges/7.png"
+  },
+  {
+    "id": "badge-8",
+    "name": "Inventory Pro",
+    "type": "BADGE",
+    "status": "ACTIVE",
+    "description": "Inventory Pro badge",
+    "image_path": "https://example.invalid/badges/8.png"
+  }
+]
