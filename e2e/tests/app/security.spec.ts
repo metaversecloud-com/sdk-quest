@@ -66,9 +66,6 @@ test("a player can't count a non-quest asset as a find", async ({ page, world })
 });
 
 test("clicking the same item twice in a row counts once", async ({ page, world }) => {
-  // Known bug: the duplicate-click guard reads lastProcessedAt from questItem.dataObject, but
-  // DroppedAsset.get doesn't load the data object, so the 3 s window never applies.
-  test.fail(true, "EXP-435: duplicate-click guard never sees lastProcessedAt");
   await seedQuest(world, { badges: ["First Find"] });
 
   for (let i = 0; i < 2; i++) {

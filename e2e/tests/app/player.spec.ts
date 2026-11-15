@@ -80,7 +80,7 @@ test.describe("clicking a quest item", () => {
       expect.objectContaining({ assetId: ITEM, clickableLink: expect.stringMatching(/\/quest-item-clicked\/\?lastMoved=\d+$/) }),
     );
     expect(await world.events("particles")).toContainEqual(
-      expect.objectContaining({ particleId: "particle-1", position: ITEM_POSITION }),
+      expect.objectContaining({ particleName: "lightBlueSmoke_puff", position: ITEM_POSITION }),
     );
 
     const analytics = (await world.events("analytics")).map((a) => a.analyticName);
@@ -103,7 +103,7 @@ test.describe("clicking a quest item", () => {
     await expect(page.getByText("5/5 collected today")).toBeVisible();
     expect(await world.progress()).toMatchObject({ totalCollected: 5, totalCollectedToday: 5 });
     expect(await world.events("particles")).toContainEqual(
-      expect.objectContaining({ particleId: "particle-2", followPlayerId: VISITOR_ID }),
+      expect.objectContaining({ particleName: "redPinkHeart_float", followPlayerId: VISITOR_ID }),
     );
     expect(await world.events("grant-item")).toEqual([expect.objectContaining({ name: "Inventory Pro" })]);
     expect((await world.events("analytics")).map((a) => a.analyticName)).toContain("completions");
