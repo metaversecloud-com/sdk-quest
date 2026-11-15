@@ -770,7 +770,9 @@ const routes = [
       if (!visitor || !expression) return [404, { message: "Visitor or expression not found" }];
       // Owned expressions are ids in visitor.expressions; like the public API, granting one twice is a 409.
       visitor.expressions ||= [];
-      if (visitor.expressions.includes(expressionId)) return [409, { message: "Expression already granted" }];
+      // Quest: grantUserExpression returns its ApiError instead of throwing, so a repeat grant answers 200
+      // with the serialized error (only its own field, statusCode, survives JSON.stringify).
+      if (visitor.expressions.includes(expressionId)) return [200, { statusCode: 409 }];
       visitor.expressions.push(expressionId);
       world.events.push({ type: "grant-expression", visitorId: id, expressionId, name: expression.name });
       return [200, { success: true }];
