@@ -65,10 +65,6 @@ export type RouteSpec = {
   knownBugs?: KnownBugs;
 };
 
-// getCredentials (protected file) returns { error } instead of throwing, so every route that
-// uses it has this bug until it's fixed there.
-const GET_CREDENTIALS_DOESNT_THROW = "EXP-428 #6: getCredentials doesn't throw";
-
 /**
  * API routes that read the session credentials (getCredentials). Each one must reject missing or
  * foreign credentials and must never send the interactive secret to the browser. List them all.
@@ -77,50 +73,27 @@ const GET_CREDENTIALS_DOESNT_THROW = "EXP-428 #6: getCredentials doesn't throw";
  * the platform tests can't read its body and time out. Cover an SSE route's credential checks in
  * tests/app instead (open it with page.request or fetch + AbortController and check the status).
  */
-// Known bug, tracked in EXP-435: the upload routes only talk to S3, so with getCredentials not throwing
-// (EXP-428 #6) they upload and list without valid credentials.
-const UNGUARDED = "EXP-435: upload routes work without valid credentials";
-
 // 1x1 transparent PNG, small enough for every upload test.
 const PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-const UNNAMED = { unnamedCredentialError: GET_CREDENTIALS_DOESNT_THROW };
-
 export const CREDENTIALED_ROUTES: RouteSpec[] = [
-  { method: "get", path: "/quest", knownBugs: UNNAMED },
-  { method: "get", path: "/leaderboard", knownBugs: UNNAMED },
-  { method: "get", path: "/quest-items", knownBugs: UNNAMED },
-  // server/index.ts registers the cleanReturnPayload scrubber after the API routes, so it never runs: POST
-  // /drop-quest-item returns the raw DroppedAsset, secret included (GET /quest-items too once items exist, see
-  // tests/app/security.spec.ts).
-  {
-    method: "post",
-    path: "/drop-quest-item",
-    knownBugs: { ...UNNAMED, leaksSecret: "EXP-429: cleanReturnPayload is registered after the routes (server/index.ts)" },
-  },
-  { method: "post", path: "/quest-item-clicked", knownBugs: UNNAMED },
-  { method: "post", path: "/dropped-asset/remove-all-with-unique-name", knownBugs: UNNAMED },
-  { method: "delete", path: "/dropped-asset/quest-item-1", knownBugs: UNNAMED },
+  { method: "get", path: "/quest" },
+  { method: "get", path: "/leaderboard" },
+  { method: "get", path: "/quest-items" },
+  { method: "post", path: "/drop-quest-item" },
+  { method: "post", path: "/quest-item-clicked" },
+  { method: "post", path: "/dropped-asset/remove-all-with-unique-name" },
+  { method: "delete", path: "/dropped-asset/quest-item-1" },
   {
     method: "post",
     path: "/admin-settings",
     data: { numberAllowedToCollect: 3, questItemImage: "https://example.invalid/q.png" },
-    knownBugs: UNNAMED,
   },
-  { method: "put", path: "/visitor/move", data: { moveTo: { x: 10, y: 20 } }, knownBugs: UNNAMED },
-  { method: "delete", path: "/quest", knownBugs: UNNAMED },
-  {
-    method: "post",
-    path: "/uploads",
-    data: { filename: "gem.png", contentType: "image/png", data: PNG },
-    knownBugs: { ...UNNAMED, acceptsMissingCredentials: UNGUARDED, acceptsForeignCredentials: UNGUARDED },
-  },
-  {
-    method: "get",
-    path: "/uploads",
-    knownBugs: { ...UNNAMED, acceptsMissingCredentials: UNGUARDED, acceptsForeignCredentials: UNGUARDED },
-  },
-  { method: "delete", path: "/uploads", data: { key: "userUploads/e2e-public-key/nobody_gem.png" }, knownBugs: UNNAMED },
+  { method: "put", path: "/visitor/move", data: { moveTo: { x: 10, y: 20 } } },
+  { method: "delete", path: "/quest" },
+  { method: "post", path: "/uploads", data: { filename: "gem.png", contentType: "image/png", data: PNG } },
+  { method: "get", path: "/uploads" },
+  { method: "delete", path: "/uploads", data: { key: "userUploads/e2e-public-key/nobody_gem.png" } },
 ];
 
 /**
@@ -177,10 +150,7 @@ export const HEALTH_KNOWN_BUGS: { incompleteContract?: string } = {};
  * registers its own logging handler. Fix: process.removeAllListeners("unhandledRejection") before
  * registering the app's handler.
  */
-export const PROCESS_KNOWN_BUGS: { exitsOnUnhandledRejection?: string } = {
-  exitsOnUnhandledRejection:
-    "EXP-472: @rtsdk/topia's unhandledRejection hook calls process.exit(1); server/index.ts's handler doesn't stop it",
-};
+export const PROCESS_KNOWN_BUGS: { exitsOnUnhandledRejection?: string } = {};
 
 /**
  * The request system.spec sends a malformed JSON body to. Default: the first POST/PUT route in
@@ -196,10 +166,7 @@ export const MALFORMED_JSON_REQUEST: { method: "post" | "put"; path: string } | 
  * middleware after express.json()). Fix: an error middleware that answers body-parser errors
  * (err.type === "entity.parse.failed") with res.status(400).json({ success: false, error: "Invalid JSON" }).
  */
-export const ERROR_KNOWN_BUGS: { malformedJson?: string } = {
-  malformedJson:
-    "EXP-473: no error middleware: Express' default error page shows the stack trace (NODE_ENV isn't production)",
-};
+export const ERROR_KNOWN_BUGS: { malformedJson?: string } = {};
 
 /**
  * true starts mock-redis/server.mjs (an in-memory Redis) next to mock-topia and points REDIS_URL at it
