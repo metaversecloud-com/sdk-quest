@@ -122,9 +122,6 @@ test("a request signed for another app's public key changes nothing", async ({ p
 });
 
 test("the admin item list never carries the interactive secret", async ({ page, world }) => {
-  // Same root cause as the platform secrets test (EXP-429): GET /quest-items returns raw DroppedAsset
-  // objects, each with topia.interactiveSecret and a signed InteractiveJWT.
-  test.fail(true, "EXP-429: cleanReturnPayload is registered after the routes (server/index.ts)");
   await seedQuest(world, { isAdmin: true });
 
   const body = await (await page.request.get(world.api("/quest-items"))).text();
